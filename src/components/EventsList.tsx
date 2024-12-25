@@ -7,6 +7,9 @@ const events = [
   { name: "Exercise", time: "1h 30m", color: "bg-green-500" },
   { name: "Hobbies", time: "45m", color: "bg-cyan-500" },
   { name: "Socializing", time: "1h", color: "bg-yellow-500" },
+  { name: "Education", time: "30m", color: "bg-red-500" },
+  { name: "Side project", time: "1h 15m", color: "bg-pink-500" },
+  { name: "Reading", time: "45m", color: "bg-orange-500" },
 ];
 
 export function EventsList({ onTimeUpdate }: { onTimeUpdate?: (activity: string, time: number) => void }) {
@@ -19,7 +22,7 @@ export function EventsList({ onTimeUpdate }: { onTimeUpdate?: (activity: string,
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       {events.map((event, index) => (
         <ActivityCard
           key={index}

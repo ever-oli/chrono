@@ -19,22 +19,22 @@ export function ActivityCard({
     <button
       onClick={onClick}
       className={cn(
-        "relative w-full rounded-lg border p-4 text-left transition-colors",
+        "relative w-full rounded-lg border p-3 text-left transition-colors",
         isActive ? "bg-accent/20" : "hover:bg-accent/10",
         "group flex items-center justify-between"
       )}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <div 
           className={cn(
             "h-4 w-1 rounded-full",
             color
           )} 
         />
-        <span className="font-medium">{name}</span>
+        <span className="font-medium text-sm">{name}</span>
       </div>
       {time && (
-        <span className="text-sm text-muted-foreground">{time}</span>
+        <span className="text-xs text-muted-foreground">{time}</span>
       )}
     </button>
   );
