@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { TimelineChart } from "@/components/TimelineChart";
 import { EventsList } from "@/components/EventsList";
 import { Plus, Timer } from "lucide-react";
+import { Timer as TimerComponent } from "@/components/Timer";
 
 export default function Index() {
   return (
@@ -20,10 +21,7 @@ export default function Index() {
             <h2 className="text-lg font-semibold">Active Timer</h2>
           </div>
           <div className="rounded-lg border p-4">
-            <div className="text-center">
-              <span className="text-3xl font-bold">00:00:00</span>
-              <p className="text-sm text-muted-foreground">No active timer</p>
-            </div>
+            <TimerComponent />
           </div>
         </div>
 

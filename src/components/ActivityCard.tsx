@@ -5,14 +5,22 @@ interface ActivityCardProps {
   time?: string;
   color: string;
   onClick?: () => void;
+  isActive?: boolean;
 }
 
-export function ActivityCard({ name, time, color, onClick }: ActivityCardProps) {
+export function ActivityCard({ 
+  name, 
+  time, 
+  color, 
+  onClick,
+  isActive 
+}: ActivityCardProps) {
   return (
     <button
       onClick={onClick}
       className={cn(
-        "relative w-full rounded-lg border p-4 text-left transition-colors hover:bg-accent/10",
+        "relative w-full rounded-lg border p-4 text-left transition-colors",
+        isActive ? "bg-accent/20" : "hover:bg-accent/10",
         "group flex items-center justify-between"
       )}
     >

@@ -1,0 +1,64 @@
+import { useState, useEffect } from "react";
+import { Button } from "./ui/button";
+import { Play, Pause, RefreshCw } from "lucide-react";
+import { useToast } from "./ui/use-toast";
+
+export function Timer({ activity }: { activity?: string }) {
+  const [time, setTime] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    let intervalId: number;
+    if (isRunning) {
+      intervalId = window.setInterval(() => {
+        setTime((time) => time + 1);
+      }, 1000);
+    }
+    return () => clearInterval(intervalId);
+  }, [isRunning]);
+
+  const handleStartStop = () => {
+    setIsRunning(!isRunning);
+    toast({
+      title: !isRunning ? "Timer Started" : "Timer Paused",
+      description: activity ? `For activity: ${activity}` : undefined,
+    });
+  };
+
+  const handleReset = () => {
+    setIsRunning(false);
+    setTime(0);
+    toast({
+      title: "Timer Reset",
+      description: activity ? `For activity: ${activity}` : undefined,
+    });
+  };
+
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="text-4xl font-mono font-bold">{formatTime(time)}</div>
+      <div className="flex justify-center gap-2">
+        <Button
+          variant={isRunning ? "destructive" : "default"}
+          size="icon"
+          onClick={handleStartStop}
+        >
+          {isRunning ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+        </Button>
+        <Button variant="outline" size="icon" onClick={handleReset}>
+          <RefreshCw className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}

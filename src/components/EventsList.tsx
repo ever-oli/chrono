@@ -1,4 +1,6 @@
 import { ActivityCard } from "./ActivityCard";
+import { useState } from "react";
+import { Timer } from "./Timer";
 
 const events = [
   { name: "Morning Work", time: "2h 13m", color: "bg-purple-500" },
@@ -8,6 +10,8 @@ const events = [
 ];
 
 export function EventsList() {
+  const [activeEvent, setActiveEvent] = useState<string | null>(null);
+
   return (
     <div className="space-y-2">
       {events.map((event, index) => (
@@ -16,8 +20,15 @@ export function EventsList() {
           name={event.name}
           time={event.time}
           color={event.color}
+          isActive={activeEvent === event.name}
+          onClick={() => setActiveEvent(event.name)}
         />
       ))}
+      {activeEvent && (
+        <div className="mt-4">
+          <Timer activity={activeEvent} />
+        </div>
+      )}
     </div>
   );
 }
