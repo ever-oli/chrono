@@ -3,8 +3,17 @@ import { TimelineChart } from "@/components/TimelineChart";
 import { EventsList } from "@/components/EventsList";
 import { Plus, Timer } from "lucide-react";
 import { Timer as TimerComponent } from "@/components/Timer";
+import { useState } from "react";
 
 export default function Index() {
+  const [activeActivity, setActiveActivity] = useState<string>();
+  const [activeTime, setActiveTime] = useState<number>();
+
+  const handleTimeUpdate = (activity: string, time: number) => {
+    setActiveActivity(activity);
+    setActiveTime(time);
+  };
+
   return (
     <div className="container mx-auto p-4 space-y-8">
       <div className="flex items-center justify-between">
@@ -27,13 +36,13 @@ export default function Index() {
 
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Time Distribution</h2>
-          <TimelineChart />
+          <TimelineChart activeActivity={activeActivity} activeTime={activeTime} />
         </div>
       </div>
 
       <div className="space-y-4">
         <h2 className="text-lg font-semibold">Recent Activities</h2>
-        <EventsList />
+        <EventsList onTimeUpdate={handleTimeUpdate} />
       </div>
     </div>
   );

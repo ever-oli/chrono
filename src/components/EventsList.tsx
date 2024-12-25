@@ -3,14 +3,20 @@ import { useState } from "react";
 import { Timer } from "./Timer";
 
 const events = [
-  { name: "Morning Work", time: "2h 13m", color: "bg-purple-500" },
-  { name: "Gym Session", time: "1h 30m", color: "bg-green-500" },
-  { name: "Reading", time: "45m", color: "bg-cyan-500" },
-  { name: "Team Meeting", time: "1h", color: "bg-yellow-500" },
+  { name: "Work", time: "2h 13m", color: "bg-purple-500" },
+  { name: "Exercise", time: "1h 30m", color: "bg-green-500" },
+  { name: "Hobbies", time: "45m", color: "bg-cyan-500" },
+  { name: "Socializing", time: "1h", color: "bg-yellow-500" },
 ];
 
-export function EventsList() {
+export function EventsList({ onTimeUpdate }: { onTimeUpdate?: (activity: string, time: number) => void }) {
   const [activeEvent, setActiveEvent] = useState<string | null>(null);
+
+  const handleTimeUpdate = (time: number) => {
+    if (activeEvent) {
+      onTimeUpdate?.(activeEvent, time);
+    }
+  };
 
   return (
     <div className="space-y-2">
@@ -26,7 +32,7 @@ export function EventsList() {
       ))}
       {activeEvent && (
         <div className="mt-4">
-          <Timer activity={activeEvent} />
+          <Timer activity={activeEvent} onTimeUpdate={handleTimeUpdate} />
         </div>
       )}
     </div>

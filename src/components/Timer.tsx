@@ -3,7 +3,12 @@ import { Button } from "./ui/button";
 import { Play, Pause, RefreshCw } from "lucide-react";
 import { useToast } from "./ui/use-toast";
 
-export function Timer({ activity }: { activity?: string }) {
+interface TimerProps {
+  activity?: string;
+  onTimeUpdate?: (time: number) => void;
+}
+
+export function Timer({ activity, onTimeUpdate }: TimerProps) {
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const { toast } = useToast();
@@ -12,11 +17,15 @@ export function Timer({ activity }: { activity?: string }) {
     let intervalId: number;
     if (isRunning) {
       intervalId = window.setInterval(() => {
-        setTime((time) => time + 1);
+        setTime((time) => {
+          const newTime = time + 1;
+          onTimeUpdate?.(newTime);
+          return newTime;
+        });
       }, 1000);
     }
     return () => clearInterval(intervalId);
-  }, [isRunning]);
+  }, [isRunning, onTimeUpdate]);
 
   const handleStartStop = () => {
     setIsRunning(!isRunning);
@@ -29,6 +38,7 @@ export function Timer({ activity }: { activity?: string }) {
   const handleReset = () => {
     setIsRunning(false);
     setTime(0);
+    onTimeUpdate?.(0);
     toast({
       title: "Timer Reset",
       description: activity ? `For activity: ${activity}` : undefined,

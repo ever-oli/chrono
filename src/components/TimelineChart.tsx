@@ -1,16 +1,43 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
+import { useEffect, useState } from "react";
 
-const data = [
-  { name: "Work", value: 34, color: "bg-purple-500" },
-  { name: "Exercise", value: 23, color: "bg-green-500" },
-  { name: "Hobbies", value: 18, color: "bg-cyan-500" },
-  { name: "Socializing", value: 15, color: "bg-yellow-500" },
-  { name: "Education", value: 10, color: "bg-red-500" },
+interface TimeData {
+  name: string;
+  value: number;
+  color: string;
+}
+
+const initialData: TimeData[] = [
+  { name: "Work", value: 34, color: "#9333EA" },
+  { name: "Exercise", value: 23, color: "#22C55E" },
+  { name: "Hobbies", value: 18, color: "#06B6D4" },
+  { name: "Socializing", value: 15, color: "#EAB308" },
+  { name: "Education", value: 10, color: "#EF4444" },
 ];
 
-const COLORS = ["#9333EA", "#22C55E", "#06B6D4", "#EAB308", "#EF4444"];
+export function TimelineChart({ activeActivity, activeTime }: { activeActivity?: string; activeTime?: number }) {
+  const [data, setData] = useState<TimeData[]>(initialData);
 
-export function TimelineChart() {
+  useEffect(() => {
+    if (activeActivity && activeTime) {
+      setData(prevData => {
+        const newData = [...prevData];
+        const activityIndex = newData.findIndex(item => item.name === activeActivity);
+        
+        if (activityIndex !== -1) {
+          // Convert seconds to same unit as other values (assuming they're in minutes)
+          const timeInMinutes = Math.floor(activeTime / 60);
+          newData[activityIndex] = {
+            ...newData[activityIndex],
+            value: timeInMinutes
+          };
+        }
+        
+        return newData;
+      });
+    }
+  }, [activeActivity, activeTime]);
+
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -25,7 +52,7 @@ export function TimelineChart() {
             dataKey="value"
           >
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
           <Legend />
