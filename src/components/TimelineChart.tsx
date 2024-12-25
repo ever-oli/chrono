@@ -1,4 +1,4 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { useEffect, useState } from "react";
 
 interface TimeData {
@@ -38,6 +38,12 @@ export function TimelineChart({ activeActivity, activeTime }: { activeActivity?:
     }
   }, [activeActivity, activeTime]);
 
+  const formatTooltip = (value: number) => {
+    const hours = Math.floor(value / 60);
+    const minutes = value % 60;
+    return `${hours}h ${minutes}m`;
+  };
+
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -55,6 +61,7 @@ export function TimelineChart({ activeActivity, activeTime }: { activeActivity?:
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
+          <Tooltip formatter={formatTooltip} />
           <Legend />
         </PieChart>
       </ResponsiveContainer>

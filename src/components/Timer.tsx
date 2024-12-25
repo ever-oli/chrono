@@ -11,6 +11,7 @@ interface TimerProps {
 export function Timer({ activity, onTimeUpdate }: TimerProps) {
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
+  const [totalContributed, setTotalContributed] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -29,10 +30,18 @@ export function Timer({ activity, onTimeUpdate }: TimerProps) {
 
   const handleStartStop = () => {
     setIsRunning(!isRunning);
-    toast({
-      title: !isRunning ? "Timer Started" : "Timer Paused",
-      description: activity ? `For activity: ${activity}` : undefined,
-    });
+    if (!isRunning) {
+      toast({
+        title: "Timer Started",
+        description: activity ? `Tracking time for: ${activity}` : undefined,
+      });
+    } else {
+      setTotalContributed(prev => prev + time);
+      toast({
+        title: "Timer Paused",
+        description: activity ? `Total time contributed to ${activity}: ${formatTime(totalContributed + time)}` : undefined,
+      });
+    }
   };
 
   const handleReset = () => {
@@ -41,7 +50,7 @@ export function Timer({ activity, onTimeUpdate }: TimerProps) {
     onTimeUpdate?.(0);
     toast({
       title: "Timer Reset",
-      description: activity ? `For activity: ${activity}` : undefined,
+      description: activity ? `Timer reset for: ${activity}` : undefined,
     });
   };
 
@@ -56,7 +65,17 @@ export function Timer({ activity, onTimeUpdate }: TimerProps) {
 
   return (
     <div className="space-y-4">
+      {activity && (
+        <div className="text-sm text-muted-foreground">
+          Currently tracking: <span className="font-medium text-foreground">{activity}</span>
+        </div>
+      )}
       <div className="text-4xl font-mono font-bold">{formatTime(time)}</div>
+      {totalContributed > 0 && (
+        <div className="text-sm text-muted-foreground">
+          Total time contributed: {formatTime(totalContributed)}
+        </div>
+      )}
       <div className="flex justify-center gap-2">
         <Button
           variant={isRunning ? "destructive" : "default"}
