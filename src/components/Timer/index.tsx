@@ -70,13 +70,11 @@ export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: Ti
           .from('time_entries')
           .insert([timeEntry]);
 
-        if (error) {
-          console.error('Error saving time entry:', error);
-          return;
+        // Only update if there was no error
+        if (!error) {
+          await onSecondsUpdate(id, elapsedSeconds);
+          queryClient.invalidateQueries({ queryKey: ['timers'] });
         }
-
-        await onSecondsUpdate(id, elapsedSeconds);
-        queryClient.invalidateQueries({ queryKey: ['timers'] });
       }
       setIsRunning(false);
     }
