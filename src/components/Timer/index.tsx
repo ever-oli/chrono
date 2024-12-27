@@ -46,11 +46,22 @@ export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: Ti
   }, [isRunning]);
 
   const toggleTimer = async () => {
+    const now = new Date();
+    
     if (!isRunning) {
-      setStartTime(new Date());
+      setStartTime(now);
     } else {
       if (startTime) {
-        const elapsedSeconds = Math.floor((new Date().getTime() - startTime.getTime()) / 1000);
+        const elapsedSeconds = Math.floor((now.getTime() - startTime.getTime()) / 1000);
+        
+        // Ensure proper timestamp ordering
+        const timeEntry = {
+          timer_id: id,
+          seconds: elapsedSeconds,
+          started_at: startTime.toISOString(),
+          ended_at: now.toISOString()
+        };
+        
         await onSecondsUpdate(id, elapsedSeconds);
         queryClient.invalidateQueries({ queryKey: ['timers'] });
       }
