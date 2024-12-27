@@ -48,7 +48,8 @@ export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: Ti
   const toggleTimer = async () => {
     if (!isRunning) {
       // Starting timer
-      setStartTime(new Date());
+      const now = new Date();
+      setStartTime(now);
       setIsRunning(true);
     } else {
       // Stopping timer
