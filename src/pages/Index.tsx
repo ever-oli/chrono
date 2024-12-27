@@ -22,7 +22,7 @@ export default function Index() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch timers
+  // Fetch timers with real-time updates
   const { data: timers = [] } = useQuery({
     queryKey: ['timers'],
     queryFn: async () => {
@@ -43,7 +43,9 @@ export default function Index() {
         color: timer.color,
         seconds: timer.time_entries?.reduce((acc: number, entry: any) => acc + entry.seconds, 0) || 0
       }));
-    }
+    },
+    // Refresh data every 5 seconds to keep analytics up to date
+    refetchInterval: 5000
   });
 
   // Add timer mutation
@@ -133,8 +135,34 @@ export default function Index() {
         description: "Failed to update timer: " + error.message,
         variant: "destructive",
       });
+    } else {
+      // Invalidate queries to refresh analytics
+      queryClient.invalidateQueries({ queryKey: ['timers'] });
     }
   };
+
+  // Set up real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('time_entries_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'time_entries'
+        },
+        () => {
+          // Refresh data when time entries change
+          queryClient.invalidateQueries({ queryKey: ['timers'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   return (
     <div className="container max-w-2xl mx-auto p-4 space-y-6">

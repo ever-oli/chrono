@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface TimerProps {
   id: string;
@@ -15,6 +16,7 @@ export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: Ti
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     // Load initial seconds from time_entries
@@ -57,6 +59,8 @@ export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: Ti
       if (startTime) {
         const elapsedSeconds = Math.floor((new Date().getTime() - startTime.getTime()) / 1000);
         await onSecondsUpdate(id, elapsedSeconds);
+        // Invalidate queries to refresh analytics
+        queryClient.invalidateQueries({ queryKey: ['timers'] });
       }
     }
     setIsRunning(!isRunning);
