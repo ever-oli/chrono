@@ -56,6 +56,11 @@ export default function Index() {
     }
   };
 
+  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setSelectedColor(e.target.value);
+  };
+
   const handleDeleteActivity = (id: string) => {
     setActivities(activities.filter(activity => activity.id !== id));
     setTimers(prev => {
@@ -133,7 +138,8 @@ export default function Index() {
                   id="activity-color"
                   type="color"
                   value={selectedColor}
-                  onChange={(e) => setSelectedColor(e.target.value)}
+                  onChange={handleColorChange}
+                  onClick={(e) => e.stopPropagation()}
                   className="h-10 w-20 cursor-pointer"
                 />
                 <div style={{ backgroundColor: selectedColor }} className="h-10 w-4 rounded-full" />
