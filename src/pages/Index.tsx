@@ -76,7 +76,7 @@ export default function Index() {
                   onChange={(e) => setSelectedColor(e.target.value)}
                   className="h-10 w-20"
                 />
-                <div style={{ backgroundColor: selectedColor }} className="h-10 w-2 rounded-full" />
+                <div style={{ backgroundColor: selectedColor }} className="h-10 w-4 rounded-full" />
               </div>
             </div>
           </div>
@@ -89,7 +89,7 @@ export default function Index() {
           <div key={activity.id} className="flex items-start gap-4 p-4 border rounded-lg relative overflow-hidden">
             <div 
               style={{ backgroundColor: activity.color }} 
-              className="absolute left-0 top-0 bottom-0 w-1.5" 
+              className="absolute left-0 top-0 bottom-0 w-4" 
             />
             <div className="flex-1 pl-3">
               <div className="flex items-center gap-2 mb-2">
