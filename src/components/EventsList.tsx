@@ -1,6 +1,7 @@
 import { ActivityCard } from "./ActivityCard";
 import { useState } from "react";
 import { Timer } from "./Timer";
+import { useToast } from "./ui/use-toast";
 
 const events = [
   { name: "Work", time: "2h 13m", color: "bg-purple-500" },
@@ -14,6 +15,23 @@ const events = [
 
 export function EventsList({ onTimeUpdate }: { onTimeUpdate?: (activity: string, time: number) => void }) {
   const [activeEvent, setActiveEvent] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handleEventSelect = (eventName: string) => {
+    if (activeEvent === eventName) {
+      setActiveEvent(null);
+      toast({
+        title: "Timer Stopped",
+        description: `Stopped tracking: ${eventName}`,
+      });
+    } else {
+      setActiveEvent(eventName);
+      toast({
+        title: "Timer Started",
+        description: `Now tracking: ${eventName}`,
+      });
+    }
+  };
 
   const handleTimeUpdate = (time: number) => {
     if (activeEvent) {
@@ -30,7 +48,7 @@ export function EventsList({ onTimeUpdate }: { onTimeUpdate?: (activity: string,
           time={event.time}
           color={event.color}
           isActive={activeEvent === event.name}
-          onClick={() => setActiveEvent(event.name)}
+          onClick={() => handleEventSelect(event.name)}
         />
       ))}
       {activeEvent && (

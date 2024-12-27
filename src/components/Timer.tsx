@@ -28,6 +28,13 @@ export function Timer({ activity, onTimeUpdate }: TimerProps) {
     return () => clearInterval(intervalId);
   }, [isRunning, onTimeUpdate]);
 
+  useEffect(() => {
+    // Reset timer when activity changes
+    setTime(0);
+    setIsRunning(false);
+    setTotalContributed(0);
+  }, [activity]);
+
   const handleStartStop = () => {
     setIsRunning(!isRunning);
     if (!isRunning) {
