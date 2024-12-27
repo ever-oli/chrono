@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import Timer from "@/components/Timer";
 import Analytics from "@/components/Analytics";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface TimerData {
   id: string;
@@ -13,36 +16,124 @@ interface TimerData {
 }
 
 export default function Index() {
-  const [timers, setTimers] = useState<TimerData[]>([]);
   const [showNewTimer, setShowNewTimer] = useState(false);
   const [newTimerName, setNewTimerName] = useState("");
   const [selectedColor, setSelectedColor] = useState("#2D2D2D");
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch timers
+  const { data: timers = [] } = useQuery({
+    queryKey: ['timers'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('timers')
+        .select(`
+          id,
+          name,
+          color,
+          time_entries (seconds)
+        `);
+      
+      if (error) throw error;
+      
+      return data.map(timer => ({
+        id: timer.id,
+        name: timer.name,
+        color: timer.color,
+        seconds: timer.time_entries?.reduce((acc: number, entry: any) => acc + entry.seconds, 0) || 0
+      }));
+    }
+  });
+
+  // Add timer mutation
+  const addTimerMutation = useMutation({
+    mutationFn: async (newTimer: { name: string; color: string }) => {
+      const { data, error } = await supabase
+        .from('timers')
+        .insert([newTimer])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['timers'] });
+      toast({
+        title: "Timer created",
+        description: "Your new timer has been created successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to create timer: " + error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Delete timer mutation
+  const deleteTimerMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('timers')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['timers'] });
+      toast({
+        title: "Timer deleted",
+        description: "Timer has been deleted successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to delete timer: " + error.message,
+        variant: "destructive",
+      });
+    }
+  });
 
   const addTimer = (e: React.FormEvent) => {
     e.preventDefault();
     if (newTimerName.trim()) {
-      setTimers([
-        ...timers,
-        {
-          id: crypto.randomUUID(),
-          name: newTimerName.trim(),
-          color: selectedColor,
-          seconds: 0,
-        }
-      ]);
+      addTimerMutation.mutate({
+        name: newTimerName.trim(),
+        color: selectedColor,
+      });
       setNewTimerName("");
       setShowNewTimer(false);
     }
   };
 
   const deleteTimer = (id: string) => {
-    setTimers(timers.filter(timer => timer.id !== id));
+    deleteTimerMutation.mutate(id);
   };
 
-  const updateTimerSeconds = (id: string, seconds: number) => {
-    setTimers(timers.map(timer => 
-      timer.id === id ? { ...timer, seconds } : timer
-    ));
+  const updateTimerSeconds = async (id: string, seconds: number) => {
+    const { error } = await supabase
+      .from('time_entries')
+      .insert([
+        { 
+          timer_id: id,
+          seconds: seconds,
+          ended_at: new Date().toISOString()
+        }
+      ]);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update timer: " + error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -87,7 +178,7 @@ export default function Index() {
             name={timer.name}
             color={timer.color}
             onDelete={deleteTimer}
-            onSecondsUpdate={(seconds) => updateTimerSeconds(timer.id, seconds)}
+            onSecondsUpdate={updateTimerSeconds}
           />
         ))}
         {timers.length === 0 && (

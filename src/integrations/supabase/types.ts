@@ -9,7 +9,62 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      time_entries: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          id: string
+          seconds: number
+          started_at: string
+          timer_id: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          seconds?: number
+          started_at?: string
+          timer_id: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          seconds?: number
+          started_at?: string
+          timer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_entries_timer_id_fkey"
+            columns: ["timer_id"]
+            isOneToOne: false
+            referencedRelation: "timers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      timers: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

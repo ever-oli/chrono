@@ -1,34 +1,64 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, Trash2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TimerProps {
   id: string;
   name: string;
   color: string;
   onDelete: (id: string) => void;
-  onSecondsUpdate: (seconds: number) => void;
+  onSecondsUpdate: (id: string, seconds: number) => void;
 }
 
 export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: TimerProps) {
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
+  const [startTime, setStartTime] = useState<Date | null>(null);
+
+  useEffect(() => {
+    // Load initial seconds from time_entries
+    const loadInitialSeconds = async () => {
+      const { data, error } = await supabase
+        .from('time_entries')
+        .select('seconds')
+        .eq('timer_id', id);
+      
+      if (!error && data) {
+        const totalSeconds = data.reduce((acc, entry) => acc + entry.seconds, 0);
+        setSeconds(totalSeconds);
+      }
+    };
+
+    loadInitialSeconds();
+  }, [id]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
+    
     if (isRunning) {
       interval = setInterval(() => {
         setSeconds((prev) => {
           const newSeconds = prev + 1;
-          onSecondsUpdate(newSeconds);
           return newSeconds;
         });
       }, 1000);
     }
+    
     return () => clearInterval(interval);
-  }, [isRunning, onSecondsUpdate]);
+  }, [isRunning]);
 
-  const toggleTimer = () => {
+  const toggleTimer = async () => {
+    if (!isRunning) {
+      // Starting timer
+      setStartTime(new Date());
+    } else {
+      // Stopping timer
+      if (startTime) {
+        const elapsedSeconds = Math.floor((new Date().getTime() - startTime.getTime()) / 1000);
+        await onSecondsUpdate(id, elapsedSeconds);
+      }
+    }
     setIsRunning(!isRunning);
   };
 
