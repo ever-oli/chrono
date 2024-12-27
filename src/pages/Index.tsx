@@ -25,7 +25,7 @@ export default function Index() {
         { 
           id: crypto.randomUUID(), 
           name: newActivity.trim(),
-          color: `bg-[${selectedColor}]`
+          color: selectedColor
         }
       ]);
       setNewActivity("");
@@ -76,7 +76,7 @@ export default function Index() {
                   onChange={(e) => setSelectedColor(e.target.value)}
                   className="h-10 w-20"
                 />
-                <div className={`h-10 w-2 rounded-full bg-[${selectedColor}]`} />
+                <div style={{ backgroundColor: selectedColor }} className="h-10 w-2 rounded-full" />
               </div>
             </div>
           </div>
@@ -87,7 +87,10 @@ export default function Index() {
       <div className="space-y-4">
         {activities.map((activity) => (
           <div key={activity.id} className="flex items-start gap-4 p-4 border rounded-lg relative overflow-hidden">
-            <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${activity.color}`} />
+            <div 
+              style={{ backgroundColor: activity.color }} 
+              className="absolute left-0 top-0 bottom-0 w-1.5" 
+            />
             <div className="flex-1 pl-3">
               <div className="flex items-center gap-2 mb-2">
                 <h3 className="font-medium">{activity.name}</h3>
