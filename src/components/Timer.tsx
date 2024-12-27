@@ -7,9 +7,10 @@ interface TimerProps {
   name: string;
   color: string;
   onDelete: (id: string) => void;
+  onSecondsUpdate: (seconds: number) => void;
 }
 
-export default function Timer({ id, name, color, onDelete }: TimerProps) {
+export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: TimerProps) {
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
 
@@ -17,11 +18,15 @@ export default function Timer({ id, name, color, onDelete }: TimerProps) {
     let interval: NodeJS.Timeout | undefined;
     if (isRunning) {
       interval = setInterval(() => {
-        setSeconds((prev) => prev + 1);
+        setSeconds((prev) => {
+          const newSeconds = prev + 1;
+          onSecondsUpdate(newSeconds);
+          return newSeconds;
+        });
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isRunning]);
+  }, [isRunning, onSecondsUpdate]);
 
   const toggleTimer = () => {
     setIsRunning(!isRunning);

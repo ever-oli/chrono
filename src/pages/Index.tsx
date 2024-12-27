@@ -3,11 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import Timer from "@/components/Timer";
+import Analytics from "@/components/Analytics";
 
 interface TimerData {
   id: string;
   name: string;
   color: string;
+  seconds: number;
 }
 
 export default function Index() {
@@ -25,6 +27,7 @@ export default function Index() {
           id: crypto.randomUUID(),
           name: newTimerName.trim(),
           color: selectedColor,
+          seconds: 0,
         }
       ]);
       setNewTimerName("");
@@ -34,6 +37,12 @@ export default function Index() {
 
   const deleteTimer = (id: string) => {
     setTimers(timers.filter(timer => timer.id !== id));
+  };
+
+  const updateTimerSeconds = (id: string, seconds: number) => {
+    setTimers(timers.map(timer => 
+      timer.id === id ? { ...timer, seconds } : timer
+    ));
   };
 
   return (
@@ -78,6 +87,7 @@ export default function Index() {
             name={timer.name}
             color={timer.color}
             onDelete={deleteTimer}
+            onSecondsUpdate={(seconds) => updateTimerSeconds(timer.id, seconds)}
           />
         ))}
         {timers.length === 0 && (
@@ -86,6 +96,13 @@ export default function Index() {
           </div>
         )}
       </div>
+
+      {timers.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold mb-4">Analytics</h2>
+          <Analytics timers={timers} />
+        </div>
+      )}
     </div>
   );
 }
