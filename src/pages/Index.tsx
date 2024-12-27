@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { TimelineChart } from "@/components/TimelineChart";
 import { EventsList } from "@/components/EventsList";
-import { Plus, Timer, BarChart } from "lucide-react";
-import { Timer as TimerComponent } from "@/components/Timer";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 
 export default function Index() {
@@ -24,33 +23,12 @@ export default function Index() {
       </div>
 
       <div className="grid gap-6">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Timer className="h-4 w-4 text-primary" />
-            <h2 className="text-base font-medium">Active Timer</h2>
-          </div>
-          <div className="rounded-lg bg-background/50 p-4">
-            {activeActivity ? (
-              <TimerComponent activity={activeActivity} onTimeUpdate={setActiveTime} />
-            ) : (
-              <div className="text-center text-muted-foreground py-6">
-                Select an activity from below to start tracking
-              </div>
-            )}
-          </div>
-        </div>
-
         <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <h2 className="text-base font-medium">Recent Activities</h2>
             <EventsList onTimeUpdate={handleTimeUpdate} />
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <BarChart className="h-4 w-4 text-primary" />
-              <h2 className="text-base font-medium">Time Distribution</h2>
-            </div>
             <div className="rounded-lg bg-background/50 p-4">
               <TimelineChart activeActivity={activeActivity} activeTime={activeTime} />
             </div>
