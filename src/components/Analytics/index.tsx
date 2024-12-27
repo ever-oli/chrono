@@ -31,6 +31,16 @@ export default function Analytics({ timers }: AnalyticsProps) {
     [timers]
   );
 
+  // Transform chartData for PieChart to match its expected props type
+  const pieChartData = useMemo(() => 
+    chartData.map(item => ({
+      name: item.name,
+      value: item.hours, // Map 'hours' to 'value' for PieChart
+      color: item.color
+    })),
+    [chartData]
+  );
+
   // Fetch time entries for the timeline
   const { data: timeEntries = [] } = useQuery({
     queryKey: ['timeEntries'],
@@ -73,7 +83,7 @@ export default function Analytics({ timers }: AnalyticsProps) {
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <PieChart data={chartData} />
+        <PieChart data={pieChartData} />
         <BarChart data={chartData} />
       </div>
       <Timeline entries={timeEntries} />
