@@ -52,28 +52,33 @@ export default function Index() {
 
       {showInput && (
         <form onSubmit={handleAddActivity} className="space-y-4 mb-6">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="activity-name">Activity Name</Label>
-            <Input
-              id="activity-name"
-              type="text"
-              value={newActivity}
-              onChange={(e) => setNewActivity(e.target.value)}
-              placeholder="Enter activity name"
-              className="flex-1"
-              autoFocus
-              onBlur={() => !newActivity && setShowInput(false)}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="activity-color">Activity Color</Label>
-            <Input
-              id="activity-color"
-              type="color"
-              value={selectedColor}
-              onChange={(e) => setSelectedColor(e.target.value)}
-              className="h-10 w-20"
-            />
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <Label htmlFor="activity-name">Activity Name</Label>
+              <Input
+                id="activity-name"
+                type="text"
+                value={newActivity}
+                onChange={(e) => setNewActivity(e.target.value)}
+                placeholder="Enter activity name"
+                className="mt-2"
+                autoFocus
+                onBlur={() => !newActivity && setShowInput(false)}
+              />
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <Label htmlFor="activity-color">Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="activity-color"
+                  type="color"
+                  value={selectedColor}
+                  onChange={(e) => setSelectedColor(e.target.value)}
+                  className="h-10 w-20"
+                />
+                <div className={`h-10 w-2 rounded-full bg-[${selectedColor}]`} />
+              </div>
+            </div>
           </div>
           <Button type="submit">Add Activity</Button>
         </form>
@@ -81,10 +86,10 @@ export default function Index() {
 
       <div className="space-y-4">
         {activities.map((activity) => (
-          <div key={activity.id} className="flex items-start gap-4 p-4 border rounded-lg">
-            <div className="flex-1">
+          <div key={activity.id} className="flex items-start gap-4 p-4 border rounded-lg relative overflow-hidden">
+            <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${activity.color}`} />
+            <div className="flex-1 pl-3">
               <div className="flex items-center gap-2 mb-2">
-                <div className={`w-2 h-2 rounded-full ${activity.color}`} />
                 <h3 className="font-medium">{activity.name}</h3>
               </div>
               <Timer />

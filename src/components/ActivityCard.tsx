@@ -31,16 +31,16 @@ export function ActivityCard({
         className={cn(
           "relative w-full rounded-lg border p-3 text-left transition-colors",
           isActive ? "bg-accent/20" : "hover:bg-accent/10",
-          "group flex items-center justify-between"
+          "group flex items-center justify-between overflow-hidden"
         )}
       >
-        <div className="flex items-center gap-3">
-          <div 
-            className={cn(
-              "h-4 w-1 rounded-full",
-              color
-            )} 
-          />
+        <div 
+          className={cn(
+            "absolute left-0 top-0 bottom-0 w-1.5",
+            color
+          )} 
+        />
+        <div className="flex items-center gap-3 pl-3">
           <span className="font-medium text-sm">{name}</span>
         </div>
         {time && (
