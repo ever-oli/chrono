@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Play, Pause, Trash2 } from "lucide-react";
@@ -53,7 +53,7 @@ export default function Index() {
   };
 
   // Update running timers
-  useState(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setTimers(prevTimers =>
         prevTimers.map(timer =>
