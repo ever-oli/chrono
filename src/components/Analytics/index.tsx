@@ -35,7 +35,7 @@ export default function Analytics({ timers }: AnalyticsProps) {
   const pieChartData = useMemo(() => 
     chartData.map(item => ({
       name: item.name,
-      value: item.hours, // Map 'hours' to 'value' for PieChart
+      value: item.hours,
       color: item.color
     })),
     [chartData]
