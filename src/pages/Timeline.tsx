@@ -2,15 +2,18 @@ import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Analytics from "@/components/Analytics";
 import TimelineView from "@/components/Analytics/Timeline";
 import { useTimerContext } from "@/components/Timer/TimerContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 type TimeRange = "hours" | "days" | "weeks" | "months";
+type ViewMode = "timeline" | "analytics";
 
 export default function Timeline() {
   const [timeRange, setTimeRange] = useState<TimeRange>("hours");
+  const [viewMode, setViewMode] = useState<ViewMode>("timeline");
   const { timers } = useTimerContext();
 
   // Fetch time entries
@@ -48,33 +51,45 @@ export default function Timeline() {
     <div className="container max-w-2xl mx-auto p-4 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Timeline</h1>
-      </div>
-
-      <div className="flex items-center justify-center gap-4">
-        <Button variant="outline" size="icon">
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-
-        <Tabs value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)} className="w-[400px]">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="hours">Hours</TabsTrigger>
-            <TabsTrigger value="days">Days</TabsTrigger>
-            <TabsTrigger value="weeks">Weeks</TabsTrigger>
-            <TabsTrigger value="months">Months</TabsTrigger>
-          </TabsList>
-        </Tabs>
-
-        <Button variant="outline" size="icon">
-          <ChevronRight className="h-4 w-4" />
+        <Button 
+          variant="outline" 
+          onClick={() => setViewMode(viewMode === "timeline" ? "analytics" : "timeline")}
+        >
+          {viewMode === "timeline" ? "Show Analytics" : "Show Timeline"}
         </Button>
       </div>
 
-      <div className="bg-card rounded-lg p-4">
-        <TimelineView 
-          entries={timeEntries} 
-          view={timeRange}
-        />
-      </div>
+      {viewMode === "timeline" ? (
+        <>
+          <div className="flex items-center justify-center gap-4">
+            <Button variant="outline" size="icon">
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+
+            <Tabs value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)} className="w-[400px]">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="hours">Hours</TabsTrigger>
+                <TabsTrigger value="days">Days</TabsTrigger>
+                <TabsTrigger value="weeks">Weeks</TabsTrigger>
+                <TabsTrigger value="months">Months</TabsTrigger>
+              </TabsList>
+            </Tabs>
+
+            <Button variant="outline" size="icon">
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          </div>
+
+          <div className="bg-card rounded-lg p-4">
+            <TimelineView 
+              entries={timeEntries} 
+              view={timeRange}
+            />
+          </div>
+        </>
+      ) : (
+        <Analytics timers={timers} />
+      )}
     </div>
   );
 }
