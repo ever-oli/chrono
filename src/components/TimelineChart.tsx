@@ -25,6 +25,13 @@ export function TimelineChart({ activeActivity, activeTime }: { activeActivity?:
             ...newData[activityIndex],
             value: timeInMinutes
           };
+        } else {
+          // Add new activity if it doesn't exist
+          newData.push({
+            name: activeActivity,
+            value: Math.floor(activeTime / 60),
+            color: '#' + Math.floor(Math.random()*16777215).toString(16) // Generate random color for now
+          });
         }
         
         return newData;
