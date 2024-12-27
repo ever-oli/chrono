@@ -14,6 +14,9 @@ export type Database = {
           created_at: string
           ended_at: string | null
           id: string
+          marker_size: Database["public"]["Enums"]["marker_size"] | null
+          name: string | null
+          notes: string | null
           seconds: number
           started_at: string
           timer_id: string
@@ -22,6 +25,9 @@ export type Database = {
           created_at?: string
           ended_at?: string | null
           id?: string
+          marker_size?: Database["public"]["Enums"]["marker_size"] | null
+          name?: string | null
+          notes?: string | null
           seconds?: number
           started_at?: string
           timer_id: string
@@ -30,6 +36,9 @@ export type Database = {
           created_at?: string
           ended_at?: string | null
           id?: string
+          marker_size?: Database["public"]["Enums"]["marker_size"] | null
+          name?: string | null
+          notes?: string | null
           seconds?: number
           started_at?: string
           timer_id?: string
@@ -73,7 +82,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      marker_size: "small" | "medium" | "large"
     }
     CompositeTypes: {
       [_ in never]: never
