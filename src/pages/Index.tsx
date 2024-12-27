@@ -58,6 +58,7 @@ export default function Index() {
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     setSelectedColor(e.target.value);
   };
 
@@ -117,7 +118,7 @@ export default function Index() {
 
       {showInput && (
         <form onSubmit={handleAddActivity} className="space-y-4 mb-6">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col md:flex-row md:items-end gap-4">
             <div className="flex-1">
               <Label htmlFor="activity-name">Activity Name</Label>
               <Input
@@ -131,7 +132,7 @@ export default function Index() {
                 onBlur={() => !newActivity && setShowInput(false)}
               />
             </div>
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="activity-color">Color</Label>
               <div className="flex items-center gap-2">
                 <Input
@@ -139,10 +140,12 @@ export default function Index() {
                   type="color"
                   value={selectedColor}
                   onChange={handleColorChange}
-                  onClick={(e) => e.stopPropagation()}
-                  className="h-10 w-20 cursor-pointer"
+                  className="h-12 w-24 min-w-[6rem] cursor-pointer p-1 touch-manipulation"
                 />
-                <div style={{ backgroundColor: selectedColor }} className="h-10 w-4 rounded-full" />
+                <div 
+                  style={{ backgroundColor: selectedColor }} 
+                  className="h-12 w-6 rounded-full" 
+                />
               </div>
             </div>
           </div>
