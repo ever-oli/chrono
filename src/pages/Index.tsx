@@ -22,18 +22,19 @@ export default function Index() {
   const handleAddActivity = (e: React.FormEvent) => {
     e.preventDefault();
     if (newActivity.trim()) {
+      const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'pink'];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
       const event = {
         name: newActivity.trim(),
         time: "0m",
-        color: `bg-${['red', 'blue', 'green', 'yellow', 'purple', 'pink'][Math.floor(Math.random() * 6)]-500`
+        color: `bg-${randomColor}-500`
       };
       setNewActivity("");
       setIsDialogOpen(false);
       toast({
         title: "Activity added",
-        description: `${event.name} has been added to your tracking list.`
+        description: "'" + event.name + "' has been added to your tracking list."
       });
-      // The EventsList component will handle adding the new activity
       return event;
     }
   };
