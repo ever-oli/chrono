@@ -14,7 +14,7 @@ export default function Timer({ id, name, color, onDelete }: TimerProps) {
   const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
-    let interval: number | undefined;
+    let interval: NodeJS.Timeout | undefined;
     if (isRunning) {
       interval = setInterval(() => {
         setSeconds((prev) => prev + 1);
