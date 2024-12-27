@@ -7,10 +7,8 @@ interface TimeData {
   color: string;
 }
 
-const initialData: TimeData[] = [];
-
 export function TimelineChart({ activeActivity, activeTime }: { activeActivity?: string; activeTime?: number }) {
-  const [data, setData] = useState<TimeData[]>(initialData);
+  const [data, setData] = useState<TimeData[]>([]);
 
   useEffect(() => {
     if (activeActivity && activeTime) {
@@ -19,18 +17,16 @@ export function TimelineChart({ activeActivity, activeTime }: { activeActivity?:
         const activityIndex = newData.findIndex(item => item.name === activeActivity);
         
         if (activityIndex !== -1) {
-          // Convert seconds to same unit as other values (assuming they're in minutes)
           const timeInMinutes = Math.floor(activeTime / 60);
           newData[activityIndex] = {
             ...newData[activityIndex],
             value: timeInMinutes
           };
         } else {
-          // Add new activity if it doesn't exist
           newData.push({
             name: activeActivity,
             value: Math.floor(activeTime / 60),
-            color: '#' + Math.floor(Math.random()*16777215).toString(16) // Generate random color for now
+            color: '#' + Math.floor(Math.random()*16777215).toString(16)
           });
         }
         
@@ -44,6 +40,14 @@ export function TimelineChart({ activeActivity, activeTime }: { activeActivity?:
     const minutes = value % 60;
     return `${hours}h ${minutes}m`;
   };
+
+  if (data.length === 0) {
+    return (
+      <div className="h-[300px] w-full flex items-center justify-center text-muted-foreground">
+        No activities tracked yet
+      </div>
+    );
+  }
 
   return (
     <div className="h-[300px] w-full">

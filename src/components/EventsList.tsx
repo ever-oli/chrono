@@ -1,6 +1,5 @@
 import { ActivityCard } from "./ActivityCard";
 import { useState } from "react";
-import { useToast } from "./ui/use-toast";
 
 interface Activity {
   name: string;
@@ -9,7 +8,12 @@ interface Activity {
   totalSeconds?: number;
 }
 
-export function EventsList({ onTimeUpdate }: { onTimeUpdate?: (activity: string, time: number) => void }) {
+interface EventsListProps {
+  onTimeUpdate?: (activity: string, time: number) => void;
+  onAddActivity?: (e: React.FormEvent) => any;
+}
+
+export function EventsList({ onTimeUpdate, onAddActivity }: EventsListProps) {
   const [events, setEvents] = useState<Activity[]>([]);
 
   const formatTime = (seconds: number): string => {
@@ -37,8 +41,17 @@ export function EventsList({ onTimeUpdate }: { onTimeUpdate?: (activity: string,
     onTimeUpdate?.(activity, time);
   };
 
+  // Add event listener for form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    const newEvent = onAddActivity?.(e);
+    if (newEvent) {
+      setEvents(currentEvents => [...currentEvents, newEvent]);
+    }
+  };
+
   return (
     <div className="space-y-1.5">
+      <form onSubmit={handleSubmit} className="hidden" />
       {events.map((event, index) => (
         <ActivityCard
           key={index}
@@ -48,6 +61,11 @@ export function EventsList({ onTimeUpdate }: { onTimeUpdate?: (activity: string,
           onTimeUpdate={handleTimeUpdate(event.name)}
         />
       ))}
+      {events.length === 0 && (
+        <div className="text-center text-muted-foreground py-8">
+          No activities yet. Click the + button to add one.
+        </div>
+      )}
     </div>
   );
 }
