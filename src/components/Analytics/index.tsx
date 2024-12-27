@@ -86,7 +86,9 @@ export default function Analytics({ timers }: AnalyticsProps) {
         <PieChart data={pieChartData} />
         <BarChart data={chartData} />
       </div>
-      <Timeline entries={timeEntries} />
+      <div className="mt-8">
+        <Timeline entries={timeEntries} />
+      </div>
     </div>
   );
 }
