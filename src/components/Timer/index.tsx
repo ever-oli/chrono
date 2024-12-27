@@ -56,15 +56,14 @@ export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: Ti
       if (startTime) {
         const elapsedSeconds = Math.floor((new Date().getTime() - startTime.getTime()) / 1000);
         
-        // Create both timestamps at once to ensure proper ordering
-        const started_at = startTime.toISOString();
-        const ended_at = new Date(startTime.getTime() + (elapsedSeconds * 1000)).toISOString();
+        // First create the end time by adding elapsed seconds to start time
+        const endTime = new Date(startTime.getTime() + (elapsedSeconds * 1000));
         
         const timeEntry = {
           timer_id: id,
           seconds: elapsedSeconds,
-          started_at,
-          ended_at
+          started_at: startTime.toISOString(),
+          ended_at: endTime.toISOString()
         };
 
         const { error } = await supabase
