@@ -6,9 +6,10 @@ import { useToast } from "./ui/use-toast";
 interface TimerProps {
   activity?: string;
   onTimeUpdate?: (time: number) => void;
+  allowMultiple?: boolean;
 }
 
-export function Timer({ activity, onTimeUpdate }: TimerProps) {
+export function Timer({ activity, onTimeUpdate, allowMultiple }: TimerProps) {
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [totalContributed, setTotalContributed] = useState(0);
@@ -72,28 +73,23 @@ export function Timer({ activity, onTimeUpdate }: TimerProps) {
   };
 
   return (
-    <div className="space-y-4">
-      {activity && (
-        <div className="text-sm text-muted-foreground">
-          Currently tracking: <span className="font-medium text-foreground">{activity}</span>
-        </div>
-      )}
-      <div className="text-4xl font-mono font-bold">{formatTime(time)}</div>
+    <div className="space-y-2">
+      <div className="text-xl font-mono font-medium">{formatTime(time)}</div>
       {totalContributed > 0 && (
-        <div className="text-sm text-muted-foreground">
-          Total time contributed: {formatTime(totalContributed)}
+        <div className="text-xs text-muted-foreground">
+          Total: {formatTime(totalContributed)}
         </div>
       )}
-      <div className="flex justify-center gap-2">
+      <div className="flex gap-2">
         <Button
           variant={isRunning ? "destructive" : "default"}
-          size="icon"
+          size="sm"
           onClick={handleStartStop}
         >
-          {isRunning ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+          {isRunning ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
         </Button>
-        <Button variant="outline" size="icon" onClick={handleReset}>
-          <RefreshCw className="h-4 w-4" />
+        <Button variant="outline" size="sm" onClick={handleReset}>
+          <RefreshCw className="h-3 w-3" />
         </Button>
       </div>
     </div>

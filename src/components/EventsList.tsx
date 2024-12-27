@@ -1,6 +1,5 @@
 import { ActivityCard } from "./ActivityCard";
 import { useState } from "react";
-import { Timer } from "./Timer";
 import { useToast } from "./ui/use-toast";
 
 interface Activity {
@@ -22,24 +21,6 @@ const initialEvents: Activity[] = [
 
 export function EventsList({ onTimeUpdate }: { onTimeUpdate?: (activity: string, time: number) => void }) {
   const [events, setEvents] = useState<Activity[]>(initialEvents);
-  const [activeEvent, setActiveEvent] = useState<string | null>(null);
-  const { toast } = useToast();
-
-  const handleEventSelect = (eventName: string) => {
-    if (activeEvent === eventName) {
-      setActiveEvent(null);
-      toast({
-        title: "Timer Stopped",
-        description: `Stopped tracking: ${eventName}`,
-      });
-    } else {
-      setActiveEvent(eventName);
-      toast({
-        title: "Timer Started",
-        description: `Now tracking: ${eventName}`,
-      });
-    }
-  };
 
   const formatTime = (seconds: number): string => {
     const hours = Math.floor(seconds / 3600);
@@ -50,23 +31,20 @@ export function EventsList({ onTimeUpdate }: { onTimeUpdate?: (activity: string,
     return `${minutes}m`;
   };
 
-  const handleTimeUpdate = (time: number) => {
-    if (activeEvent) {
-      onTimeUpdate?.(activeEvent, time);
-      setEvents(currentEvents => 
-        currentEvents.map(event => {
-          if (event.name === activeEvent) {
-            const totalSeconds = time;
-            return {
-              ...event,
-              totalSeconds,
-              time: formatTime(totalSeconds)
-            };
-          }
-          return event;
-        })
-      );
-    }
+  const handleTimeUpdate = (activity: string) => (time: number) => {
+    setEvents(currentEvents => 
+      currentEvents.map(event => {
+        if (event.name === activity) {
+          return {
+            ...event,
+            totalSeconds: time,
+            time: formatTime(time)
+          };
+        }
+        return event;
+      })
+    );
+    onTimeUpdate?.(activity, time);
   };
 
   return (
@@ -77,15 +55,9 @@ export function EventsList({ onTimeUpdate }: { onTimeUpdate?: (activity: string,
           name={event.name}
           time={event.time}
           color={event.color}
-          isActive={activeEvent === event.name}
-          onClick={() => handleEventSelect(event.name)}
+          onTimeUpdate={handleTimeUpdate(event.name)}
         />
       ))}
-      {activeEvent && (
-        <div className="mt-4">
-          <Timer activity={activeEvent} onTimeUpdate={handleTimeUpdate} />
-        </div>
-      )}
     </div>
   );
 }
