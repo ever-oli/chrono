@@ -41,8 +41,8 @@ export function EventsList({ onTimeUpdate, onAddActivity }: EventsListProps) {
     onTimeUpdate?.(activity, time);
   };
 
-  // Add event listener for form submission
   const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     const newEvent = onAddActivity?.(e);
     if (newEvent) {
       setEvents(currentEvents => [...currentEvents, newEvent]);
@@ -51,7 +51,7 @@ export function EventsList({ onTimeUpdate, onAddActivity }: EventsListProps) {
 
   return (
     <div className="space-y-1.5">
-      <form onSubmit={handleSubmit} className="hidden" />
+      <form onSubmit={handleSubmit} />
       {events.map((event, index) => (
         <ActivityCard
           key={index}
