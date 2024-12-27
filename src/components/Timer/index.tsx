@@ -53,10 +53,9 @@ export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: Ti
     } else {
       // Stopping timer
       if (startTime) {
-        const endTime = new Date();
-        const elapsedSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000);
+        const elapsedSeconds = Math.floor((new Date().getTime() - startTime.getTime()) / 1000);
+        const endTime = new Date(startTime.getTime() + (elapsedSeconds * 1000));
         
-        // Ensure proper timestamp ordering
         const timeEntry = {
           timer_id: id,
           seconds: elapsedSeconds,
