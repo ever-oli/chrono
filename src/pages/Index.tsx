@@ -12,6 +12,7 @@ interface Activity {
 export default function Index() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [newActivity, setNewActivity] = useState("");
+  const [showInput, setShowInput] = useState(false);
 
   const handleAddActivity = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,6 +22,7 @@ export default function Index() {
         { id: crypto.randomUUID(), name: newActivity.trim() }
       ]);
       setNewActivity("");
+      setShowInput(false);
     }
   };
 
@@ -32,21 +34,29 @@ export default function Index() {
     <div className="container mx-auto p-4 max-w-4xl">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-semibold">Activity Timers</h1>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={() => setShowInput(true)}
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
       </div>
 
-      <form onSubmit={handleAddActivity} className="flex gap-2 mb-6">
-        <Input
-          type="text"
-          value={newActivity}
-          onChange={(e) => setNewActivity(e.target.value)}
-          placeholder="Enter activity name"
-          className="flex-1"
-        />
-        <Button type="submit">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Activity
-        </Button>
-      </form>
+      {showInput && (
+        <form onSubmit={handleAddActivity} className="flex gap-2 mb-6">
+          <Input
+            type="text"
+            value={newActivity}
+            onChange={(e) => setNewActivity(e.target.value)}
+            placeholder="Enter activity name"
+            className="flex-1"
+            autoFocus
+            onBlur={() => !newActivity && setShowInput(false)}
+          />
+          <Button type="submit">Add Activity</Button>
+        </form>
+      )}
 
       <div className="space-y-4">
         {activities.map((activity) => (
@@ -66,7 +76,7 @@ export default function Index() {
         ))}
         {activities.length === 0 && (
           <div className="text-center text-muted-foreground py-8">
-            No activities yet. Add one to get started!
+            No activities yet. Click the + button to add one.
           </div>
         )}
       </div>
