@@ -7,9 +7,11 @@ interface AnalyticsProps {
     color: string;
     seconds: number;
   }>;
+  timeRange?: "hours" | "days" | "weeks" | "months";
+  currentDate?: Date;
 }
 
-export default function Analytics({ timers }: AnalyticsProps) {
+export default function Analytics({ timers, timeRange = "hours", currentDate = new Date() }: AnalyticsProps) {
   // Filter out timers with 0 seconds
   const activeTimers = timers.filter((timer) => timer.seconds > 0);
   
