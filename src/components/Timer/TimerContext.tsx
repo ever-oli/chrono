@@ -1,7 +1,7 @@
 import { createContext, useContext, ReactNode } from 'react';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface TimerContextType {
   timers: Array<{
@@ -98,24 +98,25 @@ export function TimerProvider({ children }: { children: ReactNode }) {
   });
 
   const updateTimerSeconds = async (id: string, seconds: number) => {
-    const { error } = await supabase
-      .from('time_entries')
-      .insert([
-        { 
-          timer_id: id,
-          seconds: seconds,
-          ended_at: new Date().toISOString()
-        }
-      ]);
+    try {
+      const { error } = await supabase
+        .from('time_entries')
+        .insert([
+          { 
+            timer_id: id,
+            seconds: seconds,
+            ended_at: new Date().toISOString()
+          }
+        ]);
 
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update timer: " + error.message,
-        variant: "destructive",
-      });
-    } else {
+      if (error) {
+        console.error("Error updating timer seconds:", error);
+        return;
+      }
+
       queryClient.invalidateQueries({ queryKey: ['timers'] });
+    } catch (error) {
+      console.error("Error in updateTimerSeconds:", error);
     }
   };
 

@@ -56,7 +56,7 @@ export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: Ti
       if (startTime) {
         const elapsedSeconds = Math.floor((new Date().getTime() - startTime.getTime()) / 1000);
         
-        // First create the end time by adding elapsed seconds to start time
+        // Calculate end time by adding elapsed seconds to start time
         const endTime = new Date(startTime.getTime() + (elapsedSeconds * 1000));
         
         const timeEntry = {
