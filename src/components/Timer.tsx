@@ -20,13 +20,13 @@ export function Timer({ activity, onTimeUpdate }: TimerProps) {
       intervalId = window.setInterval(() => {
         setTime((time) => {
           const newTime = time + 1;
-          onTimeUpdate?.(newTime);
+          onTimeUpdate?.(totalContributed + newTime);
           return newTime;
         });
       }, 1000);
     }
     return () => clearInterval(intervalId);
-  }, [isRunning, onTimeUpdate]);
+  }, [isRunning, onTimeUpdate, totalContributed]);
 
   useEffect(() => {
     // Reset timer when activity changes
@@ -54,6 +54,7 @@ export function Timer({ activity, onTimeUpdate }: TimerProps) {
   const handleReset = () => {
     setIsRunning(false);
     setTime(0);
+    setTotalContributed(0);
     onTimeUpdate?.(0);
     toast({
       title: "Timer Reset",

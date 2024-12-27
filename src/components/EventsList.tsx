@@ -3,7 +3,14 @@ import { useState } from "react";
 import { Timer } from "./Timer";
 import { useToast } from "./ui/use-toast";
 
-const events = [
+interface Activity {
+  name: string;
+  time: string;
+  color: string;
+  totalSeconds?: number;
+}
+
+const initialEvents: Activity[] = [
   { name: "Work", time: "2h 13m", color: "bg-purple-500" },
   { name: "Exercise", time: "1h 30m", color: "bg-green-500" },
   { name: "Hobbies", time: "45m", color: "bg-cyan-500" },
@@ -14,6 +21,7 @@ const events = [
 ];
 
 export function EventsList({ onTimeUpdate }: { onTimeUpdate?: (activity: string, time: number) => void }) {
+  const [events, setEvents] = useState<Activity[]>(initialEvents);
   const [activeEvent, setActiveEvent] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -33,9 +41,31 @@ export function EventsList({ onTimeUpdate }: { onTimeUpdate?: (activity: string,
     }
   };
 
+  const formatTime = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+    return `${minutes}m`;
+  };
+
   const handleTimeUpdate = (time: number) => {
     if (activeEvent) {
       onTimeUpdate?.(activeEvent, time);
+      setEvents(currentEvents => 
+        currentEvents.map(event => {
+          if (event.name === activeEvent) {
+            const totalSeconds = time;
+            return {
+              ...event,
+              totalSeconds,
+              time: formatTime(totalSeconds)
+            };
+          }
+          return event;
+        })
+      );
     }
   };
 
