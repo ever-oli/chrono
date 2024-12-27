@@ -2,7 +2,13 @@ import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Play, Pause, RefreshCw } from "lucide-react";
 
-export function Timer() {
+interface TimerProps {
+  activity?: string;
+  onTimeUpdate?: (time: number) => void;
+  allowMultiple?: boolean;
+}
+
+export function Timer({ activity, onTimeUpdate, allowMultiple }: TimerProps) {
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
 
@@ -10,11 +16,15 @@ export function Timer() {
     let intervalId: number;
     if (isRunning) {
       intervalId = window.setInterval(() => {
-        setTime(time => time + 1);
+        setTime(time => {
+          const newTime = time + 1;
+          onTimeUpdate?.(newTime);
+          return newTime;
+        });
       }, 1000);
     }
     return () => clearInterval(intervalId);
-  }, [isRunning]);
+  }, [isRunning, onTimeUpdate]);
 
   const handleStartStop = () => {
     setIsRunning(!isRunning);
@@ -23,6 +33,7 @@ export function Timer() {
   const handleReset = () => {
     setIsRunning(false);
     setTime(0);
+    onTimeUpdate?.(0);
   };
 
   const formatTime = (seconds: number) => {
