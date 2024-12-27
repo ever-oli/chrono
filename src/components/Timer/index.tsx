@@ -46,22 +46,24 @@ export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: Ti
   }, [isRunning]);
 
   const toggleTimer = async () => {
-    const now = new Date();
-    
     if (!isRunning) {
+      // Starting timer
+      const now = new Date();
       setStartTime(now);
     } else {
+      // Stopping timer
       if (startTime) {
+        const now = new Date();
         const elapsedSeconds = Math.floor((now.getTime() - startTime.getTime()) / 1000);
         
-        // Insert the time entry directly using the timeEntry object
+        // Insert the time entry with properly ordered timestamps
         const { error } = await supabase
           .from('time_entries')
           .insert([{
             timer_id: id,
             seconds: elapsedSeconds,
             started_at: startTime.toISOString(),
-            ended_at: now.toISOString()
+            ended_at: new Date(startTime.getTime() + (elapsedSeconds * 1000)).toISOString()
           }]);
 
         if (error) {
