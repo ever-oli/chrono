@@ -48,33 +48,36 @@ export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: Ti
   const toggleTimer = async () => {
     if (!isRunning) {
       // Starting timer
-      const now = new Date();
-      setStartTime(now);
+      setStartTime(new Date());
+      setIsRunning(true);
     } else {
       // Stopping timer
       if (startTime) {
-        const now = new Date();
-        const elapsedSeconds = Math.floor((now.getTime() - startTime.getTime()) / 1000);
+        const endTime = new Date();
+        const elapsedSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000);
         
-        // Insert the time entry with properly ordered timestamps
+        // Ensure proper timestamp ordering
+        const timeEntry = {
+          timer_id: id,
+          seconds: elapsedSeconds,
+          started_at: startTime.toISOString(),
+          ended_at: endTime.toISOString()
+        };
+
         const { error } = await supabase
           .from('time_entries')
-          .insert([{
-            timer_id: id,
-            seconds: elapsedSeconds,
-            started_at: startTime.toISOString(),
-            ended_at: new Date(startTime.getTime() + (elapsedSeconds * 1000)).toISOString()
-          }]);
+          .insert([timeEntry]);
 
         if (error) {
           console.error('Error saving time entry:', error);
           return;
         }
 
+        await onSecondsUpdate(id, elapsedSeconds);
         queryClient.invalidateQueries({ queryKey: ['timers'] });
       }
+      setIsRunning(false);
     }
-    setIsRunning(!isRunning);
   };
 
   return (
