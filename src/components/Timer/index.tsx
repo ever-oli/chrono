@@ -54,15 +54,21 @@ export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: Ti
       if (startTime) {
         const elapsedSeconds = Math.floor((now.getTime() - startTime.getTime()) / 1000);
         
-        // Ensure proper timestamp ordering
-        const timeEntry = {
-          timer_id: id,
-          seconds: elapsedSeconds,
-          started_at: startTime.toISOString(),
-          ended_at: now.toISOString()
-        };
-        
-        await onSecondsUpdate(id, elapsedSeconds);
+        // Insert the time entry directly using the timeEntry object
+        const { error } = await supabase
+          .from('time_entries')
+          .insert([{
+            timer_id: id,
+            seconds: elapsedSeconds,
+            started_at: startTime.toISOString(),
+            ended_at: now.toISOString()
+          }]);
+
+        if (error) {
+          console.error('Error saving time entry:', error);
+          return;
+        }
+
         queryClient.invalidateQueries({ queryKey: ['timers'] });
       }
     }
