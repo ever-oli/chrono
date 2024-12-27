@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import PieChart from "./PieChart";
 import BarChart from "./BarChart";
-import Timeline from "./Timeline";
+import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns";
 
 interface Timer {
   id: string;
@@ -14,36 +14,40 @@ interface Timer {
 
 interface AnalyticsProps {
   timers: Timer[];
+  timeRange: "hours" | "days" | "weeks" | "months";
+  currentDate: Date;
 }
 
-export default function Analytics({ timers }: AnalyticsProps) {
-  const totalSeconds = useMemo(() => 
-    timers.reduce((acc, timer) => acc + timer.seconds, 0),
-    [timers]
-  );
+export default function Analytics({ timers, timeRange, currentDate }: AnalyticsProps) {
+  // Get date range based on selected time period
+  const dateRange = useMemo(() => {
+    switch (timeRange) {
+      case "hours":
+        return {
+          start: startOfDay(currentDate),
+          end: endOfDay(currentDate)
+        };
+      case "days":
+        return {
+          start: startOfWeek(currentDate),
+          end: endOfWeek(currentDate)
+        };
+      case "weeks":
+        return {
+          start: startOfMonth(currentDate),
+          end: endOfMonth(currentDate)
+        };
+      case "months":
+        return {
+          start: startOfYear(currentDate),
+          end: endOfYear(currentDate)
+        };
+    }
+  }, [timeRange, currentDate]);
 
-  const chartData = useMemo(() => 
-    timers.map(timer => ({
-      name: timer.name,
-      hours: timer.seconds / 3600,
-      color: timer.color
-    })),
-    [timers]
-  );
-
-  // Transform chartData for PieChart to match its expected props type
-  const pieChartData = useMemo(() => 
-    chartData.map(item => ({
-      name: item.name,
-      value: item.hours,
-      color: item.color
-    })),
-    [chartData]
-  );
-
-  // Fetch time entries for the timeline
+  // Fetch time entries for the selected period
   const { data: timeEntries = [] } = useQuery({
-    queryKey: ['timeEntries'],
+    queryKey: ['timeEntries', dateRange.start, dateRange.end],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('time_entries')
@@ -53,29 +57,65 @@ export default function Analytics({ timers }: AnalyticsProps) {
           started_at,
           ended_at,
           timers (
+            id,
             name,
             color
           )
         `)
+        .gte('started_at', dateRange.start.toISOString())
+        .lte('started_at', dateRange.end.toISOString())
         .order('started_at', { ascending: true });
       
       if (error) throw error;
-      
-      return data.map(entry => ({
-        id: entry.id,
-        name: entry.timers.name,
-        color: entry.timers.color,
-        started_at: entry.started_at,
-        ended_at: entry.ended_at,
-        seconds: entry.seconds
-      }));
+      return data;
     }
   });
 
-  if (totalSeconds === 0) {
+  // Aggregate time entries by timer
+  const aggregatedData = useMemo(() => {
+    const timerMap = new Map<string, { name: string; color: string; seconds: number }>();
+    
+    timeEntries.forEach(entry => {
+      const timer = entry.timers;
+      const current = timerMap.get(timer.id) || { 
+        name: timer.name, 
+        color: timer.color, 
+        seconds: 0 
+      };
+      
+      timerMap.set(timer.id, {
+        ...current,
+        seconds: current.seconds + entry.seconds
+      });
+    });
+
+    return Array.from(timerMap.values());
+  }, [timeEntries]);
+
+  // Transform data for charts
+  const chartData = useMemo(() => 
+    aggregatedData.map(timer => ({
+      name: timer.name,
+      hours: timer.seconds / 3600,
+      color: timer.color
+    })),
+    [aggregatedData]
+  );
+
+  // Transform data specifically for pie chart
+  const pieChartData = useMemo(() => 
+    chartData.map(item => ({
+      name: item.name,
+      value: item.hours,
+      color: item.color
+    })),
+    [chartData]
+  );
+
+  if (chartData.length === 0) {
     return (
       <div className="text-center text-muted-foreground py-8">
-        No data available yet. Start tracking time to see analytics.
+        No data available for this time period
       </div>
     );
   }
@@ -85,9 +125,6 @@ export default function Analytics({ timers }: AnalyticsProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <PieChart data={pieChartData} />
         <BarChart data={chartData} />
-      </div>
-      <div className="mt-8">
-        <Timeline entries={timeEntries} view="hours" />
       </div>
     </div>
   );

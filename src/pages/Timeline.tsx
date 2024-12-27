@@ -3,93 +3,98 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Analytics from "@/components/Analytics";
-import TimelineView from "@/components/Analytics/Timeline";
 import { useTimerContext } from "@/components/Timer/TimerContext";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { format, subDays, addDays } from "date-fns";
 
 type TimeRange = "hours" | "days" | "weeks" | "months";
-type ViewMode = "timeline" | "analytics";
 
 export default function Timeline() {
   const [timeRange, setTimeRange] = useState<TimeRange>("hours");
-  const [viewMode, setViewMode] = useState<ViewMode>("timeline");
+  const [currentDate, setCurrentDate] = useState(new Date());
   const { timers } = useTimerContext();
 
-  // Fetch time entries
-  const { data: timeEntries = [] } = useQuery({
-    queryKey: ['timeEntries'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('time_entries')
-        .select(`
-          id,
-          seconds,
-          started_at,
-          ended_at,
-          timers (
-            name,
-            color
-          )
-        `)
-        .order('started_at', { ascending: true });
-      
-      if (error) throw error;
-      
-      return data.map(entry => ({
-        id: entry.id,
-        name: entry.timers.name,
-        color: entry.timers.color,
-        started_at: entry.started_at,
-        ended_at: entry.ended_at,
-        seconds: entry.seconds
-      }));
+  const handlePrevious = () => {
+    switch (timeRange) {
+      case "hours":
+        setCurrentDate(prev => subDays(prev, 1));
+        break;
+      case "days":
+        setCurrentDate(prev => subDays(prev, 7));
+        break;
+      case "weeks":
+        setCurrentDate(prev => subDays(prev, 30));
+        break;
+      case "months":
+        setCurrentDate(prev => subDays(prev, 365));
+        break;
     }
-  });
+  };
+
+  const handleNext = () => {
+    switch (timeRange) {
+      case "hours":
+        setCurrentDate(prev => addDays(prev, 1));
+        break;
+      case "days":
+        setCurrentDate(prev => addDays(prev, 7));
+        break;
+      case "weeks":
+        setCurrentDate(prev => addDays(prev, 30));
+        break;
+      case "months":
+        setCurrentDate(prev => addDays(prev, 365));
+        break;
+    }
+  };
+
+  const getDateDisplay = () => {
+    switch (timeRange) {
+      case "hours":
+        return format(currentDate, "MMMM d, yyyy");
+      case "days":
+        return `Week of ${format(currentDate, "MMMM d, yyyy")}`;
+      case "weeks":
+        return format(currentDate, "MMMM yyyy");
+      case "months":
+        return format(currentDate, "yyyy");
+    }
+  };
 
   return (
-    <div className="container max-w-2xl mx-auto p-4 space-y-6">
+    <div className="container max-w-4xl mx-auto p-4 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Timeline</h1>
-        <Button 
-          variant="outline" 
-          onClick={() => setViewMode(viewMode === "timeline" ? "analytics" : "timeline")}
-        >
-          {viewMode === "timeline" ? "Show Analytics" : "Show Timeline"}
+      </div>
+
+      <div className="flex items-center justify-center gap-4">
+        <Button variant="outline" size="icon" onClick={handlePrevious}>
+          <ChevronLeft className="h-5 w-5" />
+        </Button>
+
+        <div className="text-center min-w-[200px]">
+          <div className="text-lg font-medium mb-2">{getDateDisplay()}</div>
+          <Tabs value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)} className="w-[400px]">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="hours">Today</TabsTrigger>
+              <TabsTrigger value="days">Week</TabsTrigger>
+              <TabsTrigger value="weeks">Month</TabsTrigger>
+              <TabsTrigger value="months">Year</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
+        <Button variant="outline" size="icon" onClick={handleNext}>
+          <ChevronRight className="h-5 w-5" />
         </Button>
       </div>
 
-      {viewMode === "timeline" ? (
-        <>
-          <div className="flex items-center justify-center gap-4">
-            <Button variant="outline" size="icon">
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-
-            <Tabs value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)} className="w-[400px]">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="hours">Hours</TabsTrigger>
-                <TabsTrigger value="days">Days</TabsTrigger>
-                <TabsTrigger value="weeks">Weeks</TabsTrigger>
-                <TabsTrigger value="months">Months</TabsTrigger>
-              </TabsList>
-            </Tabs>
-
-            <Button variant="outline" size="icon">
-              <ChevronRight className="h-5 w-5" />
-            </Button>
-          </div>
-
-          <div className="bg-card rounded-lg p-4">
-            <TimelineView 
-              entries={timeEntries} 
-              view={timeRange}
-            />
-          </div>
-        </>
-      ) : (
-        <Analytics timers={timers} />
-      )}
+      <div className="bg-card rounded-lg p-6">
+        <Analytics 
+          timers={timers} 
+          timeRange={timeRange}
+          currentDate={currentDate}
+        />
+      </div>
     </div>
   );
 }
