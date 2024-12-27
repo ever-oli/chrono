@@ -1,7 +1,7 @@
 import { createContext, useContext, ReactNode } from 'react';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 interface TimerContextType {
   timers: Array<{
@@ -120,13 +120,15 @@ export function TimerProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const value = {
+    timers,
+    addTimer: (timer) => addTimerMutation.mutate(timer),
+    deleteTimer: (id) => deleteTimerMutation.mutate(id),
+    updateTimerSeconds,
+  };
+
   return (
-    <TimerContext.Provider value={{
-      timers,
-      addTimer: (timer) => addTimerMutation.mutate(timer),
-      deleteTimer: (id) => deleteTimerMutation.mutate(id),
-      updateTimerSeconds,
-    }}>
+    <TimerContext.Provider value={value}>
       {children}
     </TimerContext.Provider>
   );

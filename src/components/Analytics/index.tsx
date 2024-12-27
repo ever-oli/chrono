@@ -87,7 +87,7 @@ export default function Analytics({ timers }: AnalyticsProps) {
         <BarChart data={chartData} />
       </div>
       <div className="mt-8">
-        <Timeline entries={timeEntries} />
+        <Timeline entries={timeEntries} view="hours" />
       </div>
     </div>
   );
