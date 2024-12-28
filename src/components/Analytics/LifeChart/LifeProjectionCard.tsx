@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { calculateLifeProjection, calculatePercentChange } from "@/utils/lifeChartCalculations";
+import { calculateLifeProjection, calculatePercentChange, formatTimeUnit } from "@/utils/lifeChartCalculations";
 import { TimeUnit } from "./TimeUnitToggle";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
