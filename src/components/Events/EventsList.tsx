@@ -11,6 +11,7 @@ interface Event {
   id: string;
   name?: string;
   notes?: string;
+  timer_id: string;  // Added this property
   marker_size: 'small' | 'medium' | 'large';
   seconds: number;
   started_at: string;
