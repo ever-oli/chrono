@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTimerContext } from "@/components/Timer/TimerContext";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function GoalForm() {
@@ -19,46 +20,74 @@ export default function GoalForm() {
   const [period, setPeriod] = useState<"daily" | "weekly" | "monthly">("weekly");
   const { timers } = useTimerContext();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const createGoalMutation = useMutation({
+    mutationFn: async (goalData: {
+      timer_id: string;
+      type: "target" | "limit";
+      threshold_min?: number;
+      threshold_max?: number;
+      period: "daily" | "weekly" | "monthly";
+      active: boolean;
+    }) => {
+      const { data, error } = await supabase
+        .from("goals")
+        .insert([goalData])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw new Error(error.message);
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      // Reset form
+      setSelectedTimer("");
+      setThreshold("");
+
+      toast({
+        title: "Success",
+        description: "Goal created successfully",
+      });
+
+      // Invalidate and refetch goals query
+      queryClient.invalidateQueries({ queryKey: ['goals'] });
+    },
+    onError: (error: Error) => {
+      console.error("Error creating goal:", error);
+      toast({
+        title: "Error",
+        description: `Failed to create goal: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting goal with data:", {
-      timer_id: selectedTimer,
-      type: goalType,
-      threshold,
-      period,
-    });
+    
+    if (!selectedTimer || !threshold) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const goalData = {
       timer_id: selectedTimer,
       type: goalType,
       [goalType === "target" ? "threshold_min" : "threshold_max"]: parseInt(threshold),
       period,
-      active: true, // Explicitly set active to true
+      active: true,
     };
 
-    const { data, error } = await supabase.from("goals").insert([goalData]).select();
-
-    console.log("Supabase response:", { data, error });
-
-    if (error) {
-      console.error("Error creating goal:", error);
-      toast({
-        title: "Error",
-        description: "Failed to create goal",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    toast({
-      title: "Success",
-      description: "Goal created successfully",
-    });
-
-    // Reset form
-    setSelectedTimer("");
-    setThreshold("");
+    createGoalMutation.mutate(goalData);
   };
 
   return (
@@ -112,8 +141,12 @@ export default function GoalForm() {
         onChange={(e) => setThreshold(e.target.value)}
       />
 
-      <Button type="submit" className="w-full">
-        Create Goal
+      <Button 
+        type="submit" 
+        className="w-full"
+        disabled={createGoalMutation.isPending}
+      >
+        {createGoalMutation.isPending ? "Creating..." : "Create Goal"}
       </Button>
     </form>
   );

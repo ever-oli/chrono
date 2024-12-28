@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import GoalForm from "@/components/Goals/GoalForm";
@@ -6,11 +6,15 @@ import GoalCard from "@/components/Goals/GoalCard";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { startOfDay, startOfWeek, startOfMonth } from "date-fns";
+import { useGoalsSubscription } from "@/hooks/useGoalsSubscription";
 
 export default function Goals() {
   const [showForm, setShowForm] = useState(false);
 
-  const { data: goals, refetch } = useQuery({
+  // Enable real-time updates
+  useGoalsSubscription();
+
+  const { data: goals, isLoading, error } = useQuery({
     queryKey: ["goals"],
     queryFn: async () => {
       console.log("Fetching goals...");
@@ -70,34 +74,14 @@ export default function Goals() {
     },
   });
 
-  const handleDeleteGoal = () => {
-    refetch();
+  const handleDeleteGoal = (id: string) => {
+    // The UI will update automatically through the real-time subscription
+    console.log("Goal deleted:", id);
   };
 
-  // Subscribe to real-time changes
-  useEffect(() => {
-    console.log("Setting up real-time subscription...");
-    const channel = supabase
-      .channel("goals-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "goals",
-        },
-        (payload) => {
-          console.log("Real-time update received:", payload);
-          refetch();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      console.log("Cleaning up subscription...");
-      supabase.removeChannel(channel);
-    };
-  }, [refetch]);
+  if (error) {
+    console.error("Error loading goals:", error);
+  }
 
   return (
     <div className="container max-w-2xl mx-auto p-4 space-y-6">
@@ -119,19 +103,28 @@ export default function Goals() {
       )}
 
       <div className="space-y-4">
-        {goals?.map((goal) => (
-          <GoalCard
-            key={goal.id}
-            id={goal.id}
-            timerName={goal.timers.name}
-            type={goal.type}
-            threshold={goal.type === "target" ? goal.threshold_min : goal.threshold_max}
-            period={goal.period}
-            progress={goal.progress}
-            onDelete={handleDeleteGoal}
-          />
-        ))}
-        {(!goals || goals.length === 0) && (
+        {isLoading ? (
+          <div className="text-center text-muted-foreground py-8">
+            Loading goals...
+          </div>
+        ) : error ? (
+          <div className="text-center text-red-500 py-8">
+            Error loading goals. Please try again.
+          </div>
+        ) : goals?.length ? (
+          goals.map((goal) => (
+            <GoalCard
+              key={goal.id}
+              id={goal.id}
+              timerName={goal.timers.name}
+              type={goal.type}
+              threshold={goal.type === "target" ? goal.threshold_min : goal.threshold_max}
+              period={goal.period}
+              progress={goal.progress}
+              onDelete={handleDeleteGoal}
+            />
+          ))
+        ) : (
           <div className="text-center text-muted-foreground py-8">
             No goals yet. Click the + button to add one.
           </div>
