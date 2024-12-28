@@ -22,17 +22,27 @@ export default function GoalForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Submitting goal with data:", {
+      timer_id: selectedTimer,
+      type: goalType,
+      threshold,
+      period,
+    });
 
     const goalData = {
       timer_id: selectedTimer,
       type: goalType,
       [goalType === "target" ? "threshold_min" : "threshold_max"]: parseInt(threshold),
       period,
+      active: true, // Explicitly set active to true
     };
 
-    const { error } = await supabase.from("goals").insert([goalData]);
+    const { data, error } = await supabase.from("goals").insert([goalData]).select();
+
+    console.log("Supabase response:", { data, error });
 
     if (error) {
+      console.error("Error creating goal:", error);
       toast({
         title: "Error",
         description: "Failed to create goal",
