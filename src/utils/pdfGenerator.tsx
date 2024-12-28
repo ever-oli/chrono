@@ -1,7 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { format, parseISO, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns";
-import _ from "lodash";
 import html2canvas from "html2canvas";
 
 interface Event {
@@ -16,12 +15,6 @@ interface Event {
     color: string;
   };
 }
-
-const formatDuration = (seconds: number) => {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  return `${hours}h ${minutes}m`;
-};
 
 const getDateRange = (period: string) => {
   const now = new Date();
@@ -91,15 +84,14 @@ export const generateEventsPDF = async (events: Event[], period: string) => {
     // Capture and add charts
     const chartsContainer = document.querySelector('.grid-cols-2');
     if (chartsContainer) {
-      const [pieChart, barChart] = Array.from(chartsContainer.children);
-      
-      if (pieChart && barChart) {
+      const charts = Array.from(chartsContainer.children);
+      if (charts.length >= 2) {
         // Add pie chart
-        const pieChartImage = await captureChart(pieChart);
+        const pieChartImage = await captureChart(charts[0] as HTMLElement);
         doc.addImage(pieChartImage, 'PNG', 20, 50, 85, 85);
         
         // Add bar chart
-        const barChartImage = await captureChart(barChart);
+        const barChartImage = await captureChart(charts[1] as HTMLElement);
         doc.addImage(barChartImage, 'PNG', 105, 50, 85, 85);
       }
     }
@@ -151,4 +143,10 @@ export const generateEventsPDF = async (events: Event[], period: string) => {
     console.error('Error generating PDF:', error);
     throw error;
   }
+};
+
+const formatDuration = (seconds: number): string => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return `${hours}h ${minutes}m`;
 };

@@ -1,143 +1,77 @@
-import { createContext, useContext, ReactNode } from 'react';
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 interface TimerContextType {
-  timers: Array<{
-    id: string;
-    name: string;
-    color: string;
-    seconds: number;
-  }>;
-  addTimer: (timer: { name: string; color: string }) => void;
-  deleteTimer: (id: string) => void;
-  updateTimerSeconds: (id: string, seconds: number) => Promise<void>;
+  isRunning: boolean;
+  seconds: number;
+  startTimer: () => void;
+  stopTimer: () => void;
+  resetTimer: () => void;
 }
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
 
-export function TimerProvider({ children }: { children: ReactNode }) {
+export function TimerProvider({ children }: { children: React.ReactNode }) {
+  const [isRunning, setIsRunning] = useState(false);
+  const [seconds, setSeconds] = useState(0);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
-  const { data: timers = [] } = useQuery({
-    queryKey: ['timers'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('timers')
-        .select(`
-          id,
-          name,
-          color,
-          time_entries (seconds)
-        `);
-      
-      if (error) throw error;
-      
-      return data.map(timer => ({
-        id: timer.id,
-        name: timer.name,
-        color: timer.color,
-        seconds: timer.time_entries?.reduce((acc: number, entry: any) => acc + entry.seconds, 0) || 0
-      }));
-    },
-    refetchInterval: 5000
-  });
-
-  const addTimerMutation = useMutation({
-    mutationFn: async (newTimer: { name: string; color: string }) => {
-      const { data, error } = await supabase
-        .from('timers')
-        .insert([newTimer])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['timers'] });
-      toast({
-        title: "Timer created",
-        description: "Your new timer has been created successfully.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to create timer: " + error.message,
-        variant: "destructive",
-      });
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isRunning) {
+      interval = setInterval(() => {
+        setSeconds((prevSeconds) => prevSeconds + 1);
+      }, 1000);
     }
-  });
+    return () => clearInterval(interval);
+  }, [isRunning]);
 
-  const deleteTimerMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('timers')
-        .delete()
-        .eq('id', id);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['timers'] });
-      toast({
-        title: "Timer deleted",
-        description: "Timer has been deleted successfully.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to delete timer: " + error.message,
-        variant: "destructive",
-      });
-    }
-  });
-
-  const updateTimerSeconds = async (id: string, seconds: number) => {
-    try {
-      const { error } = await supabase
-        .from('time_entries')
-        .insert([
-          { 
-            timer_id: id,
-            seconds: seconds,
-            ended_at: new Date().toISOString()
-          }
-        ]);
-
-      if (error) {
-        console.error("Error updating timer seconds:", error);
-        return;
-      }
-
-      queryClient.invalidateQueries({ queryKey: ['timers'] });
-    } catch (error) {
-      console.error("Error in updateTimerSeconds:", error);
-    }
+  const startTimer = () => {
+    setIsRunning(true);
+    toast({
+      title: "Timer Started",
+      description: "Your timer is now running",
+    });
   };
 
-  const value = {
-    timers,
-    addTimer: (timer) => addTimerMutation.mutate(timer),
-    deleteTimer: (id) => deleteTimerMutation.mutate(id),
-    updateTimerSeconds,
+  const stopTimer = () => {
+    setIsRunning(false);
+    toast({
+      title: "Timer Stopped",
+      description: `Total time: ${Math.floor(seconds / 60)} minutes ${seconds % 60} seconds`,
+    });
+  };
+
+  const resetTimer = () => {
+    setIsRunning(false);
+    setSeconds(0);
+    toast({
+      title: "Timer Reset",
+      description: "Your timer has been reset to 0",
+    });
   };
 
   return (
-    <TimerContext.Provider value={value}>
+    <TimerContext.Provider
+      value={{
+        isRunning,
+        seconds,
+        startTimer,
+        stopTimer,
+        resetTimer,
+      }}
+    >
+      <Toaster />
       {children}
     </TimerContext.Provider>
   );
 }
 
-export function useTimerContext() {
+export function useTimer() {
   const context = useContext(TimerContext);
-  if (context === undefined) {
-    throw new Error('useTimerContext must be used within a TimerProvider');
+  if (!context) {
+    throw new Error("useTimer must be used within a TimerProvider");
   }
   return context;
 }
