@@ -45,12 +45,12 @@ export default function Events() {
   }, {});
 
   return (
-    <div className="container max-w-2xl mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Events Log</h1>
+    <div className="container max-w-2xl mx-auto p-4 min-h-screen bg-background">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold text-primary">Events Log</h1>
         <Dialog>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="bg-primary hover:bg-primary/90">
               <Plus className="h-4 w-4 mr-2" />
               New Event
             </Button>
@@ -65,7 +65,7 @@ export default function Events() {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-8">Loading events...</div>
+        <div className="text-center py-8 text-muted-foreground">Loading events...</div>
       ) : (
         <EventsList groupedEvents={groupedEvents} />
       )}

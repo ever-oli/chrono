@@ -2,9 +2,6 @@ import { format, isToday, parseISO } from "date-fns";
 import { Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 import NewEventForm from "./NewEventForm";
 
 interface Event {
@@ -30,9 +27,6 @@ interface EventsListProps {
 }
 
 export default function EventsList({ groupedEvents }: EventsListProps) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
   const formatTime = (dateString: string) => {
     return format(parseISO(dateString), 'h:mm a');
   };
@@ -51,23 +45,15 @@ export default function EventsList({ groupedEvents }: EventsListProps) {
     return format(parsedDate, 'EEEE, MMMM d');
   };
 
-  const getMarkerSize = (size: 'small' | 'medium' | 'large') => {
-    switch (size) {
-      case 'small': return 'h-2';
-      case 'large': return 'h-6';
-      default: return 'h-4';
-    }
-  };
-
   return (
     <div className="space-y-8">
       {Object.entries(groupedEvents).map(([date, events]) => (
         <div key={date} className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-primary">
               {getDateHeader(date)}
             </h2>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-muted-foreground">
               {events.length} events
             </span>
           </div>
@@ -77,30 +63,30 @@ export default function EventsList({ groupedEvents }: EventsListProps) {
               <div
                 key={event.id}
                 className="rounded-lg p-4 relative overflow-hidden"
-                style={{ 
+                style={{
                   borderLeft: `4px solid ${event.timers.color}`,
-                  backgroundColor: 'rgba(220, 158, 130, 0.15)',
-                  backdropFilter: 'blur(5px)',
-                  boxShadow: '0 0 1rem 0 rgba(0, 0, 0, 0.2)'
+                  backgroundColor: 'rgba(242, 243, 217, 0.3)',
+                  backdropFilter: 'blur(8px)',
+                  boxShadow: '0 4px 12px -2px rgba(0, 0, 0, 0.12)'
                 }}
               >
                 <div className="pl-4">
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <h3 className="font-medium">
+                      <h3 className="font-medium text-primary">
                         {event.name || event.timers.name}
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-muted-foreground">
                         {formatTime(event.started_at)} → {formatTime(event.ended_at)}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-blue-600">
+                      <span className="text-sm font-medium text-accent">
                         {formatDuration(event.seconds)}
                       </span>
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="outline" size="icon">
+                          <Button variant="outline" size="icon" className="h-8 w-8">
                             <Edit className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
@@ -117,7 +103,7 @@ export default function EventsList({ groupedEvents }: EventsListProps) {
                     </div>
                   </div>
                   {event.notes && (
-                    <p className="text-sm text-gray-600 mt-2">{event.notes}</p>
+                    <p className="text-sm text-muted-foreground mt-2">{event.notes}</p>
                   )}
                 </div>
               </div>
