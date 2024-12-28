@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import PieChart from "./PieChart";
 import BarChart from "./BarChart";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { 
   startOfDay, 
   endOfDay, 
@@ -27,6 +29,13 @@ interface AnalyticsProps {
   timeRange: "hours" | "days" | "weeks" | "months";
   currentDate: Date;
 }
+
+// Format time for display
+const formatTime = (seconds: number) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return `${hours}h ${minutes}m`;
+};
 
 export default function Analytics({ timeRange, currentDate }: AnalyticsProps) {
   // Get date range based on selected time period
@@ -151,7 +160,7 @@ export default function Analytics({ timeRange, currentDate }: AnalyticsProps) {
               />
               <span className="font-medium">{item.name}</span>
             </div>
-            <span>{item.hours.toFixed(2)}h</span>
+            <span>{formatTime(item.hours * 3600)}</span>
           </div>
         ))}
       </div>

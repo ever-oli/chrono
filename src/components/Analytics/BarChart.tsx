@@ -29,7 +29,11 @@ export default function BarChart({ data }: BarChartProps) {
             className="text-xs"
           />
           <Tooltip
-            formatter={(value: number) => [`${value.toFixed(2)}h`, 'Time Spent']}
+            formatter={(value: number) => {
+              const hours = Math.floor(value);
+              const minutes = Math.floor((value - hours) * 60);
+              return [`${hours}h ${minutes}m`, 'Time Spent'];
+            }}
           />
           <Bar 
             dataKey="hours"
