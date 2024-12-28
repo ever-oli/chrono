@@ -65,9 +65,9 @@ export default function EventsList({ groupedEvents }: EventsListProps) {
                 className="rounded-lg p-4 relative overflow-hidden"
                 style={{
                   borderLeft: `4px solid ${event.timers.color}`,
-                  backgroundColor: 'rgba(242, 243, 217, 0.3)',
-                  backdropFilter: 'blur(8px)',
-                  boxShadow: '0 4px 12px -2px rgba(0, 0, 0, 0.12)'
+                  backgroundColor: 'rgba(220, 158, 130, 0.15)',
+                  backdropFilter: 'blur(5px)',
+                  boxShadow: '0 0 1rem 0 rgba(0, 0, 0, 0.2)'
                 }}
               >
                 <div className="pl-4">
