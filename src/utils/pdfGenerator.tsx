@@ -54,11 +54,16 @@ const getDateRange = (period: string) => {
 };
 
 const captureChart = async (chartElement: HTMLElement): Promise<string> => {
-  const canvas = await html2canvas(chartElement, {
-    scale: 2,
-    backgroundColor: null,
-  });
-  return canvas.toDataURL('image/png');
+  try {
+    const canvas = await html2canvas(chartElement, {
+      scale: 2,
+      backgroundColor: null,
+    });
+    return canvas.toDataURL('image/png');
+  } catch (error) {
+    console.error('Error capturing chart:', error);
+    throw error;
+  }
 };
 
 export const generateEventsPDF = async (events: Event[], period: string) => {
@@ -71,60 +76,33 @@ export const generateEventsPDF = async (events: Event[], period: string) => {
     return eventDate >= start && eventDate <= end;
   });
 
-  // Add header
-  doc.setFontSize(20);
-  doc.text(title, 20, 20);
-
-  // Add statement info
-  doc.setFontSize(12);
-  doc.text(`Generated on: ${format(new Date(), 'MMMM d, yyyy')}`, 20, 30);
-  
-  const totalTime = filteredEvents.reduce((acc, event) => acc + event.seconds, 0);
-  doc.text(`Total Time: ${formatDuration(totalTime)}`, 20, 40);
-
-  // Prepare analytics data
-  const analyticsData = _.chain(filteredEvents)
-    .groupBy(event => event.timers.name)
-    .map((events, name) => ({
-      name,
-      hours: _.sumBy(events, 'seconds') / 3600,
-      color: events[0].timers.color
-    }))
-    .value();
-
-  // Create temporary chart elements
-  const chartsContainer = document.createElement('div');
-  chartsContainer.style.width = '800px';
-  chartsContainer.style.height = '300px';
-  chartsContainer.style.position = 'absolute';
-  chartsContainer.style.left = '-9999px';
-  document.body.appendChild(chartsContainer);
-
-  // Render and capture charts
-  const Analytics = (await import('@/components/Analytics/AnalyticsCharts')).default;
-  const root = document.createElement('div');
-  chartsContainer.appendChild(root);
-
-  // @ts-ignore - We know this exists in the window object
-  const { createRoot } = window.ReactDOM;
-  const reactRoot = createRoot(root);
-  reactRoot.render(<Analytics data={analyticsData} />);
-
-  // Wait for charts to render
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
   try {
-    // Capture charts
-    const chartElements = chartsContainer.querySelectorAll('.h-[300px]');
-    const [pieChartImage, barChartImage] = await Promise.all(
-      Array.from(chartElements).map(element => captureChart(element as HTMLElement))
-    );
+    // Add header
+    doc.setFontSize(20);
+    doc.text(title, 20, 20);
 
-    // Add charts to PDF
-    const chartWidth = 85;
-    const chartHeight = 85;
-    doc.addImage(pieChartImage, 'PNG', 20, 50, chartWidth, chartHeight);
-    doc.addImage(barChartImage, 'PNG', 105, 50, chartWidth, chartHeight);
+    // Add statement info
+    doc.setFontSize(12);
+    doc.text(`Generated on: ${format(new Date(), 'MMMM d, yyyy')}`, 20, 30);
+    
+    const totalTime = filteredEvents.reduce((acc, event) => acc + event.seconds, 0);
+    doc.text(`Total Time: ${formatDuration(totalTime)}`, 20, 40);
+
+    // Capture and add charts
+    const chartsContainer = document.querySelector('.grid-cols-2');
+    if (chartsContainer) {
+      const [pieChart, barChart] = Array.from(chartsContainer.children);
+      
+      if (pieChart && barChart) {
+        // Add pie chart
+        const pieChartImage = await captureChart(pieChart);
+        doc.addImage(pieChartImage, 'PNG', 20, 50, 85, 85);
+        
+        // Add bar chart
+        const barChartImage = await captureChart(barChart);
+        doc.addImage(barChartImage, 'PNG', 105, 50, 85, 85);
+      }
+    }
 
     // Add events table
     const tableData = filteredEvents.map(event => [
@@ -169,9 +147,8 @@ export const generateEventsPDF = async (events: Event[], period: string) => {
     // Save the PDF
     const fileName = `time-statement-${period}.pdf`;
     doc.save(fileName);
-  } finally {
-    // Cleanup
-    reactRoot.unmount();
-    document.body.removeChild(chartsContainer);
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    throw error;
   }
 };

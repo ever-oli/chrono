@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import NewEventForm from "@/components/Events/NewEventForm";
 import StatementPeriodSelect from "@/components/Events/StatementPeriodSelect";
 import { generateEventsPDF } from "@/utils/pdfGenerator";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { format, parseISO } from "date-fns";
 
 export default function Events() {
@@ -53,7 +53,7 @@ export default function Events() {
       await generateEventsPDF(events, period);
       toast({
         title: "Export Successful",
-        description: `Your statement has been generated.`,
+        description: "Your statement has been generated.",
       });
     } catch (error) {
       console.error('Export error:', error);
