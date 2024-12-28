@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Rectangle } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Info } from 'lucide-react';
 
@@ -54,6 +54,14 @@ export default function LifeChartView({ data }: LifeChartProps) {
     });
   }, [data]);
 
+  // Create a map of activity names to their colors for easy lookup
+  const activityColorMap = useMemo(() => {
+    return data.reduce((acc, activity) => {
+      acc[activity.name] = activity.color;
+      return acc;
+    }, {} as Record<string, string>);
+  }, [data]);
+
   return (
     <Card className="w-full bg-card/50 backdrop-blur-sm border-none shadow-lg">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -100,7 +108,7 @@ export default function LifeChartView({ data }: LifeChartProps) {
                       .map(activityName => ({
                         name: activityName,
                         hours: data[activityName],
-                        color: data.find((d: any) => d.name === activityName)?.color || '#C16E70'
+                        color: activityColorMap[activityName]
                       }));
 
                     const totalHours = activities.reduce((sum, activity) => sum + activity.hours, 0);
