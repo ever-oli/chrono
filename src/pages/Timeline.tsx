@@ -3,7 +3,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Analytics from "@/components/Analytics";
-import { useTimerContext } from "@/components/Timer/TimerContext";
 import { format, subDays, addDays } from "date-fns";
 
 type TimeRange = "hours" | "days" | "weeks" | "months";
@@ -11,7 +10,6 @@ type TimeRange = "hours" | "days" | "weeks" | "months";
 export default function Timeline() {
   const [timeRange, setTimeRange] = useState<TimeRange>("hours");
   const [currentDate, setCurrentDate] = useState(new Date());
-  const { timers } = useTimerContext();
 
   const handlePrevious = () => {
     switch (timeRange) {
@@ -90,7 +88,6 @@ export default function Timeline() {
 
       <div className="bg-card rounded-lg p-6">
         <Analytics 
-          timers={timers} 
           timeRange={timeRange}
           currentDate={currentDate}
         />
