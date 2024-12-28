@@ -3,7 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import PieChart from "./PieChart";
 import BarChart from "./BarChart";
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns";
+import { 
+  startOfDay, 
+  endOfDay, 
+  startOfWeek, 
+  endOfWeek, 
+  startOfMonth, 
+  endOfMonth, 
+  startOfYear, 
+  endOfYear,
+  isWithinInterval
+} from "date-fns";
 
 interface Timer {
   id: string;
@@ -71,26 +81,31 @@ export default function Analytics({ timers, timeRange, currentDate }: AnalyticsP
     }
   });
 
-  // Aggregate time entries by timer
+  // Filter and aggregate time entries based on time range
   const aggregatedData = useMemo(() => {
     const timerMap = new Map<string, { name: string; color: string; seconds: number }>();
     
     timeEntries.forEach(entry => {
+      const entryDate = new Date(entry.started_at);
       const timer = entry.timers;
-      const current = timerMap.get(timer.id) || { 
-        name: timer.name, 
-        color: timer.color, 
-        seconds: 0 
-      };
-      
-      timerMap.set(timer.id, {
-        ...current,
-        seconds: current.seconds + entry.seconds
-      });
+
+      // Only include entries that fall within the selected time range
+      if (isWithinInterval(entryDate, { start: dateRange.start, end: dateRange.end })) {
+        const current = timerMap.get(timer.id) || { 
+          name: timer.name, 
+          color: timer.color, 
+          seconds: 0 
+        };
+        
+        timerMap.set(timer.id, {
+          ...current,
+          seconds: current.seconds + entry.seconds
+        });
+      }
     });
 
     return Array.from(timerMap.values());
-  }, [timeEntries]);
+  }, [timeEntries, dateRange]);
 
   // Transform data for charts
   const chartData = useMemo(() => 
