@@ -3,8 +3,12 @@ import { LifeChartProps } from "./types";
 import LifeChartHeader from "./LifeChartHeader";
 import LifeChartVisualization from "./LifeChartVisualization";
 import { ErrorBoundary } from "react-error-boundary";
+import { useState } from "react";
 
 export default function LifeChart({ data }: LifeChartProps) {
+  const [currentAge, setCurrentAge] = useState(25);
+  const [expectedLifespan, setExpectedLifespan] = useState(85);
+
   return (
     <ErrorBoundary
       fallback={
@@ -20,7 +24,13 @@ export default function LifeChart({ data }: LifeChartProps) {
       <Card className="w-full bg-card/50 backdrop-blur-sm border-none shadow-lg">
         <LifeChartHeader />
         <CardContent>
-          <LifeChartVisualization data={data} />
+          <LifeChartVisualization 
+            data={data}
+            currentAge={currentAge}
+            setCurrentAge={setCurrentAge}
+            expectedLifespan={expectedLifespan}
+            setExpectedLifespan={setExpectedLifespan}
+          />
         </CardContent>
       </Card>
     </ErrorBoundary>
