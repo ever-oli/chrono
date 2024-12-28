@@ -76,8 +76,14 @@ export default function EventsList({ groupedEvents }: EventsListProps) {
             {events.map((event) => (
               <div
                 key={event.id}
-                className="border-secondary rounded-lg p-4 relative overflow-hidden border"
-                style={{ borderLeft: `4px solid ${event.timers.color}` }}
+                className="rounded-lg p-4 relative overflow-hidden"
+                style={{ 
+                  borderLeft: `4px solid ${event.timers.color}`,
+                  backgroundColor: 'rgba(220, 158, 130, 0.15)',
+                  backdropFilter: 'blur(5px)',
+                  boxShadow: '0 0 1rem 0 rgba(0, 0, 0, 0.2)',
+                  border: '1px solid rgba(220, 158, 130, 0.3)'
+                }}
               >
                 <div className="pl-4">
                   <div className="flex justify-between items-start mb-2">
