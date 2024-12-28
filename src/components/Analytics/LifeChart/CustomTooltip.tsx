@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { TooltipProps } from "recharts";
 
 interface TooltipData {
   name: string;
@@ -6,15 +7,7 @@ interface TooltipData {
   color: string;
 }
 
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: Array<{
-    payload: {
-      age: number;
-      label: string;
-      [key: string]: any;
-    };
-  }>;
+interface CustomTooltipProps extends TooltipProps<any, any> {
   activityColorMap: Record<string, string>;
 }
 

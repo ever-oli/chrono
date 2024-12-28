@@ -67,10 +67,9 @@ export default function LifeChartVisualization({
             }}
           />
           <Tooltip
-            content={({ active, payload }) => (
+            content={(props) => (
               <CustomTooltip
-                active={active}
-                payload={payload}
+                {...props}
                 activityColorMap={activityColorMap}
               />
             )}
