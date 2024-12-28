@@ -2,76 +2,71 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 
+interface Timer {
+  id: string;
+  name: string;
+  color: string;
+}
+
 interface TimerContextType {
-  isRunning: boolean;
-  seconds: number;
-  startTimer: () => void;
-  stopTimer: () => void;
-  resetTimer: () => void;
+  timers: Timer[];
+  addTimer: (timer: Omit<Timer, "id">) => void;
+  deleteTimer: (id: string) => void;
+  updateTimerSeconds: (id: string, seconds: number) => void;
 }
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
 
 export function TimerProvider({ children }: { children: React.ReactNode }) {
-  const [isRunning, setIsRunning] = useState(false);
-  const [seconds, setSeconds] = useState(0);
+  const [timers, setTimers] = useState<Timer[]>([]);
   const { toast } = useToast();
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isRunning) {
-      interval = setInterval(() => {
-        setSeconds((prevSeconds) => prevSeconds + 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isRunning]);
-
-  const startTimer = () => {
-    setIsRunning(true);
+  const addTimer = (timer: Omit<Timer, "id">) => {
+    const newTimer = {
+      ...timer,
+      id: crypto.randomUUID(),
+    };
+    setTimers((prev) => [...prev, newTimer]);
     toast({
-      title: "Timer Started",
-      description: "Your timer is now running",
+      title: "Timer Added",
+      description: `${timer.name} has been added to your timers`,
     });
   };
 
-  const stopTimer = () => {
-    setIsRunning(false);
+  const deleteTimer = (id: string) => {
+    setTimers((prev) => prev.filter((timer) => timer.id !== id));
     toast({
-      title: "Timer Stopped",
-      description: `Total time: ${Math.floor(seconds / 60)} minutes ${seconds % 60} seconds`,
+      title: "Timer Deleted",
+      description: "Timer has been removed",
     });
   };
 
-  const resetTimer = () => {
-    setIsRunning(false);
-    setSeconds(0);
-    toast({
-      title: "Timer Reset",
-      description: "Your timer has been reset to 0",
-    });
+  const updateTimerSeconds = (id: string, seconds: number) => {
+    setTimers((prev) =>
+      prev.map((timer) =>
+        timer.id === id ? { ...timer, seconds } : timer
+      )
+    );
   };
 
   return (
     <TimerContext.Provider
       value={{
-        isRunning,
-        seconds,
-        startTimer,
-        stopTimer,
-        resetTimer,
+        timers,
+        addTimer,
+        deleteTimer,
+        updateTimerSeconds,
       }}
     >
-      <Toaster />
       {children}
     </TimerContext.Provider>
   );
 }
 
-export function useTimer() {
+export function useTimerContext() {
   const context = useContext(TimerContext);
   if (!context) {
-    throw new Error("useTimer must be used within a TimerProvider");
+    throw new Error("useTimerContext must be used within a TimerProvider");
   }
   return context;
 }
