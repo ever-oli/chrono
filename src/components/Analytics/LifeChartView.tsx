@@ -8,8 +8,7 @@ interface CustomBarProps {
   y?: number;
   width?: number;
   height?: number;
-  age?: number;
-  isHovered?: boolean;
+  fill?: string;
 }
 
 interface LifeChartProps {
@@ -23,7 +22,7 @@ interface LifeChartProps {
 export default function LifeChartView({ data }: LifeChartProps) {
   const [hoveredAge, setHoveredAge] = useState<number | null>(null);
   
-  const totalWeeklyHours = useMemo(() => {
+  const totalDailyHours = useMemo(() => {
     return data.reduce((sum, entry) => sum + entry.hours, 0);
   }, [data]);
   
@@ -31,38 +30,29 @@ export default function LifeChartView({ data }: LifeChartProps) {
     const currentAge = 30;
     const expectedLifespan = 80;
     const remainingYears = expectedLifespan - currentAge;
-    const yearlyHours = totalWeeklyHours * 52;
+    
+    // Convert weekly hours to yearly hours (daily hours × 365)
+    const yearlyHoursByActivity = data.map(activity => ({
+      name: activity.name,
+      hours: (activity.hours / 7) * 365, // Convert weekly hours to daily, then multiply by days in year
+      color: activity.color
+    }));
     
     return Array.from({ length: remainingYears }, (_, i) => {
       const age = currentAge + i;
-      return {
+      const yearData = {
         age,
-        projected: yearlyHours,
         label: `Age ${age}`,
-        activities: data.map(activity => ({
-          name: activity.name,
-          hours: (activity.hours * 52),
-          color: activity.color
-        }))
       };
-    });
-  }, [data, totalWeeklyHours]);
 
-  const CustomBar = ({ x, y, width, height, age }: CustomBarProps) => {
-    const isHovered = hoveredAge === age;
-    
-    return (
-      <Rectangle
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        fill={isHovered ? '#DC9E82' : '#C16E70'}
-        className="transition-colors duration-200"
-        opacity={isHovered ? 1 : 0.8}
-      />
-    );
-  };
+      // Add each activity's hours as a separate property
+      yearlyHoursByActivity.forEach(activity => {
+        yearData[activity.name] = activity.hours;
+      });
+
+      return yearData;
+    });
+  }, [data]);
 
   return (
     <Card className="w-full bg-card/50 backdrop-blur-sm border-none shadow-lg">
@@ -105,11 +95,21 @@ export default function LifeChartView({ data }: LifeChartProps) {
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     const data = payload[0].payload;
+                    const activities = Object.keys(data)
+                      .filter(key => key !== 'age' && key !== 'label')
+                      .map(activityName => ({
+                        name: activityName,
+                        hours: data[activityName],
+                        color: data.find((d: any) => d.name === activityName)?.color || '#C16E70'
+                      }));
+
+                    const totalHours = activities.reduce((sum, activity) => sum + activity.hours, 0);
+
                     return (
                       <div className="bg-card/95 backdrop-blur-sm p-4 shadow-lg rounded-lg border border-border/50">
                         <p className="font-semibold text-foreground">Age {data.age}</p>
                         <div className="space-y-1.5 mt-2">
-                          {data.activities.map((activity: any) => (
+                          {activities.map((activity) => (
                             <div key={activity.name} className="flex justify-between items-center gap-4">
                               <div className="flex items-center gap-2">
                                 <div 
@@ -127,7 +127,7 @@ export default function LifeChartView({ data }: LifeChartProps) {
                         <div className="mt-3 pt-2 border-t border-border/50">
                           <p className="text-sm font-medium text-foreground flex justify-between">
                             <span>Total:</span>
-                            <span>{Math.round(data.projected)} hours</span>
+                            <span>{Math.round(totalHours)} hours</span>
                           </p>
                         </div>
                       </div>
@@ -136,10 +136,14 @@ export default function LifeChartView({ data }: LifeChartProps) {
                   return null;
                 }}
               />
-              <Bar
-                dataKey="projected"
-                shape={<CustomBar />}
-              />
+              {data.map((activity) => (
+                <Bar
+                  key={activity.name}
+                  dataKey={activity.name}
+                  stackId="a"
+                  fill={activity.color}
+                />
+              ))}
             </BarChart>
           </ResponsiveContainer>
         </div>
