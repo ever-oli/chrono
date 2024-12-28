@@ -9,6 +9,47 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      goals: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          period: Database["public"]["Enums"]["goal_period"]
+          threshold_max: number | null
+          threshold_min: number | null
+          timer_id: string
+          type: Database["public"]["Enums"]["goal_type"]
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          period: Database["public"]["Enums"]["goal_period"]
+          threshold_max?: number | null
+          threshold_min?: number | null
+          timer_id: string
+          type: Database["public"]["Enums"]["goal_type"]
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          period?: Database["public"]["Enums"]["goal_period"]
+          threshold_max?: number | null
+          threshold_min?: number | null
+          timer_id?: string
+          type?: Database["public"]["Enums"]["goal_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goals_timer_id_fkey"
+            columns: ["timer_id"]
+            isOneToOne: false
+            referencedRelation: "timers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       time_entries: {
         Row: {
           created_at: string
@@ -82,6 +123,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      goal_period: "daily" | "weekly" | "monthly"
+      goal_type: "target" | "limit"
       marker_size: "small" | "medium" | "large"
     }
     CompositeTypes: {
