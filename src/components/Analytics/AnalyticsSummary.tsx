@@ -16,7 +16,7 @@ export default function AnalyticsSummary({ data }: AnalyticsSummaryProps) {
       {data.map((item) => (
         <div
           key={item.name}
-          className="flex items-center justify-between p-3 bg-secondary/20 border border-secondary/30 backdrop-blur-sm rounded-lg"
+          className="flex items-center justify-between p-3 bg-secondary/40 border border-secondary/60 backdrop-blur-md rounded-lg"
         >
           <div className="flex items-center gap-2">
             <div 
