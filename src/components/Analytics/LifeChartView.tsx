@@ -23,26 +23,36 @@ interface LifeChartProps {
 export default function LifeChartView({ data }: LifeChartProps) {
   const [hoveredAge, setHoveredAge] = useState<number | null>(null);
   
-  // For demo purposes, hardcoded values - these would come from user settings
-  const currentAge = 30;
-  const expectedLifespan = 80;
-  const remainingYears = expectedLifespan - currentAge;
+  // Calculate total weekly hours from real data
+  const totalWeeklyHours = useMemo(() => {
+    return data.reduce((sum, entry) => sum + entry.hours, 0);
+  }, [data]);
   
+  // Project yearly data based on real weekly data
   const projectedData = useMemo(() => {
-    // Calculate total hours from current data
-    const totalHours = data.reduce((sum, entry) => sum + entry.hours, 0);
-    const hoursPerYear = totalHours * (365 / 7); // Extrapolate weekly data to yearly
+    // Current age and lifespan could be user settings in the future
+    const currentAge = 30;
+    const expectedLifespan = 80;
+    const remainingYears = expectedLifespan - currentAge;
     
-    // Create year blocks
+    // Convert weekly hours to yearly projection
+    const yearlyHours = totalWeeklyHours * 52; // 52 weeks in a year
+    
+    // Create projected data points for each remaining year
     return Array.from({ length: remainingYears }, (_, i) => {
       const age = currentAge + i;
       return {
         age,
-        projected: hoursPerYear,
+        projected: yearlyHours,
         label: `Age ${age}`,
+        activities: data.map(activity => ({
+          name: activity.name,
+          hours: (activity.hours * 52), // yearly projection
+          color: activity.color
+        }))
       };
     });
-  }, [data, remainingYears, currentAge]);
+  }, [data, totalWeeklyHours]);
 
   const CustomBar = ({ x, y, width, height, age }: CustomBarProps) => {
     const isHovered = hoveredAge === age;
@@ -100,9 +110,21 @@ export default function LifeChartView({ data }: LifeChartProps) {
                     return (
                       <div className="bg-card p-4 shadow-lg rounded-lg border">
                         <p className="font-semibold">Age {data.age}</p>
-                        <p className="text-muted-foreground">
-                          Projected: {Math.round(data.projected)} hours
-                        </p>
+                        <div className="space-y-1 mt-2">
+                          {data.activities.map((activity: any) => (
+                            <div key={activity.name} className="flex justify-between items-center">
+                              <span className="text-sm">{activity.name}:</span>
+                              <span className="text-sm font-medium">
+                                {Math.round(activity.hours)} hours
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-2 pt-2 border-t">
+                          <p className="text-sm font-medium">
+                            Total: {Math.round(data.projected)} hours
+                          </p>
+                        </div>
                       </div>
                     );
                   }
