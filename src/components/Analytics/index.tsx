@@ -58,6 +58,11 @@ export default function Analytics({ timeRange, currentDate }: AnalyticsProps) {
   const { data: timeEntries = [] } = useQuery({
     queryKey: ['timeEntries', dateRange.start, dateRange.end],
     queryFn: async () => {
+      console.log('Fetching entries for range:', {
+        start: dateRange.start.toISOString(),
+        end: dateRange.end.toISOString()
+      });
+
       const { data, error } = await supabase
         .from('time_entries')
         .select(`
@@ -71,12 +76,18 @@ export default function Analytics({ timeRange, currentDate }: AnalyticsProps) {
             color
           )
         `)
-        .gte('started_at', dateRange.start.toISOString())
-        .lte('started_at', dateRange.end.toISOString())
-        .or(`ended_at.gte.${dateRange.start.toISOString()},ended_at.is.null`)
+        .or(
+          `and(started_at.lte.${dateRange.end.toISOString()},ended_at.gte.${dateRange.start.toISOString()}),` +
+          `and(started_at.lte.${dateRange.end.toISOString()},ended_at.is.null)`
+        )
         .order('started_at', { ascending: true });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching time entries:', error);
+        throw error;
+      }
+
+      console.log('Fetched entries:', data);
       return data;
     }
   });
