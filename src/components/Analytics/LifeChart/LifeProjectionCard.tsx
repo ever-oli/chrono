@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
 import { calculateTimeProjection, formatDurationImpact } from "@/utils/lifeProjections";
-import { formatDuration } from "@/utils/dateFormatters";
 import { TimeUnit } from "./TimeUnitToggle";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
@@ -33,13 +32,13 @@ export default function LifeProjectionCard({
   const formatTime = (hours: number) => {
     switch (timeUnit) {
       case "hours":
-        return `${Math.round(hours)} hours`;
+        return `${Math.round(hours).toLocaleString()} hours`;
       case "days":
-        return `${Math.round(hours / 24)} days`;
+        return `${Math.round(hours / 24).toLocaleString()} days`;
       case "years":
         return `${(hours / (24 * 365)).toFixed(1)} years`;
       default:
-        return formatDuration(hours * 3600);
+        return `${Math.round(hours).toLocaleString()} hours`;
     }
   };
   
@@ -75,14 +74,20 @@ export default function LifeProjectionCard({
               exit={{ opacity: 0, height: 0 }}
               className="pt-2"
             >
-              <Slider
-                value={[adjustedHours]}
-                onValueChange={(value) => setAdjustedHours(value[0])}
-                min={0}
-                max={Math.max(weeklyHours * 2, 40)}
-                step={0.5}
-                className="my-4"
-              />
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>0h</span>
+                  <span>{Math.round(weeklyHours * 2)}h / week</span>
+                </div>
+                <Slider
+                  value={[adjustedHours]}
+                  onValueChange={(value) => setAdjustedHours(value[0])}
+                  min={0}
+                  max={Math.max(weeklyHours * 2, 40)}
+                  step={0.5}
+                  className="my-4"
+                />
+              </div>
               {percentChange !== 0 && (
                 <div className="text-sm">
                   <span className={percentChange > 0 ? "text-green-500" : "text-red-500"}>
