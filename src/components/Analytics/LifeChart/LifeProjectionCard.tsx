@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { calculateTimeProjection, formatDurationImpact } from "@/utils/lifeProjections";
+import { calculateLifeProjection, calculatePercentChange } from "@/utils/lifeChartCalculations";
 import { TimeUnit } from "./TimeUnitToggle";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -28,10 +28,10 @@ export default function LifeProjectionCard({
   const [adjustedHours, setAdjustedHours] = useState(weeklyHours);
   const [isAdjusting, setIsAdjusting] = useState(false);
   
-  const baseProjection = calculateTimeProjection(weeklyHours, currentAge, expectedLifespan);
-  const adjustedProjection = calculateTimeProjection(adjustedHours, currentAge, expectedLifespan);
+  const baseProjection = calculateLifeProjection(weeklyHours, currentAge, expectedLifespan);
+  const adjustedProjection = calculateLifeProjection(adjustedHours, currentAge, expectedLifespan);
   
-  const percentChange = ((adjustedProjection.lifetime - baseProjection.lifetime) / baseProjection.lifetime) * 100;
+  const percentChange = calculatePercentChange(baseProjection.lifetime, adjustedProjection.lifetime);
   
   return (
     <motion.div
@@ -73,7 +73,7 @@ export default function LifeProjectionCard({
             {isAdjusting ? "Hide adjustment" : "Adjust time"}
           </button>
           <p className="text-sm text-muted-foreground mt-2">
-            {formatDurationImpact(adjustedProjection.lifetime)} of your remaining waking life
+            {formatTimeUnit(adjustedProjection.lifetime, timeUnit)} of your remaining waking life
           </p>
         </div>
       </Card>
