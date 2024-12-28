@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import TimerDisplay from "./TimerDisplay";
-import TimerControls from "./TimerControls";
-import TimerEditDialog from "./TimerEditDialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -24,7 +22,6 @@ export default function Timer({
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
-  const [showEditDialog, setShowEditDialog] = useState(false);
   const [editName, setEditName] = useState("");
   const [editNotes, setEditNotes] = useState("");
   const queryClient = useQueryClient();
@@ -100,26 +97,14 @@ export default function Timer({
   };
 
   return (
-    <>
-      <TimerDisplay
-        id={id}
-        name={name}
-        color={color}
-        seconds={seconds}
-        isRunning={isRunning}
-        onToggle={toggleTimer}
-        onDelete={() => onDelete(id)}
-        onEdit={() => setShowEditDialog(true)}
-      />
-
-      <TimerEditDialog
-        open={showEditDialog}
-        onOpenChange={setShowEditDialog}
-        editName={editName}
-        editNotes={editNotes}
-        onNameChange={setEditName}
-        onNotesChange={setEditNotes}
-      />
-    </>
+    <TimerDisplay
+      id={id}
+      name={name}
+      color={color}
+      seconds={seconds}
+      isRunning={isRunning}
+      onToggle={toggleTimer}
+      onDelete={() => onDelete(id)}
+    />
   );
 }
