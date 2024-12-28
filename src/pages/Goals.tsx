@@ -5,6 +5,7 @@ import GoalForm from "@/components/Goals/GoalForm";
 import GoalCard from "@/components/Goals/GoalCard";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { startOfDay, startOfWeek, startOfMonth } from "date-fns";
 
 export default function Goals() {
   const [showForm, setShowForm] = useState(false);
@@ -12,7 +13,7 @@ export default function Goals() {
   const { data: goals, refetch } = useQuery({
     queryKey: ["goals"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: goalsData, error: goalsError } = await supabase
         .from("goals")
         .select(`
           *,
@@ -22,8 +23,43 @@ export default function Goals() {
         `)
         .eq("active", true);
 
-      if (error) throw error;
-      return data;
+      if (goalsError) throw goalsError;
+
+      // Fetch time entries for progress calculation
+      const now = new Date();
+      const promises = goalsData.map(async (goal) => {
+        let startDate;
+        switch (goal.period) {
+          case "daily":
+            startDate = startOfDay(now);
+            break;
+          case "weekly":
+            startDate = startOfWeek(now);
+            break;
+          case "monthly":
+            startDate = startOfMonth(now);
+            break;
+          default:
+            startDate = startOfDay(now);
+        }
+
+        const { data: entries, error: entriesError } = await supabase
+          .from("time_entries")
+          .select("seconds")
+          .eq("timer_id", goal.timer_id)
+          .gte("started_at", startDate.toISOString());
+
+        if (entriesError) throw entriesError;
+
+        const totalHours = entries.reduce((acc, entry) => acc + entry.seconds / 3600, 0);
+        
+        return {
+          ...goal,
+          progress: totalHours
+        };
+      });
+
+      return Promise.all(promises);
     },
   });
 
@@ -81,7 +117,7 @@ export default function Goals() {
             type={goal.type}
             threshold={goal.type === "target" ? goal.threshold_min : goal.threshold_max}
             period={goal.period}
-            progress={0} // TODO: Calculate actual progress
+            progress={goal.progress}
             onDelete={handleDeleteGoal}
           />
         ))}
