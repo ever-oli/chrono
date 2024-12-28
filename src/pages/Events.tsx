@@ -1,18 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { format, isToday, parseISO } from "date-fns";
-import { Plus, Download } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import EventsList from "@/components/Events/EventsList";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import NewEventForm from "@/components/Events/NewEventForm";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import StatementPeriodSelect from "@/components/Events/StatementPeriodSelect";
 import { generateEventsPDF } from "@/utils/pdfGenerator";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -54,17 +47,18 @@ export default function Events() {
     return groups;
   }, {});
 
-  const handleExport = async (timeframe: string) => {
+  const handleExport = async (period: string) => {
     try {
-      await generateEventsPDF(events, timeframe);
+      await generateEventsPDF(events, period);
       toast({
         title: "Export Successful",
-        description: `Your ${timeframe} report has been generated.`,
+        description: `Your statement has been generated.`,
       });
     } catch (error) {
+      console.error('Export error:', error);
       toast({
         title: "Export Failed",
-        description: "There was an error generating your report.",
+        description: "There was an error generating your statement.",
         variant: "destructive",
       });
     }
@@ -75,15 +69,7 @@ export default function Events() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-primary">Events Log</h1>
         <div className="flex gap-4">
-          <Select onValueChange={handleExport}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Export as PDF" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="month">This Month</SelectItem>
-              <SelectItem value="year">This Year</SelectItem>
-            </SelectContent>
-          </Select>
+          <StatementPeriodSelect onPeriodSelect={handleExport} />
           
           <Dialog>
             <DialogTrigger asChild>

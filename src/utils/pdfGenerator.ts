@@ -21,33 +21,66 @@ const formatDuration = (seconds: number) => {
   return `${hours}h ${minutes}m`;
 };
 
-export const generateEventsPDF = async (events: Event[], timeframe: string) => {
-  const doc = new jsPDF();
+const getDateRange = (period: string) => {
   const now = new Date();
+  const currentYear = now.getFullYear();
+
+  if (period === 'current-year') {
+    return {
+      start: startOfYear(now),
+      end: endOfYear(now),
+      title: `Year ${currentYear} Statement`
+    };
+  }
+
+  // Check if it's a specific month (YYYY-MM format)
+  if (period.includes('-')) {
+    const [year, month] = period.split('-').map(Number);
+    const date = new Date(year, month - 1);
+    return {
+      start: startOfMonth(date),
+      end: endOfMonth(date),
+      title: `Monthly Statement - ${format(date, 'MMMM yyyy')}`
+    };
+  }
+
+  // Must be a future year
+  const year = parseInt(period);
+  return {
+    start: new Date(year, 0, 1),
+    end: new Date(year, 11, 31),
+    title: `Year ${year} Statement`
+  };
+};
+
+export const generateEventsPDF = async (events: Event[], period: string) => {
+  const doc = new jsPDF();
+  const { title, start, end } = getDateRange(period);
   
-  // Filter events based on timeframe
-  const startDate = timeframe === 'month' ? startOfMonth(now) : startOfYear(now);
-  const endDate = timeframe === 'month' ? endOfMonth(now) : endOfYear(now);
-  
+  // Filter events based on date range
   const filteredEvents = events.filter(event => {
     const eventDate = parseISO(event.started_at);
-    return eventDate >= startDate && eventDate <= endDate;
+    return eventDate >= start && eventDate <= end;
   });
 
   // Add header
   doc.setFontSize(20);
-  doc.text(
-    `Time Tracking Report - ${timeframe === 'month' ? format(now, 'MMMM yyyy') : format(now, 'yyyy')}`,
-    20,
-    20
-  );
+  doc.text(title, 20, 20);
 
-  // Add summary
-  const totalTime = filteredEvents.reduce((acc, event) => acc + event.seconds, 0);
+  // Add statement info
   doc.setFontSize(12);
-  doc.text(`Total Time: ${formatDuration(totalTime)}`, 20, 30);
+  doc.text(`Generated on: ${format(new Date(), 'MMMM d, yyyy')}`, 20, 30);
+  
+  const totalTime = filteredEvents.reduce((acc, event) => acc + event.seconds, 0);
+  doc.text(`Total Time: ${formatDuration(totalTime)}`, 20, 40);
 
-  // Create table data
+  // TODO: Add charts here once implemented
+  // We'll need to:
+  // 1. Create canvas elements for the charts
+  // 2. Convert them to images
+  // 3. Add them to the PDF
+
+  // Add events table
   const tableData = filteredEvents.map(event => [
     format(parseISO(event.started_at), 'MMM dd, yyyy'),
     format(parseISO(event.started_at), 'hh:mm a'),
@@ -57,11 +90,10 @@ export const generateEventsPDF = async (events: Event[], timeframe: string) => {
     event.notes || '-'
   ]);
 
-  // Add table
   autoTable(doc, {
     head: [['Date', 'Start Time', 'End Time', 'Activity', 'Duration', 'Notes']],
     body: tableData,
-    startY: 40,
+    startY: 50, // Will need to adjust this once charts are added
     styles: {
       fontSize: 10,
       cellPadding: 2,
@@ -75,6 +107,20 @@ export const generateEventsPDF = async (events: Event[], timeframe: string) => {
     },
   });
 
+  // Add page numbers
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(10);
+    doc.text(
+      `Page ${i} of ${pageCount}`,
+      doc.internal.pageSize.width / 2,
+      doc.internal.pageSize.height - 10,
+      { align: 'center' }
+    );
+  }
+
   // Save the PDF
-  doc.save(`time-tracking-${timeframe}-${format(now, 'yyyy-MM')}.pdf`);
+  const fileName = `time-statement-${period}.pdf`;
+  doc.save(fileName);
 };
