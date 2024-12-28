@@ -73,6 +73,7 @@ export default function Analytics({ timeRange, currentDate }: AnalyticsProps) {
         `)
         .gte('started_at', dateRange.start.toISOString())
         .lte('started_at', dateRange.end.toISOString())
+        .or(`ended_at.gte.${dateRange.start.toISOString()},ended_at.is.null`)
         .order('started_at', { ascending: true });
       
       if (error) throw error;
