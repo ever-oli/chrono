@@ -9,7 +9,6 @@ interface TimerDisplayProps {
   isRunning: boolean;
   onToggle: () => void;
   onDelete: () => void;
-  onEdit: () => void;
 }
 
 export default function TimerDisplay({
@@ -18,8 +17,7 @@ export default function TimerDisplay({
   seconds,
   isRunning,
   onToggle,
-  onDelete,
-  onEdit
+  onDelete
 }: TimerDisplayProps) {
   return (
     <div 
@@ -41,7 +39,6 @@ export default function TimerDisplay({
         <TimerControls
           isRunning={isRunning}
           onToggle={onToggle}
-          onEdit={onEdit}
           onDelete={onDelete}
         />
       </div>
