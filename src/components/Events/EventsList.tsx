@@ -1,4 +1,11 @@
 import { format, isToday, parseISO } from "date-fns";
+import { Edit } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import NewEventForm from "./NewEventForm";
 
 interface Event {
   id: string;
@@ -22,6 +29,9 @@ interface EventsListProps {
 }
 
 export default function EventsList({ groupedEvents }: EventsListProps) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   const formatTime = (dateString: string) => {
     return format(parseISO(dateString), 'h:mm a');
   };
@@ -81,9 +91,27 @@ export default function EventsList({ groupedEvents }: EventsListProps) {
                         {formatTime(event.started_at)} → {formatTime(event.ended_at)}
                       </p>
                     </div>
-                    <span className="text-sm font-medium text-blue-600">
-                      {formatDuration(event.seconds)}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-blue-600">
+                        {formatDuration(event.seconds)}
+                      </span>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="icon">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Edit Event</DialogTitle>
+                          </DialogHeader>
+                          <NewEventForm 
+                            initialData={event}
+                            mode="edit"
+                          />
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </div>
                   {event.notes && (
                     <p className="text-sm text-gray-600 mt-2">{event.notes}</p>

@@ -18,7 +18,20 @@ interface FormData {
   end_time: string;
 }
 
-export default function NewEventForm() {
+interface NewEventFormProps {
+  initialData?: {
+    id: string;
+    name?: string;
+    notes?: string;
+    timer_id: string;
+    marker_size: 'small' | 'medium' | 'large';
+    started_at: string;
+    ended_at: string;
+  };
+  mode?: 'create' | 'edit';
+}
+
+export default function NewEventForm({ initialData, mode = 'create' }: NewEventFormProps) {
   const { timers } = useTimerContext();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -26,9 +39,12 @@ export default function NewEventForm() {
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     defaultValues: {
-      marker_size: 'medium',
-      start_time: new Date().toISOString().slice(0, 16),
-      end_time: new Date().toISOString().slice(0, 16),
+      name: initialData?.name || '',
+      notes: initialData?.notes || '',
+      timer_id: initialData?.timer_id || '',
+      marker_size: initialData?.marker_size || 'medium',
+      start_time: initialData?.started_at?.slice(0, 16) || new Date().toISOString().slice(0, 16),
+      end_time: initialData?.ended_at?.slice(0, 16) || new Date().toISOString().slice(0, 16),
     }
   });
 
@@ -39,29 +55,44 @@ export default function NewEventForm() {
       const endDate = new Date(data.end_time);
       const seconds = Math.floor((endDate.getTime() - startDate.getTime()) / 1000);
 
-      const { error } = await supabase
-        .from('time_entries')
-        .insert([{
-          name: data.name,
-          notes: data.notes,
-          timer_id: data.timer_id,
-          marker_size: data.marker_size,
-          started_at: startDate.toISOString(),
-          ended_at: endDate.toISOString(),
-          seconds: seconds
-        }]);
+      const eventData = {
+        name: data.name,
+        notes: data.notes,
+        timer_id: data.timer_id,
+        marker_size: data.marker_size,
+        started_at: startDate.toISOString(),
+        ended_at: endDate.toISOString(),
+        seconds: seconds
+      };
+
+      let error;
+
+      if (mode === 'edit' && initialData) {
+        const { error: updateError } = await supabase
+          .from('time_entries')
+          .update(eventData)
+          .eq('id', initialData.id);
+        error = updateError;
+      } else {
+        const { error: insertError } = await supabase
+          .from('time_entries')
+          .insert([eventData]);
+        error = insertError;
+      }
 
       if (error) throw error;
 
       queryClient.invalidateQueries({ queryKey: ['events'] });
       toast({
-        title: "Event created",
-        description: "Your new event has been added successfully.",
+        title: mode === 'edit' ? "Event updated" : "Event created",
+        description: mode === 'edit' 
+          ? "Your event has been updated successfully."
+          : "Your new event has been added successfully.",
       });
     } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to create event: " + error.message,
+        description: `Failed to ${mode} event: ${error.message}`,
         variant: "destructive",
       });
     } finally {
@@ -141,7 +172,7 @@ export default function NewEventForm() {
           </Button>
         </DialogClose>
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Adding..." : "Add Event"}
+          {isSubmitting ? (mode === 'edit' ? "Updating..." : "Adding...") : (mode === 'edit' ? "Update Event" : "Add Event")}
         </Button>
       </div>
     </form>
