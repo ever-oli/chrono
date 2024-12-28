@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import TimerDisplay from "./TimerDisplay";
+import TimerControls from "./TimerControls";
+import TimerEditDialog from "./TimerEditDialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 
 interface TimerProps {
@@ -16,7 +14,13 @@ interface TimerProps {
   onSecondsUpdate: (id: string, seconds: number) => void;
 }
 
-export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: TimerProps) {
+export default function Timer({ 
+  id, 
+  name, 
+  color, 
+  onDelete, 
+  onSecondsUpdate 
+}: TimerProps) {
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
@@ -56,16 +60,15 @@ export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: Ti
 
   const toggleTimer = async () => {
     if (!isRunning) {
-      // Starting timer
       const now = new Date();
       setStartTime(now);
       setIsRunning(true);
     } else {
-      // Stopping timer
       if (startTime) {
-        const elapsedSeconds = Math.floor((new Date().getTime() - startTime.getTime()) / 1000);
+        const elapsedSeconds = Math.floor(
+          (new Date().getTime() - startTime.getTime()) / 1000
+        );
         
-        // Calculate end time by adding elapsed seconds to start time
         const endTime = new Date(startTime.getTime() + (elapsedSeconds * 1000));
         
         const timeEntry = {
@@ -96,10 +99,6 @@ export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: Ti
     }
   };
 
-  const handleEdit = () => {
-    setShowEditDialog(true);
-  };
-
   return (
     <>
       <TimerDisplay
@@ -110,40 +109,17 @@ export default function Timer({ id, name, color, onDelete, onSecondsUpdate }: Ti
         isRunning={isRunning}
         onToggle={toggleTimer}
         onDelete={() => onDelete(id)}
-        onEdit={handleEdit}
+        onEdit={() => setShowEditDialog(true)}
       />
 
-      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Timer Entry</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Input
-                placeholder="Entry name (optional)"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-              />
-            </div>
-            <div>
-              <Textarea
-                placeholder="Notes (optional)"
-                value={editNotes}
-                onChange={(e) => setEditNotes(e.target.value)}
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowEditDialog(false)}>
-                Cancel
-              </Button>
-              <Button onClick={() => setShowEditDialog(false)}>
-                Save
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <TimerEditDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        editName={editName}
+        editNotes={editNotes}
+        onNameChange={setEditName}
+        onNotesChange={setEditNotes}
+      />
     </>
   );
 }
