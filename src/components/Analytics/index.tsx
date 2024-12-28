@@ -12,7 +12,6 @@ import {
   endOfMonth, 
   startOfYear, 
   endOfYear,
-  isWithinInterval
 } from "date-fns";
 
 interface Timer {
@@ -28,7 +27,7 @@ interface AnalyticsProps {
   currentDate: Date;
 }
 
-export default function Analytics({ timers, timeRange, currentDate }: AnalyticsProps) {
+export default function Analytics({ timeRange, currentDate }: AnalyticsProps) {
   // Get date range based on selected time period
   const dateRange = useMemo(() => {
     switch (timeRange) {
@@ -55,7 +54,7 @@ export default function Analytics({ timers, timeRange, currentDate }: AnalyticsP
     }
   }, [timeRange, currentDate]);
 
-  // Fetch time entries for the selected period
+  // Fetch time entries for the selected period with proper filtering
   const { data: timeEntries = [] } = useQuery({
     queryKey: ['timeEntries', dateRange.start, dateRange.end],
     queryFn: async () => {
@@ -81,31 +80,26 @@ export default function Analytics({ timers, timeRange, currentDate }: AnalyticsP
     }
   });
 
-  // Filter and aggregate time entries based on time range
+  // Aggregate data by timer
   const aggregatedData = useMemo(() => {
     const timerMap = new Map<string, { name: string; color: string; seconds: number }>();
     
     timeEntries.forEach(entry => {
-      const entryDate = new Date(entry.started_at);
       const timer = entry.timers;
-
-      // Only include entries that fall within the selected time range
-      if (isWithinInterval(entryDate, { start: dateRange.start, end: dateRange.end })) {
-        const current = timerMap.get(timer.id) || { 
-          name: timer.name, 
-          color: timer.color, 
-          seconds: 0 
-        };
-        
-        timerMap.set(timer.id, {
-          ...current,
-          seconds: current.seconds + entry.seconds
-        });
-      }
+      const current = timerMap.get(timer.id) || { 
+        name: timer.name, 
+        color: timer.color, 
+        seconds: 0 
+      };
+      
+      timerMap.set(timer.id, {
+        ...current,
+        seconds: current.seconds + entry.seconds
+      });
     });
 
     return Array.from(timerMap.values());
-  }, [timeEntries, dateRange]);
+  }, [timeEntries]);
 
   // Transform data for charts
   const chartData = useMemo(() => 
