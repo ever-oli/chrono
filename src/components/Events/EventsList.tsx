@@ -3,6 +3,7 @@ import { Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import NewEventForm from "./NewEventForm";
+import { formatDuration } from "@/utils/dateFormatters";
 
 interface Event {
   id: string;
@@ -29,12 +30,6 @@ interface EventsListProps {
 export default function EventsList({ groupedEvents }: EventsListProps) {
   const formatTime = (dateString: string) => {
     return format(parseISO(dateString), 'h:mm a');
-  };
-
-  const formatDuration = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours}h ${minutes}m`;
   };
 
   const getDateHeader = (date: string) => {
