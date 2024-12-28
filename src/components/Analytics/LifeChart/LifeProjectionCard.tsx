@@ -1,11 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { calculateTimeProjection, formatDurationImpact } from "@/utils/lifeProjections";
 import { TimeUnit } from "./TimeUnitToggle";
-import { Badge } from "@/components/ui/badge";
-import { Slider } from "@/components/ui/slider";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import LifeProjectionCardHeader from "./LifeProjectionCardHeader";
+import LifeProjectionCardSlider from "./LifeProjectionCardSlider";
+import LifeProjectionCardStats from "./LifeProjectionCardStats";
 
 interface LifeProjectionCardProps {
   name: string;
@@ -30,19 +31,6 @@ export default function LifeProjectionCard({
   const baseProjection = calculateTimeProjection(weeklyHours, currentAge, expectedLifespan);
   const adjustedProjection = calculateTimeProjection(adjustedHours, currentAge, expectedLifespan);
   
-  const formatTime = (hours: number) => {
-    switch (timeUnit) {
-      case "hours":
-        return `${Math.round(hours).toLocaleString()} hours`;
-      case "days":
-        return `${Math.round(hours / 24).toLocaleString()} days`;
-      case "years":
-        return `${(hours / (24 * 365)).toFixed(1)} years`;
-      default:
-        return `${Math.round(hours).toLocaleString()} hours`;
-    }
-  };
-  
   const percentChange = ((adjustedProjection.lifetime - baseProjection.lifetime) / baseProjection.lifetime) * 100;
   
   return (
@@ -52,74 +40,24 @@ export default function LifeProjectionCard({
       transition={{ duration: 0.3 }}
     >
       <Card className="p-4 space-y-4 hover:shadow-lg transition-shadow duration-300">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <motion.div 
-              className="w-3 h-3 rounded-full" 
-              style={{ backgroundColor: color }}
-              whileHover={{ scale: 1.2 }}
-              transition={{ duration: 0.2 }}
-            />
-            <h3 className="font-medium">{name}</h3>
-          </div>
-          <Badge variant="secondary" className="transition-all duration-300">
-            {adjustedProjection.percentOfWakingLife.toFixed(1)}% of life
-          </Badge>
-        </div>
+        <LifeProjectionCardHeader
+          name={name}
+          color={color}
+          percentOfWakingLife={adjustedProjection.percentOfWakingLife}
+        />
         
-        <AnimatePresence>
-          {isAdjusting && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="pt-2"
-            >
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>0h</span>
-                  <span>{Math.round(weeklyHours * 2)}h / week</span>
-                </div>
-                <Slider
-                  value={[adjustedHours]}
-                  onValueChange={(value) => setAdjustedHours(value[0])}
-                  min={0}
-                  max={Math.max(weeklyHours * 2, 40)}
-                  step={0.5}
-                  className="my-4"
-                />
-              </div>
-              {percentChange !== 0 && (
-                <div className="text-sm">
-                  <span className={percentChange > 0 ? "text-green-500" : "text-red-500"}>
-                    {percentChange > 0 ? "+" : ""}{percentChange.toFixed(1)}% change
-                  </span>
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <LifeProjectionCardSlider
+          isAdjusting={isAdjusting}
+          weeklyHours={weeklyHours}
+          adjustedHours={adjustedHours}
+          percentChange={percentChange}
+          onAdjustedHoursChange={setAdjustedHours}
+        />
         
-        <motion.div 
-          className="space-y-2"
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Weekly:</span>
-            <span className="font-medium">{formatTime(adjustedProjection.weekly)}</span>
-          </div>
-          
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Yearly:</span>
-            <span className="font-medium">{formatTime(adjustedProjection.yearly)}</span>
-          </div>
-          
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Lifetime:</span>
-            <span className="font-medium">{formatTime(adjustedProjection.lifetime)}</span>
-          </div>
-        </motion.div>
+        <LifeProjectionCardStats
+          projection={adjustedProjection}
+          timeUnit={timeUnit}
+        />
         
         <div className="pt-2 border-t">
           <button
