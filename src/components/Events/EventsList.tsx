@@ -81,7 +81,7 @@ export default function EventsList({ groupedEvents }: EventsListProps) {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-accent">
+                      <span className="text-sm font-medium text-primary">
                         {formatDuration(event.seconds)}
                       </span>
                       <Dialog>
