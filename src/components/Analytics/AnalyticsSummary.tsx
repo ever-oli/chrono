@@ -18,10 +18,10 @@ export default function AnalyticsSummary({ data }: AnalyticsSummaryProps) {
           key={item.name}
           className="flex items-center justify-between p-3 rounded-lg"
           style={{
-            backgroundColor: 'rgba(220, 158, 130, 0.15)', // Buff color with transparency
+            borderLeft: `4px solid ${item.color}`,
+            backgroundColor: 'rgba(220, 158, 130, 0.15)',
             backdropFilter: 'blur(5px)',
-            boxShadow: '0 0 1rem 0 rgba(0, 0, 0, 0.2)',
-            border: '1px solid rgba(220, 158, 130, 0.3)' // Subtle buff-colored border
+            boxShadow: '0 0 1rem 0 rgba(0, 0, 0, 0.2)'
           }}
         >
           <div className="flex items-center gap-2">
