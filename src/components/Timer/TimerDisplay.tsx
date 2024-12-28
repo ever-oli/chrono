@@ -23,7 +23,7 @@ export default function TimerDisplay({
 }: TimerDisplayProps) {
   return (
     <div 
-      className="border rounded-lg p-4 relative overflow-hidden"
+      className="border-secondary rounded-lg p-4 relative overflow-hidden border"
       style={{ borderLeft: `4px solid ${color}` }}
     >
       <div className="flex items-center justify-between">

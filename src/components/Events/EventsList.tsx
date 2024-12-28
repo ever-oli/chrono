@@ -11,7 +11,7 @@ interface Event {
   id: string;
   name?: string;
   notes?: string;
-  timer_id: string;  // Added this property
+  timer_id: string;
   marker_size: 'small' | 'medium' | 'large';
   seconds: number;
   started_at: string;
@@ -76,12 +76,9 @@ export default function EventsList({ groupedEvents }: EventsListProps) {
             {events.map((event) => (
               <div
                 key={event.id}
-                className="border rounded-lg p-4 relative overflow-hidden"
+                className="border-secondary rounded-lg p-4 relative overflow-hidden border"
+                style={{ borderLeft: `4px solid ${event.timers.color}` }}
               >
-                <div
-                  className={`absolute left-0 top-0 bottom-0 w-2 ${getMarkerSize(event.marker_size)}`}
-                  style={{ backgroundColor: event.timers.color }}
-                />
                 <div className="pl-4">
                   <div className="flex justify-between items-start mb-2">
                     <div>
