@@ -2,6 +2,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recha
 import { LifeChartVisualizationProps } from "./types";
 import CustomTooltip from "./CustomTooltip";
 import { useMemo } from "react";
+import { formatDuration } from "@/utils/dateFormatters";
 
 export default function LifeChartVisualization({
   data,
@@ -15,14 +16,14 @@ export default function LifeChartVisualization({
 
   // Convert weekly hours to yearly total (52 weeks)
   const yearlyData = useMemo(() => {
-    const totalHours = data.reduce((sum, activity) => sum + activity.hours, 0);
     return [{
       period: 'Current Year',
       ...data.reduce((acc, activity) => {
-        acc[activity.name] = Math.round(activity.hours * 52); // Scale to yearly
+        // Round to 2 decimal places for display
+        const yearlyHours = Math.round(activity.hours * 52 * 100) / 100;
+        acc[activity.name] = yearlyHours;
         return acc;
-      }, {} as Record<string, number>),
-      total: Math.round(totalHours * 52)
+      }, {} as Record<string, number>)
     }];
   }, [data]);
 
@@ -73,26 +74,31 @@ export default function LifeChartVisualization({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {data.map((activity) => (
-          <div
-            key={activity.name}
-            className="p-4 rounded-lg border"
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: activity.color }}
-              />
-              <h4 className="font-medium">{activity.name}</h4>
+        {data.map((activity) => {
+          const yearlyHours = Math.round(activity.hours * 52 * 100) / 100;
+          const weeklyHours = Math.round(activity.hours * 100) / 100;
+          
+          return (
+            <div
+              key={activity.name}
+              className="p-4 rounded-lg border"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: activity.color }}
+                />
+                <h4 className="font-medium">{activity.name}</h4>
+              </div>
+              <p className="text-2xl font-bold">
+                {formatDuration(yearlyHours * 3600)} / year
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {formatDuration(weeklyHours * 3600)} / week
+              </p>
             </div>
-            <p className="text-2xl font-bold">
-              {Math.round(activity.hours * 52)} hours/year
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {activity.hours} hours/week
-            </p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
