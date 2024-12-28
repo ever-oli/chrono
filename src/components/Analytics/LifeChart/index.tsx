@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { LifeChartProps } from "./types";
 import LifeChartHeader from "./LifeChartHeader";
 import LifeChartVisualization from "./LifeChartVisualization";
+import LifeChartControls from "./LifeChartControls";
 import { ErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 
@@ -24,12 +25,16 @@ export default function LifeChart({ data }: LifeChartProps) {
       <Card className="w-full bg-card/50 backdrop-blur-sm border-none shadow-lg">
         <LifeChartHeader />
         <CardContent>
-          <LifeChartVisualization 
-            data={data}
+          <LifeChartControls
             currentAge={currentAge}
             setCurrentAge={setCurrentAge}
             expectedLifespan={expectedLifespan}
             setExpectedLifespan={setExpectedLifespan}
+          />
+          <LifeChartVisualization 
+            data={data}
+            currentAge={currentAge}
+            expectedLifespan={expectedLifespan}
           />
         </CardContent>
       </Card>

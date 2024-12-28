@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { LifeChartVisualizationProps } from "./types";
 import LifeProjectionCard from "./LifeProjectionCard";
 
