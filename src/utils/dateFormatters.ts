@@ -16,14 +16,19 @@ export const formatTimeRange = (timeRange: "hours" | "days" | "weeks" | "months"
 export const formatDuration = (seconds: number): string => {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
   
-  if (hours === 0) {
-    return `${minutes}m`;
+  const parts = [];
+  
+  if (hours > 0) {
+    parts.push(`${hours}h`);
   }
   
-  if (minutes === 0) {
-    return `${hours}h`;
+  if (minutes > 0 || hours > 0) {
+    parts.push(`${minutes}m`);
   }
   
-  return `${hours}h ${minutes}m`;
+  parts.push(`${remainingSeconds}s`);
+  
+  return parts.join(' ');
 };

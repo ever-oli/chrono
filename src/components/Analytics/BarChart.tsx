@@ -1,4 +1,5 @@
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, Tooltip } from "recharts";
+import { formatDuration } from "@/utils/dateFormatters";
 
 interface BarChartProps {
   data: Array<{
@@ -21,7 +22,7 @@ export default function BarChart({ data }: BarChartProps) {
           />
           <YAxis 
             label={{ 
-              value: 'Hours', 
+              value: 'Time (hours)', 
               angle: -90, 
               position: 'insideLeft',
               className: "text-xs"
@@ -30,14 +31,13 @@ export default function BarChart({ data }: BarChartProps) {
           />
           <Tooltip
             formatter={(value: number) => {
-              const hours = Math.floor(value);
-              const minutes = Math.floor((value - hours) * 60);
-              return [`${hours}h ${minutes}m`, 'Time Spent'];
+              const seconds = Math.floor(value * 3600); // Convert hours back to seconds
+              return [formatDuration(seconds), 'Time Spent'];
             }}
           />
           <Bar 
             dataKey="hours"
-            name="Hours Spent"
+            name="Time Spent"
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
