@@ -3,8 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import PieChart from "./PieChart";
 import BarChart from "./BarChart";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { 
   startOfDay, 
   endOfDay, 
@@ -42,21 +40,25 @@ export default function Analytics({ timeRange, currentDate }: AnalyticsProps) {
   const dateRange = useMemo(() => {
     switch (timeRange) {
       case "hours":
+        // Daily view: Only hours logged on that specific day
         return {
           start: startOfDay(currentDate),
           end: endOfDay(currentDate)
         };
       case "days":
+        // Weekly view: Total hours logged within that week
         return {
           start: startOfWeek(currentDate),
           end: endOfWeek(currentDate)
         };
       case "weeks":
+        // Monthly view: Total hours logged within that month
         return {
           start: startOfMonth(currentDate),
           end: endOfMonth(currentDate)
         };
       case "months":
+        // Yearly view: Total hours logged within that year
         return {
           start: startOfYear(currentDate),
           end: endOfYear(currentDate)
@@ -64,7 +66,7 @@ export default function Analytics({ timeRange, currentDate }: AnalyticsProps) {
     }
   }, [timeRange, currentDate]);
 
-  // Fetch time entries for the selected period with simplified filtering
+  // Fetch time entries for the selected period
   const { data: timeEntries = [] } = useQuery({
     queryKey: ['timeEntries', dateRange.start, dateRange.end],
     queryFn: async () => {
@@ -100,7 +102,7 @@ export default function Analytics({ timeRange, currentDate }: AnalyticsProps) {
     }
   });
 
-  // Aggregate data by timer using lodash
+  // Aggregate data by timer
   const aggregatedData = useMemo(() => {
     return _.chain(timeEntries)
       .groupBy(entry => entry.timers.id)
@@ -122,7 +124,7 @@ export default function Analytics({ timeRange, currentDate }: AnalyticsProps) {
     [aggregatedData]
   );
 
-  // Transform data specifically for pie chart
+  // Transform data for pie chart
   const pieChartData = useMemo(() => 
     chartData.map(item => ({
       name: item.name,
