@@ -23,23 +23,23 @@ export default function TimerDisplay({
 }: TimerDisplayProps) {
   return (
     <div 
-      className="flex items-center justify-between p-4 bg-secondary rounded-lg"
+      className="border rounded-lg p-4 relative overflow-hidden"
       style={{ borderLeft: `4px solid ${color}` }}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between">
         <div>
           <h3 className="font-medium text-primary">{name}</h3>
           <p className="text-sm text-muted-foreground">
             {formatDuration(seconds)}
           </p>
         </div>
+        <TimerControls
+          isRunning={isRunning}
+          onToggle={onToggle}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
       </div>
-      <TimerControls
-        isRunning={isRunning}
-        onToggle={onToggle}
-        onEdit={onEdit}
-        onDelete={onDelete}
-      />
     </div>
   );
 }
