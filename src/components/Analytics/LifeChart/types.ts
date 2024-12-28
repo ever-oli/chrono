@@ -13,6 +13,8 @@ export interface LifeChartControlsProps {
   setExpectedLifespan: (lifespan: number) => void;
 }
 
-export interface LifeChartVisualizationProps extends LifeChartControlsProps {
+export interface LifeChartVisualizationProps {
   data: LifeChartProps["data"];
+  currentAge: number;
+  expectedLifespan: number;
 }
