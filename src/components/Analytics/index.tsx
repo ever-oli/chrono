@@ -13,6 +13,7 @@ import {
   startOfYear, 
   endOfYear,
 } from "date-fns";
+import _ from "lodash";
 
 interface Timer {
   id: string;
@@ -54,7 +55,7 @@ export default function Analytics({ timeRange, currentDate }: AnalyticsProps) {
     }
   }, [timeRange, currentDate]);
 
-  // Fetch time entries for the selected period with proper filtering
+  // Fetch time entries for the selected period with simplified filtering
   const { data: timeEntries = [] } = useQuery({
     queryKey: ['timeEntries', dateRange.start, dateRange.end],
     queryFn: async () => {
@@ -76,10 +77,8 @@ export default function Analytics({ timeRange, currentDate }: AnalyticsProps) {
             color
           )
         `)
-        .or(
-          `and(started_at.lte.${dateRange.end.toISOString()},ended_at.gte.${dateRange.start.toISOString()}),` +
-          `and(started_at.lte.${dateRange.end.toISOString()},ended_at.is.null)`
-        )
+        .gte('started_at', dateRange.start.toISOString())
+        .lte('started_at', dateRange.end.toISOString())
         .order('started_at', { ascending: true });
       
       if (error) {
@@ -92,25 +91,16 @@ export default function Analytics({ timeRange, currentDate }: AnalyticsProps) {
     }
   });
 
-  // Aggregate data by timer
+  // Aggregate data by timer using lodash
   const aggregatedData = useMemo(() => {
-    const timerMap = new Map<string, { name: string; color: string; seconds: number }>();
-    
-    timeEntries.forEach(entry => {
-      const timer = entry.timers;
-      const current = timerMap.get(timer.id) || { 
-        name: timer.name, 
-        color: timer.color, 
-        seconds: 0 
-      };
-      
-      timerMap.set(timer.id, {
-        ...current,
-        seconds: current.seconds + entry.seconds
-      });
-    });
-
-    return Array.from(timerMap.values());
+    return _.chain(timeEntries)
+      .groupBy(entry => entry.timers.id)
+      .map((entries, timerId) => ({
+        name: entries[0].timers.name,
+        color: entries[0].timers.color,
+        seconds: _.sumBy(entries, 'seconds')
+      }))
+      .value();
   }, [timeEntries]);
 
   // Transform data for charts
@@ -146,6 +136,24 @@ export default function Analytics({ timeRange, currentDate }: AnalyticsProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <PieChart data={pieChartData} />
         <BarChart data={chartData} />
+      </div>
+      
+      <div className="space-y-2">
+        {chartData.map((item) => (
+          <div
+            key={item.name}
+            className="flex items-center justify-between p-3 bg-secondary rounded-lg"
+          >
+            <div className="flex items-center gap-2">
+              <div 
+                className="w-3 h-3 rounded-full" 
+                style={{ backgroundColor: item.color }}
+              />
+              <span className="font-medium">{item.name}</span>
+            </div>
+            <span>{item.hours.toFixed(2)}h</span>
+          </div>
+        ))}
       </div>
     </div>
   );
