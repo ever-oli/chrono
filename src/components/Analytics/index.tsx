@@ -6,9 +6,10 @@ import AnalyticsSummary from "./AnalyticsSummary";
 interface AnalyticsProps {
   timeRange: "hours" | "days" | "weeks" | "months";
   currentDate: Date;
+  children?: (data: any) => React.ReactNode;
 }
 
-function AnalyticsContent({ timeRange, currentDate }: AnalyticsProps) {
+function AnalyticsContent({ timeRange, currentDate, children }: AnalyticsProps) {
   const { getDateRange } = useDateRange();
   const dateRange = getDateRange(timeRange, currentDate);
   const { data, isLoading } = useAnalyticsData(dateRange);
@@ -27,6 +28,10 @@ function AnalyticsContent({ timeRange, currentDate }: AnalyticsProps) {
         No data available for this time period
       </div>
     );
+  }
+
+  if (children) {
+    return children(data.chartData);
   }
 
   return (
