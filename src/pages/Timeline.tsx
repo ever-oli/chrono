@@ -3,7 +3,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Analytics from "@/components/Analytics";
-import LifeChartView from "@/components/Analytics/LifeChartView";
+import LifeChart from "@/components/Analytics/LifeChart";
 import { subDays, addDays } from "date-fns";
 import { formatTimeRange } from "@/utils/dateFormatters";
 
@@ -91,7 +91,7 @@ export default function Timeline() {
       <div className="bg-card rounded-lg p-6">
         {timeRange === "life" ? (
           <Analytics timeRange="weeks" currentDate={currentDate}>
-            {(data) => <LifeChartView data={data} />}
+            {(data) => <LifeChart data={data} />}
           </Analytics>
         ) : (
           <Analytics 
