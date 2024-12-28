@@ -1,4 +1,6 @@
 import React from 'react';
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Select,
   SelectContent,
@@ -6,24 +8,58 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 interface StatementPeriodSelectProps {
   onPeriodSelect: (value: string) => void;
 }
 
 export default function StatementPeriodSelect({ onPeriodSelect }: StatementPeriodSelectProps) {
-  const currentYear = new Date().getFullYear();
-  const months = Array.from({ length: 12 }, (_, i) => {
-    const date = new Date(currentYear, i);
-    return {
-      value: `${currentYear}-${String(i + 1).padStart(2, '0')}`,
-      label: format(date, 'MMMM yyyy')
-    };
-  });
+  const { data: periods = [] } = useQuery({
+    queryKey: ['time-entry-periods'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('time_entries')
+        .select('started_at')
+        .order('started_at', { ascending: false });
 
-  // Generate year options (current year + future years)
-  const yearOptions = Array.from({ length: 77 }, (_, i) => currentYear + i);
+      if (error) throw error;
+
+      const uniquePeriods = new Set<string>();
+      const currentYear = new Date().getFullYear();
+      let hasCurrentYearData = false;
+
+      data?.forEach(entry => {
+        const date = parseISO(entry.started_at);
+        const yearMonth = format(date, 'yyyy-MM');
+        const year = format(date, 'yyyy');
+        
+        uniquePeriods.add(yearMonth);
+        if (year === currentYear.toString()) {
+          hasCurrentYearData = true;
+        }
+      });
+
+      const periods = Array.from(uniquePeriods).map(period => {
+        const [year, month] = period.split('-');
+        const date = new Date(parseInt(year), parseInt(month) - 1);
+        return {
+          value: period,
+          label: format(date, 'MMMM yyyy')
+        };
+      });
+
+      // Add current year summary if there's data
+      if (hasCurrentYearData) {
+        periods.unshift({
+          value: 'current-year',
+          label: 'Current Year (Summary)'
+        });
+      }
+
+      return periods;
+    }
+  });
 
   return (
     <Select onValueChange={onPeriodSelect}>
@@ -31,15 +67,9 @@ export default function StatementPeriodSelect({ onPeriodSelect }: StatementPerio
         <SelectValue placeholder="Select statement period" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="current-year">Current Year (Summary)</SelectItem>
-        {months.map((month) => (
-          <SelectItem key={month.value} value={month.value}>
-            {month.label}
-          </SelectItem>
-        ))}
-        {yearOptions.slice(1).map((year) => (
-          <SelectItem key={year} value={`${year}`}>
-            Year {year}
+        {periods.map((period) => (
+          <SelectItem key={period.value} value={period.value}>
+            {period.label}
           </SelectItem>
         ))}
       </SelectContent>
