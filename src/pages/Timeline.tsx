@@ -14,7 +14,7 @@ export default function Timeline() {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const handlePrevious = () => {
-    if (timeRange === "life") return; // No navigation for life view
+    if (timeRange === "life") return;
     
     switch (timeRange) {
       case "hours":
@@ -33,7 +33,7 @@ export default function Timeline() {
   };
 
   const handleNext = () => {
-    if (timeRange === "life") return; // No navigation for life view
+    if (timeRange === "life") return;
     
     switch (timeRange) {
       case "hours":
