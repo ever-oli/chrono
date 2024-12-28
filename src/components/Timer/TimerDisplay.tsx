@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Trash2 } from "lucide-react";
+import { Play, Pause, Trash2, Edit } from "lucide-react";
 
 interface TimerDisplayProps {
   id: string;
@@ -9,6 +9,7 @@ interface TimerDisplayProps {
   isRunning: boolean;
   onToggle: () => void;
   onDelete: () => void;
+  onEdit: () => void;
 }
 
 export default function TimerDisplay({
@@ -18,6 +19,7 @@ export default function TimerDisplay({
   isRunning,
   onToggle,
   onDelete,
+  onEdit,
 }: TimerDisplayProps) {
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
@@ -49,6 +51,13 @@ export default function TimerDisplay({
           ) : (
             <Play className="h-4 w-4" />
           )}
+        </Button>
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={onEdit}
+        >
+          <Edit className="h-4 w-4" />
         </Button>
         <Button
           size="icon"
