@@ -3,7 +3,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Analytics from "@/components/Analytics";
-import { format, subDays, addDays } from "date-fns";
+import { subDays, addDays } from "date-fns";
+import { formatTimeRange } from "@/utils/dateFormatters";
 
 type TimeRange = "hours" | "days" | "weeks" | "months";
 
@@ -45,19 +46,6 @@ export default function Timeline() {
     }
   };
 
-  const getDateDisplay = () => {
-    switch (timeRange) {
-      case "hours":
-        return format(currentDate, "MMMM d, yyyy");
-      case "days":
-        return `Week of ${format(currentDate, "MMMM d, yyyy")}`;
-      case "weeks":
-        return format(currentDate, "MMMM yyyy");
-      case "months":
-        return format(currentDate, "yyyy");
-    }
-  };
-
   return (
     <div className="container max-w-4xl mx-auto p-4 space-y-6">
       <div className="flex items-center justify-between">
@@ -70,7 +58,9 @@ export default function Timeline() {
         </Button>
 
         <div className="text-center min-w-[200px]">
-          <div className="text-lg font-medium mb-2">{getDateDisplay()}</div>
+          <div className="text-lg font-medium mb-2">
+            {formatTimeRange(timeRange, currentDate)}
+          </div>
           <Tabs value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)} className="w-[400px]">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="hours">Today</TabsTrigger>

@@ -1,3 +1,5 @@
+import { formatDuration } from "@/utils/dateFormatters";
+
 interface SummaryData {
   name: string;
   seconds: number;
@@ -7,12 +9,6 @@ interface SummaryData {
 interface AnalyticsSummaryProps {
   data: SummaryData[];
 }
-
-const formatTime = (seconds: number) => {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  return `${hours}h ${minutes}m`;
-};
 
 export default function AnalyticsSummary({ data }: AnalyticsSummaryProps) {
   return (
@@ -29,7 +25,7 @@ export default function AnalyticsSummary({ data }: AnalyticsSummaryProps) {
             />
             <span className="font-medium">{item.name}</span>
           </div>
-          <span>{formatTime(item.seconds)}</span>
+          <span>{formatDuration(item.seconds)}</span>
         </div>
       ))}
     </div>
