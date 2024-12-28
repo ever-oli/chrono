@@ -23,22 +23,16 @@ interface LifeChartProps {
 export default function LifeChartView({ data }: LifeChartProps) {
   const [hoveredAge, setHoveredAge] = useState<number | null>(null);
   
-  // Calculate total weekly hours from real data
   const totalWeeklyHours = useMemo(() => {
     return data.reduce((sum, entry) => sum + entry.hours, 0);
   }, [data]);
   
-  // Project yearly data based on real weekly data
   const projectedData = useMemo(() => {
-    // Current age and lifespan could be user settings in the future
     const currentAge = 30;
     const expectedLifespan = 80;
     const remainingYears = expectedLifespan - currentAge;
+    const yearlyHours = totalWeeklyHours * 52;
     
-    // Convert weekly hours to yearly projection
-    const yearlyHours = totalWeeklyHours * 52; // 52 weeks in a year
-    
-    // Create projected data points for each remaining year
     return Array.from({ length: remainingYears }, (_, i) => {
       const age = currentAge + i;
       return {
@@ -47,7 +41,7 @@ export default function LifeChartView({ data }: LifeChartProps) {
         label: `Age ${age}`,
         activities: data.map(activity => ({
           name: activity.name,
-          hours: (activity.hours * 52), // yearly projection
+          hours: (activity.hours * 52),
           color: activity.color
         }))
       };
@@ -71,13 +65,13 @@ export default function LifeChartView({ data }: LifeChartProps) {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Life in Years</CardTitle>
-        <Info className="h-5 w-5 text-muted-foreground" />
+    <Card className="w-full bg-card/50 backdrop-blur-sm border-none shadow-lg">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-xl font-semibold text-foreground/90">Life in Years</CardTitle>
+        <Info className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
       </CardHeader>
       <CardContent>
-        <div className="h-[400px]">
+        <div className="h-[400px] mt-4">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={projectedData}
@@ -92,15 +86,19 @@ export default function LifeChartView({ data }: LifeChartProps) {
               <XAxis
                 dataKey="label"
                 interval={4}
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 12, fill: '#666' }}
+                stroke="#666"
+                tickLine={{ stroke: '#666' }}
               />
               <YAxis
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 12, fill: '#666' }}
+                stroke="#666"
+                tickLine={{ stroke: '#666' }}
                 label={{ 
                   value: 'Projected Hours per Year',
                   angle: -90,
                   position: 'insideLeft',
-                  style: { fontSize: 14 }
+                  style: { fontSize: 14, fill: '#666' }
                 }}
               />
               <Tooltip
@@ -108,21 +106,28 @@ export default function LifeChartView({ data }: LifeChartProps) {
                   if (active && payload && payload.length) {
                     const data = payload[0].payload;
                     return (
-                      <div className="bg-card p-4 shadow-lg rounded-lg border">
-                        <p className="font-semibold">Age {data.age}</p>
-                        <div className="space-y-1 mt-2">
+                      <div className="bg-card/95 backdrop-blur-sm p-4 shadow-lg rounded-lg border border-border/50">
+                        <p className="font-semibold text-foreground">Age {data.age}</p>
+                        <div className="space-y-1.5 mt-2">
                           {data.activities.map((activity: any) => (
-                            <div key={activity.name} className="flex justify-between items-center">
-                              <span className="text-sm">{activity.name}:</span>
-                              <span className="text-sm font-medium">
+                            <div key={activity.name} className="flex justify-between items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <div 
+                                  className="w-2 h-2 rounded-full" 
+                                  style={{ backgroundColor: activity.color }}
+                                />
+                                <span className="text-sm text-muted-foreground">{activity.name}:</span>
+                              </div>
+                              <span className="text-sm font-medium text-foreground">
                                 {Math.round(activity.hours)} hours
                               </span>
                             </div>
                           ))}
                         </div>
-                        <div className="mt-2 pt-2 border-t">
-                          <p className="text-sm font-medium">
-                            Total: {Math.round(data.projected)} hours
+                        <div className="mt-3 pt-2 border-t border-border/50">
+                          <p className="text-sm font-medium text-foreground flex justify-between">
+                            <span>Total:</span>
+                            <span>{Math.round(data.projected)} hours</span>
                           </p>
                         </div>
                       </div>
