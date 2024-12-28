@@ -1,3 +1,5 @@
+import { TimeUnit } from "./TimeUnitToggle";
+
 export interface LifeChartProps {
   data: Array<{
     name: string;
@@ -17,4 +19,5 @@ export interface LifeChartVisualizationProps {
   data: LifeChartProps["data"];
   currentAge: number;
   expectedLifespan: number;
+  timeUnit: TimeUnit;
 }

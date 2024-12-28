@@ -5,10 +5,12 @@ import LifeChartVisualization from "./LifeChartVisualization";
 import LifeChartControls from "./LifeChartControls";
 import { ErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
+import { TimeUnit } from "./TimeUnitToggle";
 
 export default function LifeChart({ data }: LifeChartProps) {
   const [currentAge, setCurrentAge] = useState(25);
   const [expectedLifespan, setExpectedLifespan] = useState(85);
+  const [timeUnit, setTimeUnit] = useState<TimeUnit>("hours");
 
   return (
     <ErrorBoundary
@@ -30,11 +32,14 @@ export default function LifeChart({ data }: LifeChartProps) {
             setCurrentAge={setCurrentAge}
             expectedLifespan={expectedLifespan}
             setExpectedLifespan={setExpectedLifespan}
+            timeUnit={timeUnit}
+            onTimeUnitChange={setTimeUnit}
           />
           <LifeChartVisualization 
             data={data}
             currentAge={currentAge}
             expectedLifespan={expectedLifespan}
+            timeUnit={timeUnit}
           />
         </CardContent>
       </Card>

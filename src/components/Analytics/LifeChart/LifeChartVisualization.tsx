@@ -4,7 +4,8 @@ import LifeProjectionCard from "./LifeProjectionCard";
 export default function LifeChartVisualization({
   data,
   currentAge,
-  expectedLifespan
+  expectedLifespan,
+  timeUnit
 }: LifeChartVisualizationProps) {
   return (
     <div className="space-y-8">
@@ -20,6 +21,7 @@ export default function LifeChartVisualization({
               color={activity.color}
               currentAge={currentAge}
               expectedLifespan={expectedLifespan}
+              timeUnit={timeUnit}
             />
           ))}
         </div>
