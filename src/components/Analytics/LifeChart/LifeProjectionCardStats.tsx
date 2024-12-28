@@ -1,5 +1,6 @@
 import { TimeUnit } from "./TimeUnitToggle";
 import { formatDurationImpact } from "@/utils/lifeProjections";
+import { motion } from "framer-motion";
 
 interface LifeProjectionCardStatsProps {
   projection: {
