@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Info } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface CustomBarProps {
   x?: number;
@@ -20,6 +22,8 @@ interface LifeChartProps {
 }
 
 export default function LifeChartView({ data }: LifeChartProps) {
+  const [currentAge, setCurrentAge] = useState<number>(25);
+  const [expectedLifespan, setExpectedLifespan] = useState<number>(85);
   const [hoveredAge, setHoveredAge] = useState<number | null>(null);
   
   const totalDailyHours = useMemo(() => {
@@ -27,8 +31,8 @@ export default function LifeChartView({ data }: LifeChartProps) {
   }, [data]);
   
   const projectedData = useMemo(() => {
-    const currentAge = 30;
-    const expectedLifespan = 80;
+    if (expectedLifespan <= currentAge) return [];
+    
     const remainingYears = expectedLifespan - currentAge;
     
     // Convert weekly hours to yearly hours (daily hours × 365)
@@ -45,16 +49,14 @@ export default function LifeChartView({ data }: LifeChartProps) {
         label: `Age ${age}`,
       };
 
-      // Add each activity's hours as a separate property
       yearlyHoursByActivity.forEach(activity => {
         yearData[activity.name] = activity.hours;
       });
 
       return yearData;
     });
-  }, [data]);
+  }, [data, currentAge, expectedLifespan]);
 
-  // Create a map of activity names to their colors for easy lookup
   const activityColorMap = useMemo(() => {
     return data.reduce((acc, activity) => {
       acc[activity.name] = activity.color;
@@ -69,6 +71,30 @@ export default function LifeChartView({ data }: LifeChartProps) {
         <Info className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
       </CardHeader>
       <CardContent>
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="space-y-2">
+            <Label htmlFor="currentAge">Current Age</Label>
+            <Input
+              id="currentAge"
+              type="number"
+              min="0"
+              max={expectedLifespan}
+              value={currentAge}
+              onChange={(e) => setCurrentAge(Math.min(parseInt(e.target.value) || 0, expectedLifespan))}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="lifeExpectancy">Life Expectancy</Label>
+            <Input
+              id="lifeExpectancy"
+              type="number"
+              min={currentAge}
+              value={expectedLifespan}
+              onChange={(e) => setExpectedLifespan(Math.max(parseInt(e.target.value) || 0, currentAge))}
+            />
+          </div>
+        </div>
+        
         <div className="h-[400px] mt-4">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
