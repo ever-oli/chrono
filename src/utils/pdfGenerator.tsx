@@ -31,20 +31,26 @@ const getDateRange = (period: string) => {
 };
 
 const generateChartImage = async (chartRef: HTMLElement): Promise<string> => {
-  const canvas = await html2canvas(chartRef);
+  const canvas = await html2canvas(chartRef, {
+    backgroundColor: '#ffffff',
+    scale: 2, // Increase resolution
+    logging: false,
+    useCORS: true
+  });
   return canvas.toDataURL('image/png');
 };
 
 const renderCharts = (chartData: any[]) => {
-  // Create a temporary div to render charts
+  // Create a temporary div with controlled dimensions
   const tempDiv = document.createElement('div');
-  tempDiv.style.width = '500px';
+  tempDiv.style.width = '600px';
   tempDiv.style.height = '300px';
+  tempDiv.style.backgroundColor = '#ffffff';
   document.body.appendChild(tempDiv);
 
-  // Render pie chart
+  // Render pie chart with explicit dimensions
   const pieChart = (
-    <PieChart width={500} height={300}>
+    <PieChart width={600} height={300}>
       <Pie
         data={chartData}
         dataKey="hours"
@@ -61,12 +67,18 @@ const renderCharts = (chartData: any[]) => {
     </PieChart>
   );
 
-  // Render bar chart
+  // Render bar chart with explicit dimensions
   const barChart = (
-    <BarChart width={500} height={300} data={chartData}>
+    <BarChart width={600} height={300} data={chartData}>
       <CartesianGrid strokeDasharray="3 3" />
       <XAxis dataKey="name" />
-      <YAxis label={{ value: 'Time (hours)', angle: -90, position: 'insideLeft' }} />
+      <YAxis 
+        label={{ 
+          value: 'Time (hours)', 
+          angle: -90, 
+          position: 'insideLeft' 
+        }} 
+      />
       <Bar dataKey="hours">
         {chartData.map((entry, index) => (
           <Cell key={`cell-${index}`} fill={entry.color} />
@@ -79,7 +91,12 @@ const renderCharts = (chartData: any[]) => {
 };
 
 export const generateEventsPDF = async (events: TimeEntry[], period: string) => {
-  const doc = new jsPDF();
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'pt',
+    format: 'letter'
+  });
+  
   const { title, start, end } = getDateRange(period);
   
   // Filter events based on date range
@@ -105,43 +122,44 @@ export const generateEventsPDF = async (events: TimeEntry[], period: string) => 
     color: timerEvents[0].timer?.color || '#cccccc'
   }));
 
-  // Add header
-  doc.setFontSize(20);
-  doc.text(title, 20, 20);
+  // Start PDF content
+  doc.setFontSize(24);
+  doc.text(title, 40, 40);
 
-  // Add statement info
   doc.setFontSize(12);
-  doc.text(`Generated on: ${format(new Date(), 'MMMM d, yyyy')}`, 20, 30);
+  doc.text(`Generated on: ${format(new Date(), 'MMMM d, yyyy')}`, 40, 60);
 
-  let yOffset = 50;
+  let yOffset = 80;
 
-  // Render and add charts
+  // Render and add charts with proper positioning
   const { pieChart, barChart, tempDiv } = renderCharts(chartData);
 
-  // Render pie chart to temp div
+  // Add pie chart
   ReactDOMServer.renderToString(pieChart);
   const pieChartImage = await generateChartImage(tempDiv);
-  doc.addImage(pieChartImage, 'PNG', 20, yOffset, 180, 100);
-  yOffset += 120;
+  doc.addImage(pieChartImage, 'PNG', 40, yOffset, 500, 250);
+  yOffset += 270;
 
-  // Render bar chart to temp div
+  // Add bar chart
   ReactDOMServer.renderToString(barChart);
   const barChartImage = await generateChartImage(tempDiv);
-  doc.addImage(barChartImage, 'PNG', 20, yOffset, 180, 100);
-  yOffset += 120;
+  doc.addImage(barChartImage, 'PNG', 40, yOffset, 500, 250);
+  yOffset += 270;
 
   // Clean up temp div
   document.body.removeChild(tempDiv);
 
   // Add summary for each timer
+  doc.setFontSize(14);
   Object.entries(eventsByTimer).forEach(([timerName, timerEvents]) => {
     const totalSeconds = timerEvents.reduce((sum, event) => sum + event.seconds, 0);
-    doc.setFontSize(14);
-    doc.text(`${timerName}: ${formatDuration(totalSeconds)}`, 20, yOffset);
-    yOffset += 10;
+    if (yOffset > 700) { // Check if we need a new page
+      doc.addPage();
+      yOffset = 40;
+    }
+    doc.text(`${timerName}: ${formatDuration(totalSeconds)}`, 40, yOffset);
+    yOffset += 20;
   });
-
-  yOffset += 10;
 
   // Add events table
   const tableData = filteredEvents.map(event => [
@@ -156,7 +174,7 @@ export const generateEventsPDF = async (events: TimeEntry[], period: string) => 
   autoTable(doc, {
     head: [['Date', 'Start Time', 'End Time', 'Activity', 'Duration', 'Notes']],
     body: tableData,
-    startY: yOffset,
+    startY: yOffset + 20,
     styles: {
       fontSize: 10,
       cellPadding: 2,
@@ -178,13 +196,12 @@ export const generateEventsPDF = async (events: TimeEntry[], period: string) => 
     doc.text(
       `Page ${i} of ${pageCount}`,
       doc.internal.pageSize.width / 2,
-      doc.internal.pageSize.height - 10,
+      doc.internal.pageSize.height - 20,
       { align: 'center' }
     );
   }
 
   try {
-    // Save the PDF
     const fileName = `time-statement-${period}.pdf`;
     doc.save(fileName);
     return true;
