@@ -76,7 +76,6 @@ export default function Goals() {
   });
 
   const handleDeleteGoal = (id: string) => {
-    // The UI will update automatically through the real-time subscription
     console.log("Goal deleted:", id);
   };
 
@@ -132,9 +131,7 @@ export default function Goals() {
         )}
       </div>
 
-      <div className="border-t pt-6">
-        <HabitGrid />
-      </div>
+      <HabitGrid />
     </div>
   );
 }

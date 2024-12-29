@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Bug } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card } from "@/components/ui/card";
 
 export default function HabitGrid() {
   const [showDebug, setShowDebug] = useState(false);
@@ -84,7 +85,7 @@ export default function HabitGrid() {
   }
 
   return (
-    <div className="space-y-6">
+    <Card className="p-6 space-y-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Activity Grid</h2>
         <Button
@@ -135,6 +136,6 @@ export default function HabitGrid() {
           })}
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
