@@ -1,4 +1,4 @@
-import { parseISO, format, differenceInSeconds } from "date-fns";
+import { parseISO, format } from "date-fns";
 
 export const formatTime = (dateString: string | null): string => {
   if (!dateString) return 'N/A';
@@ -27,11 +27,15 @@ export const formatDate = (dateString: string | null): string => {
 export const formatDuration = (seconds: number): string => {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
   
   if (hours > 0) {
-    return `${hours}h ${minutes}m`;
+    return `${hours}h ${minutes}m ${remainingSeconds}s`;
   }
-  return `${minutes}m`;
+  if (minutes > 0) {
+    return `${minutes}m ${remainingSeconds}s`;
+  }
+  return `${remainingSeconds}s`;
 };
 
 export const formatTimeRange = (timeRange: string, date: Date): string => {
