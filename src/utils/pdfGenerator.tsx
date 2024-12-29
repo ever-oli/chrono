@@ -35,6 +35,49 @@ const generateChartImage = async (chartRef: HTMLElement): Promise<string> => {
   return canvas.toDataURL('image/png');
 };
 
+const renderCharts = (chartData: any[]) => {
+  // Create a temporary div to render charts
+  const tempDiv = document.createElement('div');
+  tempDiv.style.width = '500px';
+  tempDiv.style.height = '300px';
+  document.body.appendChild(tempDiv);
+
+  // Render pie chart
+  const pieChart = (
+    <PieChart width={500} height={300}>
+      <Pie
+        data={chartData}
+        dataKey="hours"
+        nameKey="name"
+        cx="50%"
+        cy="50%"
+        outerRadius={100}
+        label={({ name, value }) => `${name}: ${value.toFixed(2)}h`}
+      >
+        {chartData.map((entry, index) => (
+          <Cell key={`cell-${index}`} fill={entry.color} />
+        ))}
+      </Pie>
+    </PieChart>
+  );
+
+  // Render bar chart
+  const barChart = (
+    <BarChart width={500} height={300} data={chartData}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="name" />
+      <YAxis label={{ value: 'Time (hours)', angle: -90, position: 'insideLeft' }} />
+      <Bar dataKey="hours">
+        {chartData.map((entry, index) => (
+          <Cell key={`cell-${index}`} fill={entry.color} />
+        ))}
+      </Bar>
+    </BarChart>
+  );
+
+  return { pieChart, barChart, tempDiv };
+};
+
 export const generateEventsPDF = async (events: TimeEntry[], period: string) => {
   const doc = new jsPDF();
   const { title, start, end } = getDateRange(period);
@@ -55,6 +98,13 @@ export const generateEventsPDF = async (events: TimeEntry[], period: string) => 
     return acc;
   }, {});
 
+  // Prepare chart data
+  const chartData = Object.entries(eventsByTimer).map(([timerName, timerEvents]) => ({
+    name: timerName,
+    hours: timerEvents.reduce((sum, event) => sum + event.seconds / 3600, 0),
+    color: timerEvents[0].timer?.color || '#cccccc'
+  }));
+
   // Add header
   doc.setFontSize(20);
   doc.text(title, 20, 20);
@@ -64,6 +114,24 @@ export const generateEventsPDF = async (events: TimeEntry[], period: string) => 
   doc.text(`Generated on: ${format(new Date(), 'MMMM d, yyyy')}`, 20, 30);
 
   let yOffset = 50;
+
+  // Render and add charts
+  const { pieChart, barChart, tempDiv } = renderCharts(chartData);
+
+  // Render pie chart to temp div
+  ReactDOMServer.renderToString(pieChart);
+  const pieChartImage = await generateChartImage(tempDiv);
+  doc.addImage(pieChartImage, 'PNG', 20, yOffset, 180, 100);
+  yOffset += 120;
+
+  // Render bar chart to temp div
+  ReactDOMServer.renderToString(barChart);
+  const barChartImage = await generateChartImage(tempDiv);
+  doc.addImage(barChartImage, 'PNG', 20, yOffset, 180, 100);
+  yOffset += 120;
+
+  // Clean up temp div
+  document.body.removeChild(tempDiv);
 
   // Add summary for each timer
   Object.entries(eventsByTimer).forEach(([timerName, timerEvents]) => {
