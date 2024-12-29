@@ -1,8 +1,13 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import html2canvas from "html2canvas";
 import { format, parseISO, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns";
 import { TimeEntry } from "@/types/timeEntry";
 import { formatDuration } from "./dateFormatters";
+import { PieChart, Pie, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import React from "react";
+import ReactDOMServer from "react-dom/server";
 
 const getDateRange = (period: string) => {
   const now = new Date();
@@ -23,6 +28,11 @@ const getDateRange = (period: string) => {
     end: endOfMonth(date),
     title: `Monthly Statement - ${format(date, 'MMMM yyyy')}`
   };
+};
+
+const generateChartImage = async (chartRef: HTMLElement): Promise<string> => {
+  const canvas = await html2canvas(chartRef);
+  return canvas.toDataURL('image/png');
 };
 
 export const generateEventsPDF = async (events: TimeEntry[], period: string) => {
