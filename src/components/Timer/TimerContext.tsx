@@ -42,16 +42,16 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
         // Initialize timers with isRunning state from time_entries
         const timersWithRunningState = await Promise.all(
           data.map(async (timer) => {
-            const { data: entries } = await supabase
+            const { data: entry } = await supabase
               .from('time_entries')
               .select('*')
               .eq('timer_id', timer.id)
               .is('ended_at', null)
-              .single();
+              .maybeSingle();
 
             return {
               ...timer,
-              isRunning: !!entries,
+              isRunning: !!entry,
             };
           })
         );
