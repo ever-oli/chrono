@@ -1,11 +1,66 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import ReactDOMServer from "react-dom/server";
 import { format, parseISO } from "date-fns";
 import { TimeEntry } from "@/types/timeEntry";
 import { formatDuration } from "@/utils/dateFormatters";
-import { generateChartImage, renderCharts } from "./chartRenderer";
+import { generateChartImage } from "./chartRenderer";
 import { getDateRange } from "./dateUtils";
+import React from "react";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import ReactDOMServer from "react-dom/server";
+
+const renderCharts = (chartData: any[]) => {
+  const tempDiv = document.createElement('div');
+  tempDiv.style.cssText = `
+    width: 600px;
+    height: 300px;
+    background-color: #ffffff;
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    overflow: hidden;
+  `;
+  document.body.appendChild(tempDiv);
+
+  const pieChart = (
+    <PieChart width={600} height={300}>
+      <Pie
+        data={chartData}
+        dataKey="hours"
+        nameKey="name"
+        cx="50%"
+        cy="50%"
+        outerRadius={100}
+        label={({ name, value }) => `${name}: ${value.toFixed(2)}h`}
+      >
+        {chartData.map((entry, index) => (
+          <Cell key={`cell-${index}`} fill={entry.color} />
+        ))}
+      </Pie>
+    </PieChart>
+  );
+
+  const barChart = (
+    <BarChart width={600} height={300} data={chartData}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="name" />
+      <YAxis 
+        label={{ 
+          value: 'Time (hours)', 
+          angle: -90, 
+          position: 'insideLeft' 
+        }} 
+      />
+      <Bar dataKey="hours">
+        {chartData.map((entry, index) => (
+          <Cell key={`cell-${index}`} fill={entry.color} />
+        ))}
+      </Bar>
+    </BarChart>
+  );
+
+  return { pieChart, barChart, tempDiv };
+};
 
 export const generateEventsPDF = async (events: TimeEntry[], period: string) => {
   const doc = new jsPDF({
@@ -39,26 +94,26 @@ export const generateEventsPDF = async (events: TimeEntry[], period: string) => 
     color: timerEvents[0].timer?.color || '#cccccc'
   }));
 
-  // Start PDF content
-  doc.setFontSize(24);
-  doc.text(title, 40, 40);
-
-  doc.setFontSize(12);
-  doc.text(`Generated on: ${format(new Date(), 'MMMM d, yyyy')}`, 40, 60);
-
-  let yOffset = 80;
-
   try {
-    // Render and add charts with proper positioning for iOS Safari
+    // Start PDF content
+    doc.setFontSize(24);
+    doc.text(title, 40, 40);
+
+    doc.setFontSize(12);
+    doc.text(`Generated on: ${format(new Date(), 'MMMM d, yyyy')}`, 40, 60);
+
+    let yOffset = 80;
+
+    // Render and add charts
     const { pieChart, barChart, tempDiv } = renderCharts(chartData);
 
-    // Add pie chart with iOS Safari considerations
+    // Add pie chart
     ReactDOMServer.renderToString(pieChart);
     const pieChartImage = await generateChartImage(tempDiv);
     doc.addImage(pieChartImage, 'PNG', 40, yOffset, 500, 250);
     yOffset += 270;
 
-    // Add bar chart with iOS Safari considerations
+    // Add bar chart
     ReactDOMServer.renderToString(barChart);
     const barChartImage = await generateChartImage(tempDiv);
     doc.addImage(barChartImage, 'PNG', 40, yOffset, 500, 250);
