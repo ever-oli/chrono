@@ -10,7 +10,6 @@ import GridContent from "./components/GridContent";
 export default function HabitGrid() {
   const dates = generateDateRange();
   
-  // Fetch all timers
   const { data: timers = [], isLoading: timersLoading } = useQuery({
     queryKey: ['timers'],
     queryFn: async () => {
@@ -24,7 +23,6 @@ export default function HabitGrid() {
     }
   });
 
-  // Fetch time entries for the date range
   const { data: entries = [], isLoading: entriesLoading, error } = useQuery({
     queryKey: ['habit-entries', dates[0], dates[dates.length - 1]],
     queryFn: async () => {
@@ -57,32 +55,28 @@ export default function HabitGrid() {
 
   if (timersLoading || entriesLoading) {
     return (
-      <div className="animate-pulse">
-        <div className="h-32 bg-muted rounded-lg" />
+      <div className="animate-pulse space-y-4">
+        <div className="h-8 w-48 bg-muted rounded-lg" />
+        <div className="h-64 bg-muted rounded-lg" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {timers.map(timer => {
-        // Filter entries for this specific timer
         const timerEntries = entries.filter(entry => entry.timer_id === timer.id);
-        
-        // Group entries by date for this timer
         const entriesByDate = dates.reduce((acc, date) => {
           acc[date.toISOString()] = getDayEntries(date, timerEntries);
           return acc;
         }, {} as Record<string, TimeEntry[]>);
 
-        // Calculate maximum entries for intensity scaling
         const maxIntensity = Math.max(
           ...Object.values(entriesByDate).map(entries => 
             entries.reduce((sum, entry) => sum + (entry.seconds || 0), 0)
           )
         );
 
-        // Create weeks array for the grid
         const weeks: Date[][] = [];
         let currentWeek: Date[] = [];
 
@@ -103,18 +97,18 @@ export default function HabitGrid() {
         });
 
         return (
-          <Card key={timer.id} className="p-6">
+          <Card key={timer.id} className="p-6 hover:shadow-md transition-shadow">
             <div className="space-y-6">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <div 
                   className="w-3 h-3 rounded-full" 
                   style={{ backgroundColor: timer.color }}
                 />
-                <h3 className="text-lg font-semibold">{timer.name} Activity</h3>
+                <h3 className="text-lg font-semibold">{timer.name}</h3>
               </div>
               
               <div className="overflow-x-auto pb-4">
-                <div className="relative">
+                <div className="relative min-w-[800px]">
                   <MonthLabels weeks={weeks} />
                   <div className="flex">
                     <DayLabels />
