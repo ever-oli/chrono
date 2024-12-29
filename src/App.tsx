@@ -1,24 +1,29 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Navigation from "./components/Navigation";
-import Timeline from "./pages/Timeline";
-import Events from "./pages/Events";
-import Goals from "./pages/Goals";
-import Settings from "./pages/Settings";
-import Statement from "./pages/Statement";
+import { BrowserRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "next-themes";
+import { Toaster } from "@/components/ui/toaster";
+import Navigation from "@/components/Navigation";
+import { TimerProvider } from "@/components/Timer/TimerContext";
+import Events from "@/pages/Events";
 
-export default function App() {
+const queryClient = new QueryClient();
+
+function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<Timeline />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/goals" element={<Goals />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/statement" element={<Statement />} />
-        </Routes>
-      </div>
-    </Router>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="dark" attribute="class">
+        <TimerProvider>
+          <BrowserRouter>
+            <div className="min-h-screen bg-background text-foreground">
+              <Events />
+              <Navigation />
+              <Toaster />
+            </div>
+          </BrowserRouter>
+        </TimerProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
+
+export default App;

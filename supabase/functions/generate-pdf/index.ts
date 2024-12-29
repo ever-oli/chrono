@@ -1,4 +1,4 @@
-import { serve } from "https://deno.fresh.dev/std@v1.0.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts";
 
 const corsHeaders = {
@@ -19,7 +19,7 @@ serve(async (req) => {
     const page = await browser.newPage();
 
     // Navigate to the statement page
-    const url = `${process.env.APP_URL}/statement?period=${period}`;
+    const url = `${Deno.env.get('APP_URL')}/statement?period=${period}`;
     await page.goto(url, { waitUntil: 'networkidle0' });
 
     // Wait for charts to render
