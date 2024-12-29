@@ -9,7 +9,7 @@ import Tracking from "./pages/Tracking";
 import Events from "./pages/Events";
 import Timeline from "./pages/Timeline";
 import Goals from "./pages/Goals";
-import Settings from "./pages/Settings";
+import Habits from "./pages/Habits";
 import { useState } from "react";
 
 const App = () => {
@@ -28,7 +28,7 @@ const App = () => {
                 <Route path="/events" element={<Events />} />
                 <Route path="/timeline" element={<Timeline />} />
                 <Route path="/goals" element={<Goals />} />
-                <Route path="/settings" element={<Settings />} />
+                <Route path="/habits" element={<Habits />} />
               </Routes>
             </div>
             <Navigation />
@@ -37,6 +37,6 @@ const App = () => {
       </TimerProvider>
     </QueryClientProvider>
   );
-};
+}
 
 export default App;

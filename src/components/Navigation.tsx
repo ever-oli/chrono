@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Clock, List, Target, Settings, BarChart } from "lucide-react";
+import { Clock, List, Target, CalendarDays, BarChart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTimerContext } from "@/components/Timer/TimerContext";
 
@@ -12,7 +12,7 @@ export default function Navigation() {
     { to: "/events", icon: List, label: "Events" },
     { to: "/timeline", icon: BarChart, label: "Timeline" },
     { to: "/goals", icon: Target, label: "Goals" },
-    { to: "/settings", icon: Settings, label: "Settings" },
+    { to: "/habits", icon: CalendarDays, label: "Habits" },
   ];
 
   // Check if any timers are running using the activeTimers Set from context
