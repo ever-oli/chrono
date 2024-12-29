@@ -4,23 +4,23 @@
  
 @layer base {
   :root {
-    --background: 231 49% 16%;    /* #151E3F Space Cadet */
-    --foreground: 231 100% 8%;    /* #030027 Oxford Blue */
+    --background: 60 63% 90%;    /* #F2F3D9 Beige */
+    --foreground: 231 100% 8%;   /* #030027 Oxford Blue */
     
-    --card: 60 63% 90%;          /* #F2F3D9 Beige */
+    --card: 0 0% 100%;          /* #FFFFFF White */
     --card-foreground: 231 100% 8%; /* #030027 Oxford Blue */
     
-    --popover: 60 63% 90%;       /* #F2F3D9 Beige */
+    --popover: 0 0% 100%;       /* #FFFFFF White */
     --popover-foreground: 231 100% 8%; /* #030027 Oxford Blue */
     
-    --primary: 231 100% 8%;      /* #030027 Oxford Blue */
-    --primary-foreground: 60 63% 90%; /* #F2F3D9 Beige */
+    --primary: 17 58% 69%;      /* #DC9E82 Buff */
+    --primary-foreground: 231 100% 8%; /* #030027 Oxford Blue */
     
-    --secondary: 17 58% 69%;     /* #DC9E82 Buff */
+    --secondary: 357 41% 60%;    /* #C16E70 Old Rose */
     --secondary-foreground: 231 100% 8%; /* #030027 Oxford Blue */
     
     --muted: 231 20% 96%;
-    --muted-foreground: 231 10% 45%;
+    --muted-foreground: 231 49% 16%; /* #151E3F Space Cadet */
     
     --accent: 357 41% 60%;       /* #C16E70 Old Rose */
     --accent-foreground: 231 100% 8%; /* #030027 Oxford Blue */
@@ -41,16 +41,15 @@
     @apply border-border;
   }
   body {
-    @apply bg-space-cadet text-oxford-blue font-body;
+    @apply bg-beige text-oxford-blue font-body leading-relaxed;
   }
   h1 {
-    @apply font-display text-header-lg font-bold;
+    @apply font-display text-header-lg font-bold text-oxford-blue;
   }
   h2, h3 {
-    @apply font-display text-header-base font-semibold;
+    @apply font-display text-header-base font-semibold text-space-cadet;
   }
-}
-
-.grid-cols-53 {
-  grid-template-columns: repeat(53, minmax(0, 1fr));
+  p {
+    @apply text-body leading-relaxed;
+  }
 }

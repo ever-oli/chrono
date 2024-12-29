@@ -89,6 +89,12 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      spacing: {
+        'base': '8px',
+        'component': '16px',
+        'content': '24px',
+        'section': '32px',
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
