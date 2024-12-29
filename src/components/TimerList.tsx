@@ -9,7 +9,7 @@ export default function TimerList() {
   const [showNewTimer, setShowNewTimer] = useState(false);
   const [newTimerName, setNewTimerName] = useState("");
   const [selectedColor, setSelectedColor] = useState("#2D2D2D");
-  const { timers, addTimer, deleteTimer, updateTimerSeconds } = useTimerContext();
+  const { timers, addTimer, deleteTimer, updateTimerSeconds, state } = useTimerContext();
 
   const handleAddTimer = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,6 +21,11 @@ export default function TimerList() {
       setNewTimerName("");
       setShowNewTimer(false);
     }
+  };
+
+  const handleUpdateSeconds = (id: string, seconds: number) => {
+    const currentEntry = state.currentEntries[id];
+    updateTimerSeconds(id, seconds, currentEntry);
   };
 
   return (
@@ -65,7 +70,7 @@ export default function TimerList() {
             name={timer.name}
             color={timer.color}
             onDelete={deleteTimer}
-            onSecondsUpdate={updateTimerSeconds}
+            onSecondsUpdate={handleUpdateSeconds}
           />
         ))}
         {timers.length === 0 && (

@@ -24,5 +24,5 @@ export interface TimerContextType {
   stopTimer: (timerId: string, currentEntry?: TimeEntry) => Promise<void>;
   addTimer: (timer: Omit<Timer, 'id' | 'created_at'>) => Promise<void>;
   deleteTimer: (id: string) => Promise<void>;
-  updateTimerSeconds: (id: string, seconds: number) => Promise<void>;
+  updateTimerSeconds: (id: string, seconds: number, currentEntry?: TimeEntry) => Promise<void>;
 }
