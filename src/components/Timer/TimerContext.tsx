@@ -1,176 +1,218 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { Toaster } from "@/components/ui/toaster";
-import { supabase } from "@/integrations/supabase/client";
-import { RealtimeChannel } from "@supabase/supabase-js";
+import React, { createContext, useContext, useEffect, useReducer } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { RealtimeChannel } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/components/ui/use-toast';
+import { TimerState, TimerAction } from '@/types/timerState';
+import { Timer } from '@/types/timer';
+import { TimeEntry } from '@/types/timeEntry';
 
-interface Timer {
-  id: string;
-  name: string;
-  color: string;
-  isRunning?: boolean;
+const TimerContext = createContext<{
+  state: TimerState;
+  dispatch: React.Dispatch<TimerAction>;
+  startTimer: (timerId: string) => Promise<void>;
+  stopTimer: (timerId: string) => Promise<void>;
+} | null>(null);
+
+function timerReducer(state: TimerState, action: TimerAction): TimerState {
+  switch (action.type) {
+    case 'SET_TIMERS':
+      return {
+        ...state,
+        timers: action.payload.reduce((acc, timer) => ({
+          ...acc,
+          [timer.id]: timer
+        }), {}),
+        isLoading: false
+      };
+    case 'START_TIMER':
+      return {
+        ...state,
+        activeTimers: new Set([...state.activeTimers, action.payload.timerId]),
+        currentEntries: {
+          ...state.currentEntries,
+          [action.payload.timerId]: action.payload.entry
+        }
+      };
+    case 'STOP_TIMER':
+      const newActiveTimers = new Set(state.activeTimers);
+      newActiveTimers.delete(action.payload.timerId);
+      const { [action.payload.timerId]: _, ...remainingEntries } = state.currentEntries;
+      return {
+        ...state,
+        activeTimers: newActiveTimers,
+        currentEntries: remainingEntries
+      };
+    case 'UPDATE_ENTRY':
+      return {
+        ...state,
+        currentEntries: {
+          ...state.currentEntries,
+          [action.payload.timerId]: action.payload.entry
+        }
+      };
+    case 'SET_ERROR':
+      return {
+        ...state,
+        error: action.payload,
+        isLoading: false
+      };
+    default:
+      return state;
+  }
 }
-
-interface TimerContextType {
-  timers: Timer[];
-  addTimer: (timer: Omit<Timer, "id">) => void;
-  deleteTimer: (id: string) => void;
-  updateTimerSeconds: (id: string, seconds: number) => void;
-}
-
-const TimerContext = createContext<TimerContextType | undefined>(undefined);
 
 export function TimerProvider({ children }: { children: React.ReactNode }) {
-  const [timers, setTimers] = useState<Timer[]>([]);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
+  const [state, dispatch] = useReducer(timerReducer, {
+    timers: {},
+    activeTimers: new Set(),
+    currentEntries: {},
+    isLoading: true,
+    error: null
+  });
+
+  const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const loadTimers = async () => {
-      console.log('Loading timers...');
+  const { data: timers } = useQuery({
+    queryKey: ['timers'],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('timers')
         .select('*')
-        .order('created_at', { ascending: true });
+        .order('created_at');
+      
+      if (error) throw error;
+      return data as Timer[];
+    }
+  });
+
+  useEffect(() => {
+    const timerChannel = supabase
+      .channel('timer-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'timers'
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['timers'] });
+      })
+      .subscribe();
+
+    const entryChannel = supabase
+      .channel('entry-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'time_entries'
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['timeEntries'] });
+      })
+      .subscribe();
+
+    return () => {
+      timerChannel.unsubscribe();
+      entryChannel.unsubscribe();
+    };
+  }, [queryClient]);
+
+  useEffect(() => {
+    async function checkRunningTimers() {
+      const { data: runningEntries, error } = await supabase
+        .from('time_entries')
+        .select('*')
+        .is('ended_at', null);
 
       if (error) {
-        console.error('Error loading timers:', error);
+        toast({
+          title: "Error checking running timers",
+          description: error.message,
+          variant: "destructive"
+        });
+        dispatch({ type: 'SET_ERROR', payload: error });
         return;
       }
 
-      if (data) {
-        // Initialize timers with isRunning state from time_entries
-        const timersWithRunningState = await Promise.all(
-          data.map(async (timer) => {
-            const { data: entry, error } = await supabase
-              .from('time_entries')
-              .select('*')
-              .eq('timer_id', timer.id)
-              .is('ended_at', null)
-              .maybeSingle();
-
-            if (error) {
-              console.error('Error checking timer running state:', error);
-            }
-
-            return {
-              ...timer,
-              isRunning: !!entry,
-            };
-          })
-        );
-        console.log('Timers loaded:', timersWithRunningState);
-        setTimers(timersWithRunningState);
-      }
-    };
-
-    loadTimers();
-
-    // Set up real-time subscription
-    const timerChannel = supabase.channel('timers-channel')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'timers' },
-        (payload) => {
-          console.log('Timer change received:', payload);
-          loadTimers(); // Reload timers when changes occur
+      if (runningEntries) {
+        for (const entry of runningEntries) {
+          dispatch({
+            type: 'START_TIMER',
+            payload: { timerId: entry.timer_id, entry }
+          });
         }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'time_entries' },
-        (payload) => {
-          console.log('Time entry change received:', payload);
-          loadTimers(); // Reload timers to update running states
-        }
-      )
-      .subscribe();
-
-    setChannel(timerChannel);
-
-    // Cleanup subscription
-    return () => {
-      console.log('Cleaning up timer subscriptions...');
-      if (timerChannel) {
-        supabase.removeChannel(timerChannel);
       }
-    };
-  }, []);
-
-  const addTimer = async (timer: Omit<Timer, "id">) => {
-    console.log('Adding timer:', timer);
-    const { data, error } = await supabase
-      .from('timers')
-      .insert([timer])
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error adding timer:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add timer",
-        variant: "destructive",
-      });
-      return;
     }
 
-    if (data) {
-      setTimers((prev) => [...prev, { ...data, isRunning: false }]);
-      toast({
-        title: "Timer Added",
-        description: `${timer.name} has been added to your timers`,
+    checkRunningTimers();
+  }, [toast]);
+
+  useEffect(() => {
+    if (timers) {
+      dispatch({ type: 'SET_TIMERS', payload: timers });
+    }
+  }, [timers]);
+
+  const startTimer = async (timerId: string) => {
+    try {
+      const { data: entry, error } = await supabase
+        .from('time_entries')
+        .insert({
+          timer_id: timerId,
+          started_at: new Date().toISOString(),
+          seconds: 0
+        })
+        .select()
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!entry) throw new Error('Failed to create time entry');
+
+      dispatch({
+        type: 'START_TIMER',
+        payload: { timerId, entry }
       });
+    } catch (error) {
+      toast({
+        title: "Error starting timer",
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: "destructive"
+      });
+      dispatch({ type: 'SET_ERROR', payload: error as Error });
     }
   };
 
-  const deleteTimer = async (id: string) => {
-    console.log('Deleting timer:', id);
-    const { error } = await supabase
-      .from('timers')
-      .delete()
-      .eq('id', id);
+  const stopTimer = async (timerId: string) => {
+    const currentEntry = state.currentEntries[timerId];
+    if (!currentEntry) return;
 
-    if (error) {
-      console.error('Error deleting timer:', error);
+    try {
+      const { error } = await supabase
+        .from('time_entries')
+        .update({
+          ended_at: new Date().toISOString()
+        })
+        .eq('id', currentEntry.id);
+
+      if (error) throw error;
+
+      dispatch({ type: 'STOP_TIMER', payload: { timerId } });
       toast({
-        title: "Error",
-        description: "Failed to delete timer",
-        variant: "destructive",
+        title: "Timer stopped",
+        description: `Timer "${state.timers[timerId]?.name}" has been stopped`,
       });
-      return;
-    }
-
-    setTimers((prev) => prev.filter((timer) => timer.id !== id));
-    toast({
-      title: "Timer Deleted",
-      description: "Timer has been removed",
-    });
-  };
-
-  const updateTimerSeconds = async (id: string, seconds: number) => {
-    console.log('Updating timer seconds:', id, seconds);
-    const timer = timers.find((t) => t.id === id);
-    if (timer) {
-      setTimers((prev) =>
-        prev.map((t) =>
-          t.id === id ? { ...t, isRunning: seconds > 0 } : t
-        )
-      );
+    } catch (error) {
+      toast({
+        title: "Error stopping timer",
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: "destructive"
+      });
+      dispatch({ type: 'SET_ERROR', payload: error as Error });
     }
   };
 
   return (
-    <TimerContext.Provider
-      value={{
-        timers,
-        addTimer,
-        deleteTimer,
-        updateTimerSeconds,
-      }}
-    >
+    <TimerContext.Provider value={{ state, dispatch, startTimer, stopTimer }}>
       {children}
-      <Toaster />
     </TimerContext.Provider>
   );
 }
@@ -178,7 +220,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
 export function useTimerContext() {
   const context = useContext(TimerContext);
   if (!context) {
-    throw new Error("useTimerContext must be used within a TimerProvider");
+    throw new Error('useTimerContext must be used within a TimerProvider');
   }
   return context;
 }
