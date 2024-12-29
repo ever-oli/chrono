@@ -97,7 +97,10 @@ export default function HabitGrid() {
         });
 
         return (
-          <Card key={timer.id} className="p-6 hover:shadow-md transition-shadow">
+          <Card 
+            key={timer.id} 
+            className="p-component hover:shadow-card transition-shadow rounded-lg border border-border/5"
+          >
             <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <div 
