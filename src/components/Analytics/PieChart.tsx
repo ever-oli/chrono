@@ -20,7 +20,7 @@ export default function PieChart({ data }: PieChartProps) {
     name,
     value,
   }: any) => {
-    const radius = outerRadius * 0.95;
+    const radius = outerRadius * 1.05;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
