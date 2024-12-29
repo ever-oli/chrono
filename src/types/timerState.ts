@@ -15,3 +15,14 @@ export type TimerAction =
   | { type: 'STOP_TIMER'; payload: { timerId: string } }
   | { type: 'UPDATE_ENTRY'; payload: { timerId: string; entry: TimeEntry } }
   | { type: 'SET_ERROR'; payload: Error };
+
+export interface TimerContextType {
+  state: TimerState;
+  dispatch: React.Dispatch<TimerAction>;
+  timers: Timer[];
+  startTimer: (timerId: string) => Promise<void>;
+  stopTimer: (timerId: string) => Promise<void>;
+  addTimer: (timer: Omit<Timer, 'id' | 'created_at'>) => Promise<void>;
+  deleteTimer: (id: string) => Promise<void>;
+  updateTimerSeconds: (id: string, seconds: number) => Promise<void>;
+}

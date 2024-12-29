@@ -3,76 +3,23 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
-import { TimerState, TimerAction } from '@/types/timerState';
+import { TimerState, TimerContextType } from '@/types/timerState';
 import { Timer } from '@/types/timer';
-import { TimeEntry } from '@/types/timeEntry';
+import { timerReducer } from './timerReducer';
 
-const TimerContext = createContext<{
-  state: TimerState;
-  dispatch: React.Dispatch<TimerAction>;
-  startTimer: (timerId: string) => Promise<void>;
-  stopTimer: (timerId: string) => Promise<void>;
-} | null>(null);
-
-function timerReducer(state: TimerState, action: TimerAction): TimerState {
-  switch (action.type) {
-    case 'SET_TIMERS':
-      return {
-        ...state,
-        timers: action.payload.reduce((acc, timer) => ({
-          ...acc,
-          [timer.id]: timer
-        }), {}),
-        isLoading: false
-      };
-    case 'START_TIMER':
-      return {
-        ...state,
-        activeTimers: new Set([...state.activeTimers, action.payload.timerId]),
-        currentEntries: {
-          ...state.currentEntries,
-          [action.payload.timerId]: action.payload.entry
-        }
-      };
-    case 'STOP_TIMER':
-      const newActiveTimers = new Set(state.activeTimers);
-      newActiveTimers.delete(action.payload.timerId);
-      const { [action.payload.timerId]: _, ...remainingEntries } = state.currentEntries;
-      return {
-        ...state,
-        activeTimers: newActiveTimers,
-        currentEntries: remainingEntries
-      };
-    case 'UPDATE_ENTRY':
-      return {
-        ...state,
-        currentEntries: {
-          ...state.currentEntries,
-          [action.payload.timerId]: action.payload.entry
-        }
-      };
-    case 'SET_ERROR':
-      return {
-        ...state,
-        error: action.payload,
-        isLoading: false
-      };
-    default:
-      return state;
-  }
-}
+const TimerContext = createContext<TimerContextType | null>(null);
 
 export function TimerProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(timerReducer, {
     timers: {},
-    activeTimers: new Set(),
+    activeTimers: new Set<string>(),
     currentEntries: {},
     isLoading: true,
     error: null
   });
 
-  const queryClient = useQueryClient();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: timers } = useQuery({
     queryKey: ['timers'],
@@ -162,7 +109,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
           seconds: 0
         })
         .select()
-        .maybeSingle();
+        .single();
 
       if (error) throw error;
       if (!entry) throw new Error('Failed to create time entry');
@@ -171,13 +118,13 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
         type: 'START_TIMER',
         payload: { timerId, entry }
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error starting timer",
-        description: error instanceof Error ? error.message : 'Unknown error',
+        description: error.message,
         variant: "destructive"
       });
-      dispatch({ type: 'SET_ERROR', payload: error as Error });
+      dispatch({ type: 'SET_ERROR', payload: error });
     }
   };
 
@@ -200,18 +147,99 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
         title: "Timer stopped",
         description: `Timer "${state.timers[timerId]?.name}" has been stopped`,
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error stopping timer",
-        description: error instanceof Error ? error.message : 'Unknown error',
+        description: error.message,
         variant: "destructive"
       });
-      dispatch({ type: 'SET_ERROR', payload: error as Error });
+      dispatch({ type: 'SET_ERROR', payload: error });
     }
   };
 
+  const addTimer = async (timer: Omit<Timer, 'id' | 'created_at'>) => {
+    try {
+      const { error } = await supabase
+        .from('timers')
+        .insert(timer);
+
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ['timers'] });
+      toast({
+        title: "Timer added",
+        description: `Timer "${timer.name}" has been added`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error adding timer",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const deleteTimer = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('timers')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ['timers'] });
+      toast({
+        title: "Timer deleted",
+        description: `Timer has been deleted`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error deleting timer",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const updateTimerSeconds = async (id: string, seconds: number) => {
+    const currentEntry = state.currentEntries[id];
+    if (!currentEntry) return;
+
+    try {
+      const { error } = await supabase
+        .from('time_entries')
+        .update({ seconds })
+        .eq('id', currentEntry.id);
+
+      if (error) throw error;
+
+      dispatch({
+        type: 'UPDATE_ENTRY',
+        payload: { timerId: id, entry: { ...currentEntry, seconds } }
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error updating timer",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const value = {
+    state,
+    dispatch,
+    timers: timers || [],
+    startTimer,
+    stopTimer,
+    addTimer,
+    deleteTimer,
+    updateTimerSeconds
+  };
+
   return (
-    <TimerContext.Provider value={{ state, dispatch, startTimer, stopTimer }}>
+    <TimerContext.Provider value={value}>
       {children}
     </TimerContext.Provider>
   );
