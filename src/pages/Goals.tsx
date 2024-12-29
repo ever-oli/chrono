@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import GoalForm from "@/components/Goals/GoalForm";
 import GoalCard from "@/components/Goals/GoalCard";
+import HabitGrid from "@/components/Goals/HabitGrid";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { startOfDay, startOfWeek, startOfMonth } from "date-fns";
@@ -129,6 +130,10 @@ export default function Goals() {
             No goals yet. Click the + button to add one.
           </div>
         )}
+      </div>
+
+      <div className="border-t pt-6">
+        <HabitGrid />
       </div>
     </div>
   );
