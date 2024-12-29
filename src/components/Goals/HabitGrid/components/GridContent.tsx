@@ -7,9 +7,10 @@ interface GridContentProps {
   weeks: Date[][];
   entriesByDate: Record<string, TimeEntry[]>;
   maxIntensity: number;
+  color: string;
 }
 
-export default function GridContent({ weeks, entriesByDate, maxIntensity }: GridContentProps) {
+export default function GridContent({ weeks, entriesByDate, maxIntensity, color }: GridContentProps) {
   return (
     <div className="grid grid-cols-53 grid-rows-7 gap-[1px]">
       {weeks.map((week, weekIndex) => (
@@ -23,13 +24,6 @@ export default function GridContent({ weeks, entriesByDate, maxIntensity }: Grid
             ? calculateIntensity(dayEntries) / maxIntensity 
             : 0;
           
-          // Get the most active timer's color
-          const primaryColor = dayEntries.length > 0 
-            ? dayEntries.reduce((prev, current) => 
-                (current.seconds || 0) > (prev.seconds || 0) ? current : prev
-              ).timer?.color 
-            : '#e5e5e5';
-          
           // Calculate opacity based on intensity
           const opacity = Math.min(0.2 + (intensity * 0.8), 1);
           
@@ -39,7 +33,7 @@ export default function GridContent({ weeks, entriesByDate, maxIntensity }: Grid
                 <div 
                   className="w-3 h-3 rounded-sm cursor-pointer transition-colors"
                   style={{ 
-                    backgroundColor: primaryColor,
+                    backgroundColor: color,
                     opacity: dayEntries.length > 0 ? opacity : 0.1
                   }}
                 />
