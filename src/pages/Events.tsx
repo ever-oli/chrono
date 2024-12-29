@@ -25,6 +25,7 @@ export default function Events() {
           name,
           notes,
           marker_size,
+          timer_id,
           timer:timers (
             id,
             name,
@@ -50,7 +51,8 @@ export default function Events() {
     }
     groups[date].push({
       ...event,
-      timer: event.timer
+      timer: event.timer,
+      timer_id: event.timer_id
     });
     return groups;
   }, {});
