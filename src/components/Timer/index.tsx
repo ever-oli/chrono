@@ -29,18 +29,46 @@ export default function Timer({
 
   useEffect(() => {
     const loadInitialSeconds = async () => {
+      console.log('Loading initial seconds for timer:', id);
       const { data, error } = await supabase
         .from('time_entries')
         .select('seconds')
         .eq('timer_id', id);
       
-      if (!error && data) {
+      if (error) {
+        console.error('Error loading initial seconds:', error);
+        return;
+      }
+
+      if (data) {
         const totalSeconds = data.reduce((acc, entry) => acc + entry.seconds, 0);
         setSeconds(totalSeconds);
       }
     };
 
+    // Check if timer is already running
+    const checkRunningState = async () => {
+      console.log('Checking running state for timer:', id);
+      const { data, error } = await supabase
+        .from('time_entries')
+        .select('*')
+        .eq('timer_id', id)
+        .is('ended_at', null)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error checking timer state:', error);
+        return;
+      }
+
+      if (data) {
+        setIsRunning(true);
+        setStartTime(new Date(data.started_at));
+      }
+    };
+
     loadInitialSeconds();
+    checkRunningState();
   }, [id]);
 
   useEffect(() => {
@@ -52,10 +80,15 @@ export default function Timer({
       }, 1000);
     }
     
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
   }, [isRunning]);
 
   const toggleTimer = async () => {
+    console.log('Toggling timer:', id, 'Current state:', isRunning);
     if (!isRunning) {
       const now = new Date();
       setStartTime(now);
@@ -81,14 +114,22 @@ export default function Timer({
           .from('time_entries')
           .insert([timeEntry]);
 
-        if (!error) {
-          await onSecondsUpdate(id, elapsedSeconds);
-          queryClient.invalidateQueries({ queryKey: ['timers'] });
+        if (error) {
+          console.error('Error saving time entry:', error);
           toast({
-            title: "Timer stopped",
-            description: `Logged ${Math.floor(elapsedSeconds / 60)} minutes for ${name}`,
+            title: "Error",
+            description: "Failed to save timer entry",
+            variant: "destructive",
           });
+          return;
         }
+
+        await onSecondsUpdate(id, elapsedSeconds);
+        queryClient.invalidateQueries({ queryKey: ['timers'] });
+        toast({
+          title: "Timer stopped",
+          description: `Logged ${Math.floor(elapsedSeconds / 60)} minutes for ${name}`,
+        });
       }
       setIsRunning(false);
       setEditName("");

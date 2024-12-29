@@ -25,9 +25,9 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
   const { toast } = useToast();
 
-  // Load timers and set up real-time subscription
   useEffect(() => {
     const loadTimers = async () => {
+      console.log('Loading timers...');
       const { data, error } = await supabase
         .from('timers')
         .select('*')
@@ -42,12 +42,16 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
         // Initialize timers with isRunning state from time_entries
         const timersWithRunningState = await Promise.all(
           data.map(async (timer) => {
-            const { data: entry } = await supabase
+            const { data: entry, error } = await supabase
               .from('time_entries')
               .select('*')
               .eq('timer_id', timer.id)
               .is('ended_at', null)
               .maybeSingle();
+
+            if (error) {
+              console.error('Error checking timer running state:', error);
+            }
 
             return {
               ...timer,
@@ -55,6 +59,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
             };
           })
         );
+        console.log('Timers loaded:', timersWithRunningState);
         setTimers(timersWithRunningState);
       }
     };
@@ -85,6 +90,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
 
     // Cleanup subscription
     return () => {
+      console.log('Cleaning up timer subscriptions...');
       if (timerChannel) {
         supabase.removeChannel(timerChannel);
       }
@@ -92,6 +98,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addTimer = async (timer: Omit<Timer, "id">) => {
+    console.log('Adding timer:', timer);
     const { data, error } = await supabase
       .from('timers')
       .insert([timer])
@@ -118,6 +125,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteTimer = async (id: string) => {
+    console.log('Deleting timer:', id);
     const { error } = await supabase
       .from('timers')
       .delete()
@@ -141,6 +149,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateTimerSeconds = async (id: string, seconds: number) => {
+    console.log('Updating timer seconds:', id, seconds);
     const timer = timers.find((t) => t.id === id);
     if (timer) {
       setTimers((prev) =>
