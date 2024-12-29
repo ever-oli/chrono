@@ -8,7 +8,36 @@ interface PieChartProps {
   }>;
 }
 
+const RADIAN = Math.PI / 180;
+
 export default function PieChart({ data }: PieChartProps) {
+  const renderCustomizedLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    name,
+    value,
+  }: any) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.7;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="#030027"
+        textAnchor="middle"
+        dominantBaseline="central"
+        className="text-sm font-medium"
+      >
+        {`${name}: ${value.toFixed(1)}h`}
+      </text>
+    );
+  };
+
   return (
     <div className="h-[300px] w-full">
       <h3 className="text-lg font-semibold mb-4">Time Distribution</h3>
@@ -21,18 +50,8 @@ export default function PieChart({ data }: PieChartProps) {
             cx="50%"
             cy="50%"
             outerRadius={100}
-            label={({ name, value, percent }) => (
-              <text
-                x={0}
-                y={0}
-                fill="#030027"
-                textAnchor="middle"
-                dominantBaseline="central"
-                className="text-sm font-medium"
-              >
-                {`${name}: ${value.toFixed(1)}h`}
-              </text>
-            )}
+            labelLine={false}
+            label={renderCustomizedLabel}
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
