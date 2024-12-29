@@ -20,7 +20,7 @@ export default function PieChart({ data }: PieChartProps) {
     name,
     value,
   }: any) => {
-    const radius = outerRadius * 0.95; // Adjusted from 0.85 to 0.95
+    const radius = outerRadius * 0.95;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
@@ -52,7 +52,7 @@ export default function PieChart({ data }: PieChartProps) {
             nameKey="name"
             cx="50%"
             cy="50%"
-            outerRadius={100}
+            outerRadius={90}
             labelLine={false}
             label={renderCustomizedLabel}
           >
