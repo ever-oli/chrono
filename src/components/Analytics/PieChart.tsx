@@ -8,19 +8,6 @@ interface PieChartProps {
   }>;
 }
 
-// Helper function to determine if we should use light or dark text
-const shouldUseLightText = (backgroundColor: string) => {
-  // Convert hex to RGB
-  const hex = backgroundColor.replace('#', '');
-  const r = parseInt(hex.substr(0, 2), 16);
-  const g = parseInt(hex.substr(2, 2), 16);
-  const b = parseInt(hex.substr(4, 2), 16);
-  
-  // Calculate relative luminance
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance < 0.5;
-};
-
 export default function PieChart({ data }: PieChartProps) {
   return (
     <div className="h-[300px] w-full">
@@ -34,22 +21,16 @@ export default function PieChart({ data }: PieChartProps) {
             cx="50%"
             cy="50%"
             outerRadius={100}
-            label={({ name, value, fill }) => (
+            label={({ name, value, percent }) => (
               <text
                 x={0}
                 y={0}
-                fill={shouldUseLightText(fill) ? "#FFFFFF" : "#000000"}
+                fill="#030027"
                 textAnchor="middle"
                 dominantBaseline="central"
-                style={{
-                  fontSize: '12px',
-                  fontWeight: '500',
-                  textShadow: shouldUseLightText(fill) 
-                    ? '0px 1px 2px rgba(0,0,0,0.5)'
-                    : '0px 1px 2px rgba(255,255,255,0.5)'
-                }}
+                className="text-sm font-medium"
               >
-                {`${name}: ${value.toFixed(2)}h`}
+                {`${name}: ${value.toFixed(1)}h`}
               </text>
             )}
           >
