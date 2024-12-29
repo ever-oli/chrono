@@ -20,7 +20,7 @@ export default function PieChart({ data }: PieChartProps) {
     name,
     value,
   }: any) => {
-    const radius = outerRadius * 1.35; // Increased from 0.7 to position labels further out
+    const radius = outerRadius * 0.85; // Adjusted from 1.35 to 0.85
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
