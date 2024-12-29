@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import NewEventForm from "@/components/Events/NewEventForm";
 import StatementPeriodSelect from "@/components/Events/StatementPeriodSelect";
 import { generateEventsPDF } from "@/utils/pdfGenerator";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { format, parseISO } from "date-fns";
 
 export default function Events() {
@@ -26,7 +26,7 @@ export default function Events() {
           notes,
           marker_size,
           timer_id,
-          timers (
+          timer:timers (
             id,
             name,
             color
@@ -39,7 +39,6 @@ export default function Events() {
         throw error;
       }
 
-      console.log('Fetched events:', data);
       return data;
     }
   });
@@ -52,19 +51,17 @@ export default function Events() {
     }
     groups[date].push({
       ...event,
-      timer: event.timers // Map the nested timer data correctly
+      timer: event.timer // Map the nested timer data correctly
     });
     return groups;
   }, {});
-
-  console.log('Grouped events:', groupedEvents);
 
   const handleExport = async (period: string) => {
     try {
       await generateEventsPDF(events, period);
       toast({
         title: "Export Successful",
-        description: "Your statement has been generated.",
+        description: "Your statement has been generated and downloaded.",
       });
     } catch (error) {
       console.error('Export error:', error);
