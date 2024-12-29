@@ -1,34 +1,25 @@
-import { format } from "date-fns";
+import { parseISO, format } from "date-fns";
 
-export const formatTimeRange = (timeRange: "hours" | "days" | "weeks" | "months", date: Date): string => {
-  switch (timeRange) {
-    case "hours":
-      return format(date, "MMMM d, yyyy");
-    case "days":
-      return `Week of ${format(date, "MMMM d, yyyy")}`;
-    case "weeks":
-      return format(date, "MMMM yyyy");
-    case "months":
-      return format(date, "yyyy");
+export const formatTime = (dateString: string | null): string => {
+  if (!dateString) return 'N/A';
+  
+  try {
+    const date = parseISO(dateString);
+    return format(date, 'h:mm a');
+  } catch (error) {
+    console.error('Error formatting time:', error);
+    return 'Invalid date';
   }
 };
 
-export const formatDuration = (seconds: number): string => {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const remainingSeconds = seconds % 60;
+export const formatDate = (dateString: string | null): string => {
+  if (!dateString) return 'N/A';
   
-  const parts = [];
-  
-  if (hours > 0) {
-    parts.push(`${hours}h`);
+  try {
+    const date = parseISO(dateString);
+    return format(date, 'MMM d, yyyy');
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid date';
   }
-  
-  if (minutes > 0 || hours > 0) {
-    parts.push(`${minutes}m`);
-  }
-  
-  parts.push(`${remainingSeconds}s`);
-  
-  return parts.join(' ');
 };
