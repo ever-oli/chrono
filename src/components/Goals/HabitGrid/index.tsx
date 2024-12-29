@@ -85,55 +85,57 @@ export default function HabitGrid() {
   }
 
   return (
-    <Card className="p-6 space-y-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Activity Grid</h2>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setShowDebug(prev => !prev)}
-          title="Toggle Debug Panel (Alt+D)"
-          className="border-2"
-        >
-          <Bug className="h-4 w-4" />
-        </Button>
-      </div>
-      
-      {showDebug && (
-        <div className="border rounded-lg p-4 bg-muted/50 space-y-4">
-          <h3 className="font-medium">Debug Information</h3>
-          <ScrollArea className="h-[200px]">
-            <div className="space-y-2 text-sm">
-              <p>Date Range: {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}</p>
-              <p>Total Entries: {entries.length}</p>
-              <p>Max Entries Per Day: {maxEntries}</p>
-              <p>Days with Activity: {Object.values(entriesByDate).filter(e => e.length > 0).length}</p>
-              <div>
-                <p className="font-medium">Recent Entries:</p>
-                <pre className="text-xs mt-1 whitespace-pre-wrap">
-                  {JSON.stringify(entries.slice(-3), null, 2)}
-                </pre>
-              </div>
-            </div>
-          </ScrollArea>
+    <Card className="p-6">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Activity Grid</h2>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setShowDebug(prev => !prev)}
+            title="Toggle Debug Panel (Alt+D)"
+            className="border-2"
+          >
+            <Bug className="h-4 w-4" />
+          </Button>
         </div>
-      )}
-      
-      <div className="overflow-x-auto pb-4">
-        <div className="grid grid-cols-53 gap-1 min-w-[800px]">
-          {dates.map(date => {
-            const dayEntries = entriesByDate[date.toISOString()] || [];
-            const intensity = maxEntries > 0 ? dayEntries.length / maxEntries : 0;
-            
-            return (
-              <HabitGridCell
-                key={date.toISOString()}
-                date={date}
-                entries={dayEntries}
-                intensity={intensity}
-              />
-            );
-          })}
+        
+        {showDebug && (
+          <div className="border rounded-lg p-4 bg-muted/50 space-y-4">
+            <h3 className="font-medium">Debug Information</h3>
+            <ScrollArea className="h-[200px]">
+              <div className="space-y-2 text-sm">
+                <p>Date Range: {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}</p>
+                <p>Total Entries: {entries.length}</p>
+                <p>Max Entries Per Day: {maxEntries}</p>
+                <p>Days with Activity: {Object.values(entriesByDate).filter(e => e.length > 0).length}</p>
+                <div>
+                  <p className="font-medium">Recent Entries:</p>
+                  <pre className="text-xs mt-1 whitespace-pre-wrap">
+                    {JSON.stringify(entries.slice(-3), null, 2)}
+                  </pre>
+                </div>
+              </div>
+            </ScrollArea>
+          </div>
+        )}
+        
+        <div className="overflow-x-auto pb-4">
+          <div className="grid grid-cols-53 gap-1 min-w-[800px]">
+            {dates.map(date => {
+              const dayEntries = entriesByDate[date.toISOString()] || [];
+              const intensity = maxEntries > 0 ? dayEntries.length / maxEntries : 0;
+              
+              return (
+                <HabitGridCell
+                  key={date.toISOString()}
+                  date={date}
+                  entries={dayEntries}
+                  intensity={intensity}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
     </Card>

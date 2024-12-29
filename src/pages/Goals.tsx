@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { startOfDay, startOfWeek, startOfMonth } from "date-fns";
 import { useGoalsSubscription } from "@/hooks/useGoalsSubscription";
+import { Separator } from "@/components/ui/separator";
 
 export default function Goals() {
   const [showForm, setShowForm] = useState(false);
@@ -84,7 +85,7 @@ export default function Goals() {
   }
 
   return (
-    <div className="container max-w-2xl mx-auto p-4 space-y-6">
+    <div className="container max-w-2xl mx-auto p-4 space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Goals</h1>
         <Button
@@ -131,7 +132,11 @@ export default function Goals() {
         )}
       </div>
 
-      <HabitGrid />
+      <Separator className="my-8" />
+
+      <div className="space-y-8">
+        <HabitGrid />
+      </div>
     </div>
   );
 }
