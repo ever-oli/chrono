@@ -52,7 +52,7 @@ export default function PieChart({ data }: PieChartProps) {
             nameKey="name"
             cx="50%"
             cy="50%"
-            outerRadius={90}
+            outerRadius={80}
             labelLine={false}
             label={renderCustomizedLabel}
           >
