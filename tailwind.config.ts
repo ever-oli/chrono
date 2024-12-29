@@ -23,11 +23,11 @@ export default {
         mono: ["SF Mono", "monospace"],
       },
       fontSize: {
-        "header-lg": ["1.5rem", "2rem"],     // 24px
-        "header-base": ["1.25rem", "1.75rem"], // 20px
-        "body": ["1rem", "1.5rem"],          // 16px
-        "sm": ["0.875rem", "1.25rem"],       // 14px
-        "time": ["1.125rem", "1.5rem"],      // 18px
+        "header-lg": ["1.5rem", "2rem"],
+        "header-base": ["1.25rem", "1.75rem"],
+        "body": ["1rem", "1.5rem"],
+        "sm": ["0.875rem", "1.25rem"],
+        "time": ["1.125rem", "1.5rem"],
       },
       gridTemplateColumns: {
         '53': 'repeat(53, minmax(0, 1fr))',
@@ -69,13 +69,11 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Base Colors
         'space-cadet': '#151E3F',
         'beige': '#F2F3D9',
         'oxford-blue': '#030027',
         'buff': '#DC9E82',
         'old-rose': '#C16E70',
-        // Semantic Colors
         'success': '#4CAF50',
         'warning': '#FFA726',
         'error': '#EF5350',
@@ -83,6 +81,7 @@ export default {
       },
       boxShadow: {
         'card': '0 2px 4px rgba(21, 30, 63, 0.1)',
+        'frosted': '0 4px 6px rgba(21, 30, 63, 0.05)',
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -94,6 +93,9 @@ export default {
         'component': '16px',
         'content': '24px',
         'section': '32px',
+      },
+      backdropBlur: {
+        'frosted': '8px',
       },
     },
   },

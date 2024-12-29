@@ -7,10 +7,10 @@
     --background: 60 63% 90%;    /* #F2F3D9 Beige */
     --foreground: 231 100% 8%;   /* #030027 Oxford Blue */
     
-    --card: 0 0% 100%;          /* #FFFFFF White */
+    --card: 60 63% 90%;         /* #F2F3D9 Beige */
     --card-foreground: 231 100% 8%; /* #030027 Oxford Blue */
     
-    --popover: 0 0% 100%;       /* #FFFFFF White */
+    --popover: 60 63% 90%;      /* #F2F3D9 Beige */
     --popover-foreground: 231 100% 8%; /* #030027 Oxford Blue */
     
     --primary: 17 58% 69%;      /* #DC9E82 Buff */

@@ -21,7 +21,7 @@ export default function HabitGridCell({ date, entries, intensity }: HabitGridCel
     <Tooltip>
       <TooltipTrigger asChild>
         <div 
-          className="w-3 h-3 rounded-sm cursor-pointer transition-all hover:scale-110 hover:ring-2 ring-oxford-blue"
+          className="w-3 h-3 rounded-sm cursor-pointer transition-all hover:scale-110 hover:ring-2 ring-oxford-blue shadow-frosted backdrop-blur-frosted"
           style={{ 
             backgroundColor: primaryColor,
             opacity: entries.length > 0 ? opacity : 0.1

@@ -9,7 +9,7 @@ export default function Habits() {
           Track your daily activities and build better habits.
         </p>
       </div>
-      <div className="bg-white rounded-lg shadow-card p-6">
+      <div className="bg-beige rounded-lg shadow-frosted backdrop-blur-frosted border border-oxford-blue/5 p-6">
         <HabitGrid />
       </div>
     </div>
