@@ -4,7 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Clock } from "lucide-react";
 
 interface EventCardProps {
-  entry: TimeEntry;
+  entry: TimeEntry & {
+    timer?: {
+      id: string;
+      name: string;
+      color: string;
+    };
+  };
   onDelete: (id: string) => void;
 }
 
@@ -21,7 +27,7 @@ export default function EventCard({ entry, onDelete }: EventCardProps) {
           style={{ backgroundColor: entry.timer?.color }}
         />
         <div>
-          <h3 className="font-medium">{entry.timer?.name}</h3>
+          <h3 className="font-medium">{entry.timer?.name || 'Unnamed Timer'}</h3>
           <p className="text-sm text-muted-foreground">
             {formatTime(entry.started_at)} - {formatTime(entry.ended_at)}
           </p>
