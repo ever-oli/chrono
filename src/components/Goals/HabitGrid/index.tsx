@@ -1,32 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  eachDayOfInterval, 
-  subDays, 
-  startOfDay, 
-  endOfDay, 
-  format,
-  getDay,
-  isSameMonth,
-  startOfWeek
-} from "date-fns";
+import { getDay, isSameMonth, startOfWeek } from "date-fns";
 import { TimeEntry } from "@/types/timeEntry";
-import HabitGridCell from "./HabitGridCell";
+import { generateDateRange, getDayEntries } from "./utils/dateUtils";
 import { useState, useEffect } from "react";
 import { Bug } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
-
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+import MonthLabels from "./components/MonthLabels";
+import DayLabels from "./components/DayLabels";
+import GridContent from "./components/GridContent";
 
 export default function HabitGrid() {
   const [showDebug, setShowDebug] = useState(false);
+  const dates = generateDateRange();
   
-  const endDate = new Date();
-  const startDate = subDays(endDate, 364); // Last 365 days
-  const dates = eachDayOfInterval({ start: startDate, end: endDate });
-
   // Toggle debug panel with Alt+D
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -39,7 +28,7 @@ export default function HabitGrid() {
   }, []);
 
   const { data: entries = [], isLoading, error } = useQuery({
-    queryKey: ['habit-entries', startDate, endDate],
+    queryKey: ['habit-entries', dates[0], dates[dates.length - 1]],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('time_entries')
@@ -51,8 +40,8 @@ export default function HabitGrid() {
             color
           )
         `)
-        .gte('started_at', startDate.toISOString())
-        .lte('started_at', endDate.toISOString())
+        .gte('started_at', dates[0].toISOString())
+        .lte('started_at', dates[dates.length - 1].toISOString())
         .order('started_at', { ascending: true });
 
       if (error) throw error;
@@ -62,20 +51,12 @@ export default function HabitGrid() {
 
   // Group entries by date
   const entriesByDate = dates.reduce((acc, date) => {
-    const dayStart = startOfDay(date);
-    const dayEnd = endOfDay(date);
-    
-    const dayEntries = entries.filter(entry => {
-      const entryDate = new Date(entry.started_at);
-      return entryDate >= dayStart && entryDate <= dayEnd;
-    });
-
-    acc[date.toISOString()] = dayEntries;
+    acc[date.toISOString()] = getDayEntries(date, entries);
     return acc;
   }, {} as Record<string, TimeEntry[]>);
 
-  // Calculate maximum entries per day for intensity scaling
-  const maxEntries = Math.max(
+  // Calculate maximum entries for intensity scaling
+  const maxIntensity = Math.max(
     ...Object.values(entriesByDate).map(entries => 
       entries.reduce((sum, entry) => sum + (entry.seconds || 0), 0)
     )
@@ -140,9 +121,9 @@ export default function HabitGrid() {
             <h3 className="font-medium">Debug Information</h3>
             <ScrollArea className="h-[200px]">
               <div className="space-y-2 text-sm">
-                <p>Date Range: {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}</p>
+                <p>Date Range: {dates[0].toLocaleDateString()} - {dates[dates.length - 1].toLocaleDateString()}</p>
                 <p>Total Entries: {entries.length}</p>
-                <p>Max Seconds Per Day: {maxEntries}</p>
+                <p>Max Intensity: {maxIntensity}</p>
                 <p>Days with Activity: {Object.values(entriesByDate).filter(e => e.length > 0).length}</p>
                 <div>
                   <p className="font-medium">Recent Entries:</p>
@@ -157,62 +138,14 @@ export default function HabitGrid() {
         
         <div className="overflow-x-auto pb-4">
           <div className="relative">
-            {/* Month labels */}
-            <div className="flex mb-2 text-sm text-muted-foreground">
-              <div className="w-8" /> {/* Spacer for day labels */}
-              <div className="flex-1 flex">
-                {weeks.map((week, i) => {
-                  const date = week[0];
-                  const showMonth = i === 0 || !isSameMonth(weeks[i-1][0], date);
-                  return (
-                    <div key={i} className="w-3 mx-[1px]">
-                      {showMonth && (
-                        <div className="absolute -top-6">
-                          {format(date, 'MMM')}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Grid with day labels */}
+            <MonthLabels weeks={weeks} />
             <div className="flex">
-              {/* Day labels */}
-              <div className="flex flex-col mr-2 text-sm text-muted-foreground">
-                {DAYS.map((day, i) => (
-                  <div key={day} className="h-3 flex items-center">
-                    {i % 2 === 0 && day}
-                  </div>
-                ))}
-              </div>
-
-              {/* Activity grid */}
-              <div className="grid grid-cols-53 grid-rows-7 gap-[1px]">
-                {weeks.map((week, weekIndex) => (
-                  week.map((date, dayIndex) => {
-                    if (date.getTime() === 0) return (
-                      <div key={`empty-${weekIndex}-${dayIndex}`} className="w-3 h-3" />
-                    );
-                    
-                    const dayEntries = entriesByDate[date.toISOString()] || [];
-                    const totalSeconds = dayEntries.reduce((sum, entry) => 
-                      sum + (entry.seconds || 0), 0
-                    );
-                    const intensity = maxEntries > 0 ? totalSeconds / maxEntries : 0;
-                    
-                    return (
-                      <HabitGridCell
-                        key={date.toISOString()}
-                        date={date}
-                        entries={dayEntries}
-                        intensity={intensity}
-                      />
-                    );
-                  })
-                ))}
-              </div>
+              <DayLabels />
+              <GridContent 
+                weeks={weeks}
+                entriesByDate={entriesByDate}
+                maxIntensity={maxIntensity}
+              />
             </div>
           </div>
         </div>
