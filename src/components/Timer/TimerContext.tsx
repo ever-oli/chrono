@@ -2,12 +2,13 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { supabase } from "@/integrations/supabase/client";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 interface Timer {
   id: string;
   name: string;
   color: string;
-  isRunning?: boolean;  // Added isRunning property
+  isRunning?: boolean;
 }
 
 interface TimerContextType {
@@ -21,9 +22,10 @@ const TimerContext = createContext<TimerContextType | undefined>(undefined);
 
 export function TimerProvider({ children }: { children: React.ReactNode }) {
   const [timers, setTimers] = useState<Timer[]>([]);
+  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
   const { toast } = useToast();
 
-  // Load timers from Supabase on mount
+  // Load timers and set up real-time subscription
   useEffect(() => {
     const loadTimers = async () => {
       const { data, error } = await supabase
@@ -37,11 +39,56 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (data) {
-        setTimers(data);
+        // Initialize timers with isRunning state from time_entries
+        const timersWithRunningState = await Promise.all(
+          data.map(async (timer) => {
+            const { data: entries } = await supabase
+              .from('time_entries')
+              .select('*')
+              .eq('timer_id', timer.id)
+              .is('ended_at', null)
+              .single();
+
+            return {
+              ...timer,
+              isRunning: !!entries,
+            };
+          })
+        );
+        setTimers(timersWithRunningState);
       }
     };
 
     loadTimers();
+
+    // Set up real-time subscription
+    const timerChannel = supabase.channel('timers-channel')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'timers' },
+        (payload) => {
+          console.log('Timer change received:', payload);
+          loadTimers(); // Reload timers when changes occur
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'time_entries' },
+        (payload) => {
+          console.log('Time entry change received:', payload);
+          loadTimers(); // Reload timers to update running states
+        }
+      )
+      .subscribe();
+
+    setChannel(timerChannel);
+
+    // Cleanup subscription
+    return () => {
+      if (timerChannel) {
+        supabase.removeChannel(timerChannel);
+      }
+    };
   }, []);
 
   const addTimer = async (timer: Omit<Timer, "id">) => {
@@ -94,11 +141,14 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateTimerSeconds = async (id: string, seconds: number) => {
-    setTimers((prev) =>
-      prev.map((timer) =>
-        timer.id === id ? { ...timer, seconds } : timer
-      )
-    );
+    const timer = timers.find((t) => t.id === id);
+    if (timer) {
+      setTimers((prev) =>
+        prev.map((t) =>
+          t.id === id ? { ...t, isRunning: seconds > 0 } : t
+        )
+      );
+    }
   };
 
   return (
