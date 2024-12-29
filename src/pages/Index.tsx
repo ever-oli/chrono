@@ -1,6 +1,7 @@
 import TimerList from "@/components/TimerList";
 import Analytics from "@/components/Analytics";
 import { TimerProvider } from "@/components/Timer/TimerContext";
+import HabitGrid from "@/components/Goals/HabitGrid";
 
 export default function Index() {
   return (
@@ -13,6 +14,10 @@ export default function Index() {
             timeRange="hours"
             currentDate={new Date()}
           />
+        </div>
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold mb-4">Activity Grid</h2>
+          <HabitGrid />
         </div>
       </div>
     </TimerProvider>
