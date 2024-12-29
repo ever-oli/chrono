@@ -68,23 +68,29 @@ export default function HabitGrid() {
     ...Object.values(entriesByDate).map(entries => entries.length)
   );
 
-  // Create a 7x53 grid layout
-  const weeks = [];
+  // Create a 7x53 grid layout (7 days per week)
+  const weeks: Date[][] = [];
   let currentWeek: Date[] = [];
-  
+
   dates.forEach(date => {
     const dayOfWeek = getDay(date);
-    currentWeek[dayOfWeek] = date;
     
-    if (dayOfWeek === 6 || date === dates[dates.length - 1]) {
-      // Fill in any missing days at the start of the week
-      for (let i = 0; i < currentWeek.length; i++) {
-        if (!currentWeek[i]) {
-          currentWeek[i] = new Date(0); // Use epoch date for empty cells
-        }
-      }
+    // If it's the first day of a new week and we have a previous week
+    if (dayOfWeek === 0 && currentWeek.length > 0) {
       weeks.push([...currentWeek]);
       currentWeek = [];
+    }
+    
+    // Add the current date to the current week
+    currentWeek[dayOfWeek] = date;
+    
+    // If it's the last date, push the remaining week
+    if (date === dates[dates.length - 1]) {
+      // Fill in any remaining days in the week with null
+      while (currentWeek.length < 7) {
+        currentWeek.push(new Date(0));
+      }
+      weeks.push([...currentWeek]);
     }
   });
 
@@ -141,7 +147,7 @@ export default function HabitGrid() {
         )}
         
         <div className="overflow-x-auto pb-4">
-          <div className="grid grid-rows-7 grid-flow-col gap-1 min-w-[800px]">
+          <div className="grid grid-cols-53 grid-rows-7 gap-1">
             {weeks.map((week, weekIndex) => (
               week.map((date, dayIndex) => {
                 if (date.getTime() === 0) return <div key={`empty-${weekIndex}-${dayIndex}`} className="w-3 h-3" />;
