@@ -7,6 +7,7 @@ interface Timer {
   id: string;
   name: string;
   color: string;
+  isRunning?: boolean;  // Added isRunning property
 }
 
 interface TimerContextType {
@@ -61,7 +62,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (data) {
-      setTimers((prev) => [...prev, data]);
+      setTimers((prev) => [...prev, { ...data, isRunning: false }]);
       toast({
         title: "Timer Added",
         description: `${timer.name} has been added to your timers`,
