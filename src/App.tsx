@@ -1,42 +1,24 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { TimerProvider } from "@/components/Timer/TimerContext";
-import Navigation from "@/components/Navigation";
-import Tracking from "./pages/Tracking";
-import Events from "./pages/Events";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navigation from "./components/Navigation";
 import Timeline from "./pages/Timeline";
+import Events from "./pages/Events";
 import Goals from "./pages/Goals";
-import Habits from "./pages/Habits";
-import { useState } from "react";
+import Settings from "./pages/Settings";
+import Statement from "./pages/Statement";
 
-const App = () => {
-  const [queryClient] = useState(() => new QueryClient());
-
+export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TimerProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <div className="min-h-screen pb-20">
-              <Routes>
-                <Route path="/" element={<Tracking />} />
-                <Route path="/events" element={<Events />} />
-                <Route path="/timeline" element={<Timeline />} />
-                <Route path="/goals" element={<Goals />} />
-                <Route path="/habits" element={<Habits />} />
-              </Routes>
-            </div>
-            <Navigation />
-          </BrowserRouter>
-        </TooltipProvider>
-      </TimerProvider>
-    </QueryClientProvider>
+    <Router>
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <Routes>
+          <Route path="/" element={<Timeline />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/goals" element={<Goals />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/statement" element={<Statement />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
-
-export default App;
