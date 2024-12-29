@@ -7,6 +7,11 @@ export interface TimeEntry {
   name: string | null;
   notes: string | null;
   marker_size: 'small' | 'medium' | 'large' | null;
+  timers?: {
+    id: string;
+    name: string;
+    color: string;
+  };
   timer?: {
     id: string;
     name: string;

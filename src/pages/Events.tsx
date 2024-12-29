@@ -19,12 +19,13 @@ export default function Events() {
         .from('time_entries')
         .select(`
           id,
-          name,
-          notes,
-          marker_size,
           seconds,
           started_at,
           ended_at,
+          name,
+          notes,
+          marker_size,
+          timer_id,
           timers (
             id,
             name,
@@ -33,7 +34,12 @@ export default function Events() {
         `)
         .order('started_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching events:', error);
+        throw error;
+      }
+
+      console.log('Fetched events:', data);
       return data;
     }
   });
@@ -44,9 +50,14 @@ export default function Events() {
     if (!groups[date]) {
       groups[date] = [];
     }
-    groups[date].push(event);
+    groups[date].push({
+      ...event,
+      timer: event.timers // Map the nested timer data correctly
+    });
     return groups;
   }, {});
+
+  console.log('Grouped events:', groupedEvents);
 
   const handleExport = async (period: string) => {
     try {
