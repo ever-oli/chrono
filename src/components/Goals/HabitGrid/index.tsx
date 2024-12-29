@@ -1,13 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { eachDayOfInterval, subDays, startOfDay, endOfDay, getDay } from "date-fns";
+import { 
+  eachDayOfInterval, 
+  subDays, 
+  startOfDay, 
+  endOfDay, 
+  format,
+  getDay,
+  isSameMonth,
+  startOfWeek
+} from "date-fns";
 import { TimeEntry } from "@/types/timeEntry";
 import HabitGridCell from "./HabitGridCell";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Bug } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
+
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export default function HabitGrid() {
   const [showDebug, setShowDebug] = useState(false);
@@ -65,28 +76,26 @@ export default function HabitGrid() {
 
   // Calculate maximum entries per day for intensity scaling
   const maxEntries = Math.max(
-    ...Object.values(entriesByDate).map(entries => entries.length)
+    ...Object.values(entriesByDate).map(entries => 
+      entries.reduce((sum, entry) => sum + (entry.seconds || 0), 0)
+    )
   );
 
-  // Create a 7x53 grid layout (7 days per week)
+  // Create weeks array for the grid
   const weeks: Date[][] = [];
   let currentWeek: Date[] = [];
 
   dates.forEach(date => {
     const dayOfWeek = getDay(date);
     
-    // If it's the first day of a new week and we have a previous week
     if (dayOfWeek === 0 && currentWeek.length > 0) {
       weeks.push([...currentWeek]);
       currentWeek = [];
     }
     
-    // Add the current date to the current week
     currentWeek[dayOfWeek] = date;
     
-    // If it's the last date, push the remaining week
-    if (date === dates[dates.length - 1]) {
-      // Fill in any remaining days in the week with null
+    if (date.getTime() === dates[dates.length - 1].getTime()) {
       while (currentWeek.length < 7) {
         currentWeek.push(new Date(0));
       }
@@ -133,7 +142,7 @@ export default function HabitGrid() {
               <div className="space-y-2 text-sm">
                 <p>Date Range: {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}</p>
                 <p>Total Entries: {entries.length}</p>
-                <p>Max Entries Per Day: {maxEntries}</p>
+                <p>Max Seconds Per Day: {maxEntries}</p>
                 <p>Days with Activity: {Object.values(entriesByDate).filter(e => e.length > 0).length}</p>
                 <div>
                   <p className="font-medium">Recent Entries:</p>
@@ -147,24 +156,64 @@ export default function HabitGrid() {
         )}
         
         <div className="overflow-x-auto pb-4">
-          <div className="grid grid-cols-53 grid-rows-7 gap-1">
-            {weeks.map((week, weekIndex) => (
-              week.map((date, dayIndex) => {
-                if (date.getTime() === 0) return <div key={`empty-${weekIndex}-${dayIndex}`} className="w-3 h-3" />;
-                
-                const dayEntries = entriesByDate[date.toISOString()] || [];
-                const intensity = maxEntries > 0 ? dayEntries.length / maxEntries : 0;
-                
-                return (
-                  <HabitGridCell
-                    key={date.toISOString()}
-                    date={date}
-                    entries={dayEntries}
-                    intensity={intensity}
-                  />
-                );
-              })
-            ))}
+          <div className="relative">
+            {/* Month labels */}
+            <div className="flex mb-2 text-sm text-muted-foreground">
+              <div className="w-8" /> {/* Spacer for day labels */}
+              <div className="flex-1 flex">
+                {weeks.map((week, i) => {
+                  const date = week[0];
+                  const showMonth = i === 0 || !isSameMonth(weeks[i-1][0], date);
+                  return (
+                    <div key={i} className="w-3 mx-[1px]">
+                      {showMonth && (
+                        <div className="absolute -top-6">
+                          {format(date, 'MMM')}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Grid with day labels */}
+            <div className="flex">
+              {/* Day labels */}
+              <div className="flex flex-col mr-2 text-sm text-muted-foreground">
+                {DAYS.map((day, i) => (
+                  <div key={day} className="h-3 flex items-center">
+                    {i % 2 === 0 && day}
+                  </div>
+                ))}
+              </div>
+
+              {/* Activity grid */}
+              <div className="grid grid-cols-53 grid-rows-7 gap-[1px]">
+                {weeks.map((week, weekIndex) => (
+                  week.map((date, dayIndex) => {
+                    if (date.getTime() === 0) return (
+                      <div key={`empty-${weekIndex}-${dayIndex}`} className="w-3 h-3" />
+                    );
+                    
+                    const dayEntries = entriesByDate[date.toISOString()] || [];
+                    const totalSeconds = dayEntries.reduce((sum, entry) => 
+                      sum + (entry.seconds || 0), 0
+                    );
+                    const intensity = maxEntries > 0 ? totalSeconds / maxEntries : 0;
+                    
+                    return (
+                      <HabitGridCell
+                        key={date.toISOString()}
+                        date={date}
+                        entries={dayEntries}
+                        intensity={intensity}
+                      />
+                    );
+                  })
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
