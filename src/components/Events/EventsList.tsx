@@ -28,16 +28,27 @@ interface EventsListProps {
 }
 
 export default function EventsList({ groupedEvents }: EventsListProps) {
-  const formatTime = (dateString: string) => {
-    return format(parseISO(dateString), 'h:mm a');
+  const formatTime = (dateString: string | null) => {
+    if (!dateString) return 'N/A';
+    try {
+      return format(parseISO(dateString), 'h:mm a');
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return 'Invalid date';
+    }
   };
 
   const getDateHeader = (date: string) => {
-    const parsedDate = parseISO(date);
-    if (isToday(parsedDate)) {
-      return 'Today';
+    try {
+      const parsedDate = parseISO(date);
+      if (isToday(parsedDate)) {
+        return 'Today';
+      }
+      return format(parsedDate, 'EEEE, MMMM d');
+    } catch (error) {
+      console.error('Error formatting date header:', error);
+      return 'Invalid date';
     }
-    return format(parsedDate, 'EEEE, MMMM d');
   };
 
   return (
