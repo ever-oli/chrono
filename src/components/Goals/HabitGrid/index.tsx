@@ -85,13 +85,14 @@ export default function HabitGrid() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Activity Grid</h2>
         <Button
-          variant="ghost"
+          variant="outline"
           size="icon"
           onClick={() => setShowDebug(prev => !prev)}
           title="Toggle Debug Panel (Alt+D)"
+          className="border-2"
         >
           <Bug className="h-4 w-4" />
         </Button>
