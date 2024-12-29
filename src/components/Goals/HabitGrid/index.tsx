@@ -3,19 +3,32 @@ import { supabase } from "@/integrations/supabase/client";
 import { eachDayOfInterval, subDays, startOfDay, endOfDay } from "date-fns";
 import { TimeEntry } from "@/types/timeEntry";
 import HabitGridCell from "./HabitGridCell";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Bug } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function HabitGrid() {
-  console.log("HabitGrid component rendering");
+  const [showDebug, setShowDebug] = useState(false);
   
   const endDate = new Date();
   const startDate = subDays(endDate, 364); // Last 365 days
   const dates = eachDayOfInterval({ start: startDate, end: endDate });
 
+  // Toggle debug panel with Alt+D
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.altKey && e.key === 'd') {
+        setShowDebug(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const { data: entries = [], isLoading, error } = useQuery({
     queryKey: ['habit-entries', startDate, endDate],
     queryFn: async () => {
-      console.log("Fetching habit entries...", { startDate, endDate });
-      
       const { data, error } = await supabase
         .from('time_entries')
         .select(`
@@ -30,29 +43,10 @@ export default function HabitGrid() {
         .lte('started_at', endDate.toISOString())
         .order('started_at', { ascending: true });
 
-      console.log("Habit entries response:", { data, error });
-
       if (error) throw error;
       return data as TimeEntry[];
     }
   });
-
-  if (error) {
-    console.error("Error loading habit entries:", error);
-    return (
-      <div className="rounded-lg bg-destructive/10 p-4 text-destructive">
-        Error loading activity data. Please try again.
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="animate-pulse">
-        <div className="h-32 bg-muted rounded-lg" />
-      </div>
-    );
-  }
 
   // Group entries by date
   const entriesByDate = dates.reduce((acc, date) => {
@@ -68,20 +62,60 @@ export default function HabitGrid() {
     return acc;
   }, {} as Record<string, TimeEntry[]>);
 
-  console.log("Grouped entries by date:", entriesByDate);
-
   // Calculate maximum entries per day for intensity scaling
   const maxEntries = Math.max(
     ...Object.values(entriesByDate).map(entries => entries.length)
   );
 
-  console.log("Max entries per day:", maxEntries);
+  if (error) {
+    return (
+      <div className="rounded-lg bg-destructive/10 p-4 text-destructive">
+        Error loading activity data. Please try again.
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="animate-pulse">
+        <div className="h-32 bg-muted rounded-lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Activity Grid</h2>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setShowDebug(prev => !prev)}
+          title="Toggle Debug Panel (Alt+D)"
+        >
+          <Bug className="h-4 w-4" />
+        </Button>
       </div>
+      
+      {showDebug && (
+        <div className="border rounded-lg p-4 bg-muted/50 space-y-4">
+          <h3 className="font-medium">Debug Information</h3>
+          <ScrollArea className="h-[200px]">
+            <div className="space-y-2 text-sm">
+              <p>Date Range: {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}</p>
+              <p>Total Entries: {entries.length}</p>
+              <p>Max Entries Per Day: {maxEntries}</p>
+              <p>Days with Activity: {Object.values(entriesByDate).filter(e => e.length > 0).length}</p>
+              <div>
+                <p className="font-medium">Recent Entries:</p>
+                <pre className="text-xs mt-1 whitespace-pre-wrap">
+                  {JSON.stringify(entries.slice(-3), null, 2)}
+                </pre>
+              </div>
+            </div>
+          </ScrollArea>
+        </div>
+      )}
       
       <div className="overflow-x-auto pb-4">
         <div className="grid grid-cols-53 gap-1 min-w-[800px]">
