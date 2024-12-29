@@ -4,35 +4,35 @@
  
 @layer base {
   :root {
-    --background: 252 98% 98%;
-    --foreground: 252 10% 30%;
+    --background: 231 49% 16%;    /* #151E3F Space Cadet */
+    --foreground: 231 100% 8%;    /* #030027 Oxford Blue */
+    
+    --card: 60 63% 90%;          /* #F2F3D9 Beige */
+    --card-foreground: 231 100% 8%; /* #030027 Oxford Blue */
+    
+    --popover: 60 63% 90%;       /* #F2F3D9 Beige */
+    --popover-foreground: 231 100% 8%; /* #030027 Oxford Blue */
+    
+    --primary: 231 100% 8%;      /* #030027 Oxford Blue */
+    --primary-foreground: 60 63% 90%; /* #F2F3D9 Beige */
+    
+    --secondary: 17 58% 69%;     /* #DC9E82 Buff */
+    --secondary-foreground: 231 100% 8%; /* #030027 Oxford Blue */
+    
+    --muted: 231 20% 96%;
+    --muted-foreground: 231 10% 45%;
+    
+    --accent: 357 41% 60%;       /* #C16E70 Old Rose */
+    --accent-foreground: 231 100% 8%; /* #030027 Oxford Blue */
+    
+    --destructive: 0 84% 60%;    /* #EF5350 Error */
+    --destructive-foreground: 60 63% 90%; /* #F2F3D9 Beige */
 
-    --card: 252 98% 98%;
-    --card-foreground: 252 10% 30%;
- 
-    --popover: 252 98% 98%;
-    --popover-foreground: 252 10% 30%;
- 
-    --primary: 252 87% 59%;
-    --primary-foreground: 252 98% 98%;
- 
-    --secondary: 252 40% 54%;
-    --secondary-foreground: 252 98% 98%;
- 
-    --muted: 252 20% 96%;
-    --muted-foreground: 252 10% 45%;
- 
-    --accent: 252 40% 96%;
-    --accent-foreground: 252 87% 59%;
- 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 252 98% 98%;
-
-    --border: 252 31.8% 91.4%;
-    --input: 252 31.8% 91.4%;
-    --ring: 252 87% 59%;
- 
-    --radius: 0.5rem;
+    --border: 231 32% 91%;
+    --input: 231 32% 91%;
+    --ring: 231 100% 8%;         /* #030027 Oxford Blue */
+    
+    --radius: 0.75rem;           /* 12px border radius for cards */
   }
 }
  
@@ -41,7 +41,13 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-space-cadet text-oxford-blue font-body;
+  }
+  h1 {
+    @apply font-display text-header-lg font-bold;
+  }
+  h2, h3 {
+    @apply font-display text-header-base font-semibold;
   }
 }
 
