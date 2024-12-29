@@ -1,3 +1,5 @@
+import HabitGrid from "@/components/Goals/HabitGrid";
+
 export default function Habits() {
   return (
     <div className="container max-w-[1200px] mx-auto p-content space-y-section">
