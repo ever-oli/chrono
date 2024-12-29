@@ -6,8 +6,8 @@ interface MonthLabelsProps {
 
 export default function MonthLabels({ weeks }: MonthLabelsProps) {
   return (
-    <div className="flex mb-2 text-sm text-muted-foreground">
-      <div className="w-8" /> {/* Spacer for day labels */}
+    <div className="flex mb-6 text-sm text-muted-foreground">
+      <div className="w-12" /> {/* Increased spacer width for day labels */}
       <div className="flex-1 flex">
         {weeks.map((week, i) => {
           const date = week[0];
@@ -15,7 +15,7 @@ export default function MonthLabels({ weeks }: MonthLabelsProps) {
           return (
             <div key={i} className="w-3 mx-[1px]">
               {showMonth && (
-                <div className="absolute -top-6">
+                <div className="absolute -top-4 whitespace-nowrap">
                   {format(date, 'MMM')}
                 </div>
               )}
