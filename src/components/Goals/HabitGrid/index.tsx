@@ -107,8 +107,8 @@ export default function HabitGrid() {
                 <h3 className="text-lg font-semibold">{timer.name}</h3>
               </div>
               
-              <div className="overflow-x-auto pb-4">
-                <div className="relative min-w-[800px]">
+              <div className="min-w-0 w-full">
+                <div className="relative">
                   <MonthLabels weeks={weeks} />
                   <div className="flex">
                     <DayLabels />
