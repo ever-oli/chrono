@@ -5,7 +5,7 @@ import { useTimerContext } from "@/components/Timer/TimerContext";
 
 export default function Navigation() {
   const location = useLocation();
-  const { timers } = useTimerContext();
+  const { state } = useTimerContext();
   
   const links = [
     { to: "/", icon: Clock, label: "Tracking" },
@@ -15,8 +15,8 @@ export default function Navigation() {
     { to: "/settings", icon: Settings, label: "Settings" },
   ];
 
-  // Check if any timers are running
-  const hasRunningTimers = timers.some((timer) => timer.isRunning);
+  // Check if any timers are running using the activeTimers Set from context
+  const hasRunningTimers = state.activeTimers.size > 0;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 border-t bg-background">
