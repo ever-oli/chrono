@@ -85,7 +85,7 @@ export default function Goals() {
   }
 
   return (
-    <div className="container max-w-2xl mx-auto p-4 space-y-8">
+    <div className="container max-w-2xl mx-auto p-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Goals</h1>
         <Button
@@ -98,12 +98,12 @@ export default function Goals() {
       </div>
 
       {showForm && (
-        <div className="border rounded-lg p-4 bg-card">
+        <div className="border rounded-lg p-4 bg-card mt-4">
           <GoalForm />
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="space-y-4 mt-8">
         {isLoading ? (
           <div className="text-center text-muted-foreground py-8">
             Loading goals...
@@ -132,9 +132,9 @@ export default function Goals() {
         )}
       </div>
 
-      <Separator className="my-8" />
+      <Separator className="my-8 bg-border" />
 
-      <div className="space-y-8">
+      <div className="mt-8">
         <HabitGrid />
       </div>
     </div>

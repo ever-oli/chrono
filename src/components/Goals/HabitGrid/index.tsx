@@ -94,14 +94,14 @@ export default function HabitGrid() {
             size="icon"
             onClick={() => setShowDebug(prev => !prev)}
             title="Toggle Debug Panel (Alt+D)"
-            className="border-2"
+            className="border-2 hover:bg-muted"
           >
             <Bug className="h-4 w-4" />
           </Button>
         </div>
         
         {showDebug && (
-          <div className="border rounded-lg p-4 bg-muted/50 space-y-4">
+          <div className="border-2 rounded-lg p-4 bg-muted/50 space-y-4">
             <h3 className="font-medium">Debug Information</h3>
             <ScrollArea className="h-[200px]">
               <div className="space-y-2 text-sm">
