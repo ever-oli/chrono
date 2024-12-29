@@ -12,15 +12,13 @@ interface AnalyticsChartsProps {
 }
 
 export default function AnalyticsCharts({ data }: AnalyticsChartsProps) {
-  const pieChartData = data.map(item => ({
-    name: item.name,
-    value: item.hours,
-    color: item.color
-  }));
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <PieChart data={pieChartData} />
+      <PieChart data={data.map(item => ({
+        name: item.name,
+        value: item.hours,
+        color: item.color
+      }))} />
       <BarChart data={data} />
     </div>
   );
