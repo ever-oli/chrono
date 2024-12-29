@@ -21,7 +21,7 @@ export interface TimerContextType {
   dispatch: React.Dispatch<TimerAction>;
   timers: Timer[];
   startTimer: (timerId: string) => Promise<void>;
-  stopTimer: (timerId: string) => Promise<void>;
+  stopTimer: (timerId: string, currentEntry?: TimeEntry) => Promise<void>;
   addTimer: (timer: Omit<Timer, 'id' | 'created_at'>) => Promise<void>;
   deleteTimer: (id: string) => Promise<void>;
   updateTimerSeconds: (id: string, seconds: number) => Promise<void>;

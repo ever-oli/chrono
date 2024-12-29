@@ -52,7 +52,7 @@ export default function Timer({
 
   const handleToggle = async () => {
     if (isRunning) {
-      await stopTimer(id);
+      await stopTimer(id, currentEntry);
     } else {
       await startTimer(id);
     }
