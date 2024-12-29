@@ -20,16 +20,19 @@ export default function PieChart({ data }: PieChartProps) {
     name,
     value,
   }: any) => {
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.7;
+    const radius = outerRadius * 1.35; // Increased from 0.7 to position labels further out
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    // Determine text anchor based on position in the circle
+    const textAnchor = x > cx ? 'start' : 'end';
 
     return (
       <text
         x={x}
         y={y}
         fill="#030027"
-        textAnchor="middle"
+        textAnchor={textAnchor}
         dominantBaseline="central"
         className="text-sm font-medium"
       >
