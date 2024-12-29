@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { eachDayOfInterval, subDays, startOfDay, endOfDay } from "date-fns";
+import { eachDayOfInterval, subDays, startOfDay, endOfDay, getDay } from "date-fns";
 import { TimeEntry } from "@/types/timeEntry";
 import HabitGridCell from "./HabitGridCell";
 import { useState, useEffect } from "react";
@@ -68,6 +68,26 @@ export default function HabitGrid() {
     ...Object.values(entriesByDate).map(entries => entries.length)
   );
 
+  // Create a 7x53 grid layout
+  const weeks = [];
+  let currentWeek: Date[] = [];
+  
+  dates.forEach(date => {
+    const dayOfWeek = getDay(date);
+    currentWeek[dayOfWeek] = date;
+    
+    if (dayOfWeek === 6 || date === dates[dates.length - 1]) {
+      // Fill in any missing days at the start of the week
+      for (let i = 0; i < currentWeek.length; i++) {
+        if (!currentWeek[i]) {
+          currentWeek[i] = new Date(0); // Use epoch date for empty cells
+        }
+      }
+      weeks.push([...currentWeek]);
+      currentWeek = [];
+    }
+  });
+
   if (error) {
     return (
       <div className="rounded-lg bg-destructive/10 p-4 text-destructive">
@@ -94,7 +114,7 @@ export default function HabitGrid() {
             size="icon"
             onClick={() => setShowDebug(prev => !prev)}
             title="Toggle Debug Panel (Alt+D)"
-            className="border-2 hover:bg-muted"
+            className="border-2 border-primary hover:bg-primary/10"
           >
             <Bug className="h-4 w-4" />
           </Button>
@@ -121,20 +141,24 @@ export default function HabitGrid() {
         )}
         
         <div className="overflow-x-auto pb-4">
-          <div className="grid grid-cols-53 gap-1 min-w-[800px]">
-            {dates.map(date => {
-              const dayEntries = entriesByDate[date.toISOString()] || [];
-              const intensity = maxEntries > 0 ? dayEntries.length / maxEntries : 0;
-              
-              return (
-                <HabitGridCell
-                  key={date.toISOString()}
-                  date={date}
-                  entries={dayEntries}
-                  intensity={intensity}
-                />
-              );
-            })}
+          <div className="grid grid-rows-7 grid-flow-col gap-1 min-w-[800px]">
+            {weeks.map((week, weekIndex) => (
+              week.map((date, dayIndex) => {
+                if (date.getTime() === 0) return <div key={`empty-${weekIndex}-${dayIndex}`} className="w-3 h-3" />;
+                
+                const dayEntries = entriesByDate[date.toISOString()] || [];
+                const intensity = maxEntries > 0 ? dayEntries.length / maxEntries : 0;
+                
+                return (
+                  <HabitGridCell
+                    key={date.toISOString()}
+                    date={date}
+                    entries={dayEntries}
+                    intensity={intensity}
+                  />
+                );
+              })
+            ))}
           </div>
         </div>
       </div>
