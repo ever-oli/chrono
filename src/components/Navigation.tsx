@@ -1,9 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
 import { Clock, List, Target, Settings, BarChart } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTimerContext } from "@/components/Timer/TimerContext";
 
 export default function Navigation() {
   const location = useLocation();
+  const { timers } = useTimerContext();
   
   const links = [
     { to: "/", icon: Clock, label: "Tracking" },
@@ -13,12 +15,17 @@ export default function Navigation() {
     { to: "/settings", icon: Settings, label: "Settings" },
   ];
 
+  // Check if any timers are running
+  const hasRunningTimers = timers.some((timer) => timer.isRunning);
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 border-t bg-background">
       <div className="container max-w-2xl mx-auto">
         <div className="flex justify-between items-center px-4">
           {links.map(({ to, icon: Icon, label }) => {
             const isActive = location.pathname === to;
+            const isTracking = to === "/" && hasRunningTimers;
+            
             return (
               <Link
                 key={to}
@@ -26,10 +33,16 @@ export default function Navigation() {
                 className={cn(
                   "flex flex-col items-center py-2 px-3 min-w-[4rem]",
                   "text-muted-foreground hover:text-foreground transition-colors",
-                  isActive && "text-blue-500"
+                  isActive && "text-blue-500",
+                  isTracking && "text-green-500"
                 )}
               >
-                <Icon className="h-6 w-6" />
+                <div className="relative">
+                  <Icon className="h-6 w-6" />
+                  {isTracking && (
+                    <span className="absolute -top-1 -right-1 h-2 w-2 bg-green-500 rounded-full" />
+                  )}
+                </div>
                 <span className="text-xs mt-1">{label}</span>
               </Link>
             );
