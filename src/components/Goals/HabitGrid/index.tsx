@@ -5,13 +5,17 @@ import { TimeEntry } from "@/types/timeEntry";
 import HabitGridCell from "./HabitGridCell";
 
 export default function HabitGrid() {
+  console.log("HabitGrid component rendering");
+  
   const endDate = new Date();
   const startDate = subDays(endDate, 364); // Last 365 days
   const dates = eachDayOfInterval({ start: startDate, end: endDate });
 
-  const { data: entries = [], isLoading } = useQuery({
+  const { data: entries = [], isLoading, error } = useQuery({
     queryKey: ['habit-entries', startDate, endDate],
     queryFn: async () => {
+      console.log("Fetching habit entries...", { startDate, endDate });
+      
       const { data, error } = await supabase
         .from('time_entries')
         .select(`
@@ -26,10 +30,21 @@ export default function HabitGrid() {
         .lte('started_at', endDate.toISOString())
         .order('started_at', { ascending: true });
 
+      console.log("Habit entries response:", { data, error });
+
       if (error) throw error;
       return data as TimeEntry[];
     }
   });
+
+  if (error) {
+    console.error("Error loading habit entries:", error);
+    return (
+      <div className="rounded-lg bg-destructive/10 p-4 text-destructive">
+        Error loading activity data. Please try again.
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -53,10 +68,14 @@ export default function HabitGrid() {
     return acc;
   }, {} as Record<string, TimeEntry[]>);
 
+  console.log("Grouped entries by date:", entriesByDate);
+
   // Calculate maximum entries per day for intensity scaling
   const maxEntries = Math.max(
     ...Object.values(entriesByDate).map(entries => entries.length)
   );
+
+  console.log("Max entries per day:", maxEntries);
 
   return (
     <div className="space-y-6">
