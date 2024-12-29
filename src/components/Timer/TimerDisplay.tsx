@@ -21,13 +21,8 @@ export default function TimerDisplay({
 }: TimerDisplayProps) {
   return (
     <div 
-      className="rounded-lg p-4 relative overflow-hidden"
-      style={{ 
-        borderLeft: `4px solid ${color}`,
-        backgroundColor: 'rgba(220, 158, 130, 0.15)',
-        backdropFilter: 'blur(5px)',
-        boxShadow: '0 0 1rem 0 rgba(0, 0, 0, 0.2)'
-      }}
+      className="rounded-lg p-4 relative overflow-hidden bg-secondary/15 backdrop-blur shadow-lg"
+      style={{ borderLeft: `4px solid ${color}` }}
     >
       <div className="flex items-center justify-between">
         <div>
