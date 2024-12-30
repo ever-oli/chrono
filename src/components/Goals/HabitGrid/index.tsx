@@ -13,13 +13,6 @@ export default function HabitGrid() {
   const { toast } = useToast();
   const dates = generateDateRange();
   
-  useEffect(() => {
-    toast({
-      title: "Date Range",
-      description: `From ${dates[0].toLocaleDateString()} to ${dates[dates.length - 1].toLocaleDateString()}`
-    });
-  }, []); // Only show date range toast once on mount
-  
   const { data: timers = [], isLoading: timersLoading } = useQuery({
     queryKey: ['timers'],
     queryFn: async () => {
@@ -29,13 +22,13 @@ export default function HabitGrid() {
         .order('created_at');
       
       if (error) throw error;
-      
-      // Show toast in the success callback
+      return data;
+    },
+    onSuccess: (data) => {
       toast({
         title: "Timers Loaded",
         description: `Found ${data.length} timers`
       });
-      return data;
     }
   });
 
@@ -57,17 +50,25 @@ export default function HabitGrid() {
         .order('started_at', { ascending: true });
 
       if (error) throw error;
-      
-      // Show toast in the success callback
+      return data as TimeEntry[];
+    },
+    onSuccess: (data) => {
       toast({
         title: "Time Entries Loaded",
         description: `Found ${data.length} entries`
       });
-      return data as TimeEntry[];
     }
   });
 
-  // Move the timer entries toast to a top-level useEffect
+  // Show date range toast only once on mount
+  useEffect(() => {
+    toast({
+      title: "Date Range",
+      description: `From ${dates[0].toLocaleDateString()} to ${dates[dates.length - 1].toLocaleDateString()}`
+    });
+  }, []); // Empty dependency array means this runs once on mount
+
+  // Show timer entries toast when data is available
   useEffect(() => {
     if (timers && entries) {
       timers.forEach(timer => {
@@ -80,14 +81,9 @@ export default function HabitGrid() {
         }
       });
     }
-  }, [timers, entries, toast]);
+  }, [timers, entries]); // Only run when timers or entries change
 
   if (error) {
-    toast({
-      title: "Error",
-      description: "Failed to load activity data",
-      variant: "destructive"
-    });
     return (
       <div className="rounded-lg bg-destructive/10 p-4 text-destructive">
         Error loading activity data. Please try again.
