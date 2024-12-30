@@ -7,14 +7,18 @@ import MonthLabels from "./components/MonthLabels";
 import DayLabels from "./components/DayLabels";
 import GridContent from "./components/GridContent";
 import { useToast } from "@/components/ui/use-toast";
+import { useEffect } from "react";
 
 export default function HabitGrid() {
   const { toast } = useToast();
   const dates = generateDateRange();
-  toast({
-    title: "Date Range",
-    description: `From ${dates[0].toLocaleDateString()} to ${dates[dates.length - 1].toLocaleDateString()}`
-  });
+  
+  useEffect(() => {
+    toast({
+      title: "Date Range",
+      description: `From ${dates[0].toLocaleDateString()} to ${dates[dates.length - 1].toLocaleDateString()}`
+    });
+  }, []); // Only show date range toast once on mount
   
   const { data: timers = [], isLoading: timersLoading } = useQuery({
     queryKey: ['timers'],
@@ -25,6 +29,8 @@ export default function HabitGrid() {
         .order('created_at');
       
       if (error) throw error;
+      
+      // Show toast in the success callback
       toast({
         title: "Timers Loaded",
         description: `Found ${data.length} timers`
@@ -51,6 +57,8 @@ export default function HabitGrid() {
         .order('started_at', { ascending: true });
 
       if (error) throw error;
+      
+      // Show toast in the success callback
       toast({
         title: "Time Entries Loaded",
         description: `Found ${data.length} entries`
@@ -85,10 +93,15 @@ export default function HabitGrid() {
     <div className="space-y-6">
       {timers.map(timer => {
         const timerEntries = entries.filter(entry => entry.timer_id === timer.id);
-        toast({
-          title: `Timer: ${timer.name}`,
-          description: `Found ${timerEntries.length} entries`
-        });
+        
+        useEffect(() => {
+          if (timerEntries.length > 0) {
+            toast({
+              title: `Timer: ${timer.name}`,
+              description: `Found ${timerEntries.length} entries`
+            });
+          }
+        }, [timer.id, timerEntries.length]);
 
         const entriesByDate = dates.reduce((acc, date) => {
           const dayEntries = getDayEntries(date, timerEntries);
