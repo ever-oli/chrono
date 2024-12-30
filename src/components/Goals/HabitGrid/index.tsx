@@ -9,6 +9,10 @@ import GridContent from "./components/GridContent";
 
 export default function HabitGrid() {
   const dates = generateDateRange();
+  console.log('Date range generated:', { 
+    start: dates[0], 
+    end: dates[dates.length - 1] 
+  });
   
   const { data: timers = [], isLoading: timersLoading } = useQuery({
     queryKey: ['timers'],
@@ -19,6 +23,7 @@ export default function HabitGrid() {
         .order('created_at');
       
       if (error) throw error;
+      console.log('Fetched timers:', data);
       return data;
     }
   });
@@ -26,6 +31,11 @@ export default function HabitGrid() {
   const { data: entries = [], isLoading: entriesLoading, error } = useQuery({
     queryKey: ['habit-entries', dates[0], dates[dates.length - 1]],
     queryFn: async () => {
+      console.log('Fetching entries for date range:', {
+        start: dates[0].toISOString(),
+        end: dates[dates.length - 1].toISOString()
+      });
+
       const { data, error } = await supabase
         .from('time_entries')
         .select(`
@@ -41,11 +51,13 @@ export default function HabitGrid() {
         .order('started_at', { ascending: true });
 
       if (error) throw error;
+      console.log('Fetched time entries:', data);
       return data as TimeEntry[];
     }
   });
 
   if (error) {
+    console.error('Error loading data:', error);
     return (
       <div className="rounded-lg bg-destructive/10 p-4 text-destructive">
         Error loading activity data. Please try again.
@@ -66,8 +78,11 @@ export default function HabitGrid() {
     <div className="space-y-6">
       {timers.map(timer => {
         const timerEntries = entries.filter(entry => entry.timer_id === timer.id);
+        console.log(`Entries for timer ${timer.name}:`, timerEntries);
+
         const entriesByDate = dates.reduce((acc, date) => {
-          acc[date.toISOString()] = getDayEntries(date, timerEntries);
+          const dayEntries = getDayEntries(date, timerEntries);
+          acc[date.toISOString()] = dayEntries;
           return acc;
         }, {} as Record<string, TimeEntry[]>);
 
@@ -76,6 +91,8 @@ export default function HabitGrid() {
             entries.reduce((sum, entry) => sum + (entry.seconds || 0), 0)
           )
         );
+
+        console.log(`Max intensity for ${timer.name}:`, maxIntensity);
 
         const weeks: Date[][] = [];
         let currentWeek: Date[] = [];
