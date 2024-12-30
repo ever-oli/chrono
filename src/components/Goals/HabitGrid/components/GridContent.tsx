@@ -1,7 +1,8 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { TimeEntry } from "@/types/timeEntry";
+import { format } from "date-fns";
 import HabitGridTooltip from "../HabitGridTooltip";
-import { calculateIntensity, getGridPosition } from "../utils/dateUtils";
+import { calculateGridPosition } from "../utils/gridCalculations";
 
 interface GridContentProps {
   weeks: Date[][];
@@ -10,7 +11,12 @@ interface GridContentProps {
   color: string;
 }
 
-export default function GridContent({ weeks, entriesByDate, maxIntensity, color }: GridContentProps) {
+export default function GridContent({ 
+  weeks, 
+  entriesByDate, 
+  maxIntensity, 
+  color 
+}: GridContentProps) {
   // Get the earliest date from the weeks array
   const startDate = weeks[0][0];
   
@@ -29,7 +35,7 @@ export default function GridContent({ weeks, entriesByDate, maxIntensity, color 
   // Create a map of positions to dates
   const positionToDate = new Map(
     allDates.map(date => {
-      const position = getGridPosition(date, startDate);
+      const position = calculateGridPosition(date, startDate);
       return [`${position.row}-${position.column}`, date];
     })
   );
@@ -40,7 +46,7 @@ export default function GridContent({ weeks, entriesByDate, maxIntensity, color 
         const date = positionToDate.get(`${row}-${col}`);
         const dayEntries = date ? entriesByDate[date.toISOString()] || [] : [];
         const intensity = maxIntensity > 0 && date
-          ? calculateIntensity(dayEntries) / maxIntensity 
+          ? (dayEntries.reduce((sum, entry) => sum + (entry.seconds || 0), 0) / maxIntensity)
           : 0;
         
         // Calculate opacity based on intensity
@@ -50,7 +56,7 @@ export default function GridContent({ weeks, entriesByDate, maxIntensity, color 
           <Tooltip key={`${row}-${col}`}>
             <TooltipTrigger asChild>
               <div 
-                className="w-3 h-3 rounded-sm cursor-pointer transition-colors"
+                className="w-3 h-3 rounded-sm cursor-pointer transition-colors hover:ring-2 ring-oxford-blue"
                 style={{ 
                   backgroundColor: color,
                   opacity: dayEntries.length > 0 ? opacity : 0.1,
