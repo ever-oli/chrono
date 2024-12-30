@@ -67,6 +67,21 @@ export default function HabitGrid() {
     }
   });
 
+  // Move the timer entries toast to a top-level useEffect
+  useEffect(() => {
+    if (timers && entries) {
+      timers.forEach(timer => {
+        const timerEntries = entries.filter(entry => entry.timer_id === timer.id);
+        if (timerEntries.length > 0) {
+          toast({
+            title: `Timer: ${timer.name}`,
+            description: `Found ${timerEntries.length} entries`
+          });
+        }
+      });
+    }
+  }, [timers, entries, toast]);
+
   if (error) {
     toast({
       title: "Error",
@@ -93,16 +108,6 @@ export default function HabitGrid() {
     <div className="space-y-6">
       {timers.map(timer => {
         const timerEntries = entries.filter(entry => entry.timer_id === timer.id);
-        
-        useEffect(() => {
-          if (timerEntries.length > 0) {
-            toast({
-              title: `Timer: ${timer.name}`,
-              description: `Found ${timerEntries.length} entries`
-            });
-          }
-        }, [timer.id, timerEntries.length]);
-
         const entriesByDate = dates.reduce((acc, date) => {
           const dayEntries = getDayEntries(date, timerEntries);
           acc[date.toISOString()] = dayEntries;
