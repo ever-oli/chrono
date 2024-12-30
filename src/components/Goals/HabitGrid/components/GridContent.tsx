@@ -14,8 +14,10 @@ export default function GridContent({ weeks, entriesByDate, maxIntensity, color 
   // Get the earliest date from the weeks array
   const startDate = weeks[0][0];
   
-  // Flatten the weeks array to get all dates
-  const allDates = weeks.flat().filter(date => date.getTime() !== 0);
+  // Flatten the weeks array to get all dates and filter out invalid dates
+  const allDates = weeks.flat().filter(date => 
+    date && date instanceof Date && !isNaN(date.getTime())
+  );
 
   return (
     <div className="grid grid-rows-7 grid-cols-53 gap-[1px]">
