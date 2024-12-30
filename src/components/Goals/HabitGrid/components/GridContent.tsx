@@ -2,7 +2,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { TimeEntry } from "@/types/timeEntry";
 import { format } from "date-fns";
 import HabitGridTooltip from "../HabitGridTooltip";
-import { calculateGridPosition } from "../utils/gridCalculations";
+import { calculateGridPosition, calculateDayIntensity } from "../utils/gridCalculations";
 
 interface GridContentProps {
   weeks: Date[][];
@@ -32,7 +32,7 @@ export default function GridContent({
     date && date instanceof Date && !isNaN(date.getTime())
   );
 
-  // Create a map of positions to dates
+  // Create a map of positions to dates with improved position calculation
   const positionToDate = new Map(
     allDates.map(date => {
       const position = calculateGridPosition(date, startDate);
@@ -45,18 +45,16 @@ export default function GridContent({
       {gridCells.map(({ row, col }, index) => {
         const date = positionToDate.get(`${row}-${col}`);
         const dayEntries = date ? entriesByDate[date.toISOString()] || [] : [];
-        const intensity = maxIntensity > 0 && date
-          ? (dayEntries.reduce((sum, entry) => sum + (entry.seconds || 0), 0) / maxIntensity)
-          : 0;
+        const intensity = date ? calculateDayIntensity(dayEntries, maxIntensity) : 0;
         
-        // Calculate opacity based on intensity
-        const opacity = date ? Math.min(0.2 + (intensity * 0.8), 1) : 0.05;
+        // Calculate opacity based on intensity with improved visual feedback
+        const opacity = date ? Math.max(0.1, intensity) : 0.05;
         
         return (
           <Tooltip key={`${row}-${col}`}>
             <TooltipTrigger asChild>
               <div 
-                className="w-3 h-3 rounded-sm cursor-pointer transition-colors hover:ring-2 ring-oxford-blue"
+                className="w-3 h-3 rounded-sm cursor-pointer transition-all hover:ring-2 ring-oxford-blue hover:scale-110"
                 style={{ 
                   backgroundColor: color,
                   opacity: dayEntries.length > 0 ? opacity : 0.1,
