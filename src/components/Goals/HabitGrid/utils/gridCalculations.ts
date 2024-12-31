@@ -5,7 +5,6 @@ import { format, parseISO, differenceInCalendarWeeks, startOfWeek } from "date-f
 export const processTimeEntries = (entries: TimeEntry[]): Map<string, DayActivity> => {
   const activityMap = new Map<string, DayActivity>();
   
-  // Group entries by day with improved date handling
   entries.forEach(entry => {
     const day = format(parseISO(entry.started_at), 'yyyy-MM-dd');
     
@@ -23,21 +22,16 @@ export const processTimeEntries = (entries: TimeEntry[]): Map<string, DayActivit
     dayActivity.totalSeconds += entry.seconds || 0;
   });
 
-  // Calculate intensities with improved scaling
+  // Simplified intensity calculation with better visibility
   const maxSeconds = Math.max(
     ...Array.from(activityMap.values()).map(day => day.totalSeconds)
   );
     
   activityMap.forEach(activity => {
-    // Enhanced intensity calculation with logarithmic scaling
-    // This provides better visual distinction between different activity levels
-    const normalizedValue = maxSeconds > 0 
-      ? activity.totalSeconds / maxSeconds 
-      : 0;
-    
+    // Linear scale with minimum visibility
     activity.intensity = maxSeconds > 0 
-      ? 0.2 + (0.8 * Math.log1p(normalizedValue * 9) / Math.log1p(9))
-      : 0.1;
+      ? 0.4 + (0.6 * (activity.totalSeconds / maxSeconds))
+      : 0.4;
   });
 
   return activityMap;
@@ -56,8 +50,7 @@ export const calculateDayIntensity = (entries: TimeEntry[], maxIntensity: number
   if (!entries.length || maxIntensity <= 0) return 0;
   
   const totalSeconds = entries.reduce((sum, entry) => sum + (entry.seconds || 0), 0);
-  const normalizedValue = totalSeconds / maxIntensity;
   
-  // Apply logarithmic scaling for better visual distribution
-  return 0.2 + (0.8 * Math.log1p(normalizedValue * 9) / Math.log1p(9));
+  // Simplified linear scale with better minimum visibility
+  return 0.4 + (0.6 * (totalSeconds / maxIntensity));
 };

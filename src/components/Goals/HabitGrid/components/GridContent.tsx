@@ -17,22 +17,18 @@ export default function GridContent({
   maxIntensity, 
   color 
 }: GridContentProps) {
-  // Get the earliest date from the weeks array
   const startDate = weeks[0][0];
   
-  // Create a 7x53 grid array
   const gridCells = Array.from({ length: 7 * 53 }, (_, index) => {
     const row = index % 7;
     const col = Math.floor(index / 7);
     return { row: row + 1, col: col + 1 };
   });
 
-  // Flatten the weeks array to get all dates and filter out invalid dates
   const allDates = weeks.flat().filter(date => 
     date && date instanceof Date && !isNaN(date.getTime())
   );
 
-  // Create a map of positions to dates with improved position calculation
   const positionToDate = new Map(
     allDates.map(date => {
       const position = calculateGridPosition(date, startDate);
@@ -47,14 +43,15 @@ export default function GridContent({
         const dayEntries = date ? entriesByDate[date.toISOString()] || [] : [];
         const intensity = date ? calculateDayIntensity(dayEntries, maxIntensity) : 0;
         
-        // Calculate opacity based on intensity with improved visual feedback
-        const opacity = date ? Math.max(0.1, intensity) : 0.05;
+        // Increased base opacity to 0.4 and improved visibility
+        const opacity = date ? Math.max(0.4, intensity) : 0.1;
         
         return (
           <Tooltip key={`${row}-${col}`}>
             <TooltipTrigger asChild>
               <div 
-                className="w-3 h-3 rounded-sm cursor-pointer transition-all hover:ring-2 ring-oxford-blue hover:scale-110"
+                className="w-4 h-4 rounded-sm cursor-pointer transition-all duration-200 
+                          hover:ring-2 ring-oxford-blue hover:scale-110 hover:opacity-80"
                 style={{ 
                   backgroundColor: color,
                   opacity: dayEntries.length > 0 ? opacity : 0.1,
@@ -64,7 +61,7 @@ export default function GridContent({
               />
             </TooltipTrigger>
             {date && (
-              <TooltipContent>
+              <TooltipContent sideOffset={5}>
                 <HabitGridTooltip date={date} entries={dayEntries} />
               </TooltipContent>
             )}
