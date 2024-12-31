@@ -24,11 +24,13 @@ export default function HabitGrid() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
-      toast({
-        title: "Timers Loaded",
-        description: `Found ${data.length} timers`
-      });
+    meta: {
+      onSuccess: (data: any) => {
+        toast({
+          title: "Timers Loaded",
+          description: `Found ${data.length} timers`
+        });
+      }
     }
   });
 
@@ -52,11 +54,13 @@ export default function HabitGrid() {
       if (error) throw error;
       return data as TimeEntry[];
     },
-    onSuccess: (data) => {
-      toast({
-        title: "Time Entries Loaded",
-        description: `Found ${data.length} entries`
-      });
+    meta: {
+      onSuccess: (data: TimeEntry[]) => {
+        toast({
+          title: "Time Entries Loaded",
+          description: `Found ${data.length} entries`
+        });
+      }
     }
   });
 
