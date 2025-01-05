@@ -4,14 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 
 export default function AuthComponent() {
-  // Get the current URL for redirect
   const redirectTo = `${window.location.origin}/`;
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="w-full max-w-md mx-auto p-8 bg-white rounded-xl shadow-frosted">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-oxford-blue">Welcome to Timey</h2>
-        <p className="text-space-cadet mt-2">Track your time, achieve more.</p>
+        <h1 className="text-2xl font-bold text-oxford-blue mb-2">Welcome to Timey</h1>
+        <p className="text-space-cadet">Track your time, achieve more.</p>
       </div>
       
       <Auth
@@ -23,7 +22,44 @@ export default function AuthComponent() {
               colors: {
                 brand: '#DC9E82',
                 brandAccent: '#C16E70',
+                inputBackground: 'white',
+                inputBorder: '#E2E8F0',
+                inputBorderHover: '#CBD5E1',
+                inputBorderFocus: '#DC9E82',
               },
+              radii: {
+                borderRadiusButton: '0.5rem',
+                buttonBorderRadius: '0.5rem',
+                inputBorderRadius: '0.5rem',
+              },
+              space: {
+                inputPadding: '0.75rem 1rem',
+                buttonPadding: '0.75rem 1rem',
+              },
+              fonts: {
+                bodyFontFamily: `'Inter', system-ui, sans-serif`,
+                buttonFontFamily: `'Inter', system-ui, sans-serif`,
+                inputFontFamily: `'Inter', system-ui, sans-serif`,
+              },
+            },
+          },
+          style: {
+            button: {
+              border: '1px solid #E2E8F0',
+              fontWeight: '500',
+              '&:hover': {
+                backgroundColor: '#F8FAFC',
+              },
+            },
+            container: {
+              gap: '1rem',
+            },
+            input: {
+              backgroundColor: 'white',
+            },
+            message: {
+              color: '#64748B',
+              fontSize: '0.875rem',
             },
           },
         }}
@@ -33,9 +69,11 @@ export default function AuthComponent() {
           access_type: 'offline',
           prompt: 'consent',
         }}
+        showLinks={false}
+        view="sign_in"
       />
       
-      <div className="mt-6 text-center text-sm text-space-cadet">
+      <div className="mt-4 text-center text-sm text-space-cadet">
         <p>
           By signing in, you agree to our{' '}
           <Link to="/privacy-policy" className="text-buff hover:text-old-rose underline">
