@@ -34,8 +34,8 @@ export default function AuthComponent() {
         }}
         providers={['google']}
         redirectTo={redirectTo}
-        view="sign_in"
         showLinks={false}
+        view="sign_in"
       />
       
       <div className="mt-6 text-center text-sm text-space-cadet">
