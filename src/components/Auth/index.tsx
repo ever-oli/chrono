@@ -47,7 +47,8 @@ export default function AuthComponent() {
             button: {
               border: '1px solid #E2E8F0',
               fontWeight: '500',
-              '&:hover': {
+              backgroundColor: '#FFFFFF',
+              ':hover': {
                 backgroundColor: '#F8FAFC',
               },
             },
