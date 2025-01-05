@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 export default function AuthComponent() {
   // Get the current URL for redirect
-  const redirectTo = `${window.location.origin}/`;
+  const redirectTo = `${window.location.origin}`;
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
