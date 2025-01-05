@@ -1,15 +1,14 @@
 import { formatTime } from "@/utils/dateFormatters";
 import { TimeEntry } from "@/types/timeEntry";
 import { Button } from "@/components/ui/button";
-import { Clock, Pencil } from "lucide-react";
+import { Clock } from "lucide-react";
 
 interface EventCardProps {
   entry: TimeEntry;
   onDelete: (id: string) => void;
-  onEdit: (entry: TimeEntry) => void;
 }
 
-export default function EventCard({ entry, onDelete, onEdit }: EventCardProps) {
+export default function EventCard({ entry, onDelete }: EventCardProps) {
   const duration = Math.floor(entry.seconds / 60);
   const hours = Math.floor(duration / 60);
   const minutes = duration % 60;
@@ -38,22 +37,13 @@ export default function EventCard({ entry, onDelete, onEdit }: EventCardProps) {
             {seconds}s
           </span>
         </div>
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onEdit(entry)}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onDelete(entry.id)}
-          >
-            Delete
-          </Button>
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onDelete(entry.id)}
+        >
+          Delete
+        </Button>
       </div>
     </div>
   );

@@ -4,7 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 
 export default function AuthComponent() {
-  // Get the current URL for redirect
   const redirectTo = `${window.location.origin}/`;
 
   return (
@@ -26,13 +25,17 @@ export default function AuthComponent() {
               },
             },
           },
+          style: {
+            button: {
+              borderRadius: '6px',
+              height: '42px',
+            },
+          },
         }}
         providers={['google']}
         redirectTo={redirectTo}
-        queryParams={{
-          access_type: 'offline',
-          prompt: 'consent',
-        }}
+        showLinks={false}
+        view="sign_in"
       />
       
       <div className="mt-6 text-center text-sm text-space-cadet">

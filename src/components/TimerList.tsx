@@ -1,9 +1,8 @@
 import { useState } from "react";
+import { useTimerContext } from "@/components/Timer/TimerContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
-import Timer from "@/components/Timer";
-import { useTimerContext } from "@/components/Timer/TimerContext";
 
 export default function TimerList() {
   const [showNewTimer, setShowNewTimer] = useState(false);
@@ -11,10 +10,10 @@ export default function TimerList() {
   const [selectedColor, setSelectedColor] = useState("#2D2D2D");
   const { timers, addTimer, deleteTimer, updateTimerSeconds, state } = useTimerContext();
 
-  const handleAddTimer = (e: React.FormEvent) => {
+  const handleAddTimer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newTimerName.trim()) {
-      addTimer({
+      await addTimer({
         name: newTimerName.trim(),
         color: selectedColor,
       });
@@ -23,62 +22,35 @@ export default function TimerList() {
     }
   };
 
-  const handleUpdateSeconds = (id: string, seconds: number) => {
-    const currentEntry = state.currentEntries[id];
-    updateTimerSeconds(id, seconds, currentEntry);
-  };
-
   return (
-    <>
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Timers</h1>
-        <Button size="icon" variant="ghost" onClick={() => setShowNewTimer(true)}>
-          <Plus className="h-6 w-6" />
-        </Button>
-      </div>
-
-      {showNewTimer && (
-        <form onSubmit={handleAddTimer} className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <Input
-              type="text"
-              value={newTimerName}
-              onChange={(e) => setNewTimerName(e.target.value)}
-              placeholder="Timer name"
-              className="w-full"
-              autoFocus
-              onBlur={() => !newTimerName && setShowNewTimer(false)}
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Input
-              type="color"
-              value={selectedColor}
-              onChange={(e) => setSelectedColor(e.target.value)}
-              className="h-10 w-20 min-w-[5rem] p-1 cursor-pointer"
-            />
-            <Button type="submit">Add Timer</Button>
-          </div>
-        </form>
-      )}
-
-      <div className="space-y-4 pb-20">
+    <div>
+      <h2 className="text-lg font-bold">Timers</h2>
+      <ul>
         {timers.map((timer) => (
-          <Timer
-            key={timer.id}
-            id={timer.id}
-            name={timer.name}
-            color={timer.color}
-            onDelete={deleteTimer}
-            onSecondsUpdate={handleUpdateSeconds}
-          />
+          <li key={timer.id} className="flex items-center justify-between">
+            <span>{timer.name}</span>
+            <Button variant="destructive" onClick={() => deleteTimer(timer.id)}>
+              Delete
+            </Button>
+          </li>
         ))}
-        {timers.length === 0 && (
-          <div className="text-center text-muted-foreground py-8">
-            No timers yet. Click the + button to add one.
-          </div>
-        )}
-      </div>
-    </>
+      </ul>
+      {showNewTimer ? (
+        <form onSubmit={handleAddTimer} className="flex items-center mt-4">
+          <Input
+            type="text"
+            value={newTimerName}
+            onChange={(e) => setNewTimerName(e.target.value)}
+            placeholder="New Timer Name"
+            className="mr-2"
+          />
+          <Button type="submit">
+            <Plus />
+          </Button>
+        </form>
+      ) : (
+        <Button onClick={() => setShowNewTimer(true)}>Add Timer</Button>
+      )}
+    </div>
   );
 }
