@@ -9,6 +9,20 @@ export default function GridContent({ weeks, entriesByDate, maxIntensity, color 
       {weeks.map((week, weekIndex) => (
         <div key={weekIndex} className="grid grid-rows-7 gap-1">
           {week.map((date, dayIndex) => {
+            // Skip rendering for invalid dates (new Date(0) or undefined)
+            if (!date || date.getTime() === 0) {
+              return (
+                <div 
+                  key={dayIndex}
+                  className="w-3 h-3 rounded-sm"
+                  style={{ 
+                    backgroundColor: color,
+                    opacity: 0.1
+                  }}
+                />
+              );
+            }
+
             const dayEntries = entriesByDate[date.toISOString()] || [];
             const totalSeconds = dayEntries.reduce((sum, entry) => sum + (entry.seconds || 0), 0);
             const intensity = totalSeconds / maxIntensity;
