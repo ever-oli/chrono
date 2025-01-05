@@ -1,7 +1,8 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { TimeEntry } from "@/types/timeEntry";
 import { GridContentProps } from "@/types/habitGrid";
-import HabitGridTooltip from "./HabitGridTooltip";
+import HabitGridTooltip from "../HabitGridTooltip";
+import { calculateIntensity } from "../utils/gridCalculations";
 
 export default function GridContent({ weeks, entriesByDate, maxIntensity, color }: GridContentProps) {
   return (
@@ -25,16 +26,16 @@ export default function GridContent({ weeks, entriesByDate, maxIntensity, color 
 
             const dayEntries = entriesByDate[date.toISOString()] || [];
             const totalSeconds = dayEntries.reduce((sum, entry) => sum + (entry.seconds || 0), 0);
-            const intensity = totalSeconds / maxIntensity;
+            const intensity = calculateIntensity(totalSeconds, maxIntensity);
             
             return (
               <Tooltip key={dayIndex}>
                 <TooltipTrigger asChild>
                   <div 
-                    className="w-3 h-3 rounded-sm cursor-pointer transition-all hover:scale-110"
+                    className="w-3 h-3 rounded-sm cursor-pointer transition-all hover:scale-110 hover:ring-2 ring-oxford-blue shadow-frosted backdrop-blur-frosted"
                     style={{ 
                       backgroundColor: color,
-                      opacity: dayEntries.length > 0 ? 0.4 + (0.6 * intensity) : 0.1
+                      opacity: dayEntries.length > 0 ? intensity : 0.1
                     }}
                   />
                 </TooltipTrigger>
