@@ -1,11 +1,8 @@
-import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Timer } from '@/types/timer';
 import { QueryClient } from '@tanstack/react-query';
 
 export function useTimerCRUD(queryClient: QueryClient) {
-  const { toast } = useToast();
-
   const addTimer = async (timer: Omit<Timer, 'id' | 'created_at'>) => {
     try {
       const { error } = await supabase
@@ -15,16 +12,8 @@ export function useTimerCRUD(queryClient: QueryClient) {
       if (error) throw error;
       
       queryClient.invalidateQueries({ queryKey: ['timers'] });
-      toast({
-        title: "Timer added",
-        description: `Timer "${timer.name}" has been added`,
-      });
     } catch (error: any) {
-      toast({
-        title: "Error adding timer",
-        description: error.message,
-        variant: "destructive"
-      });
+      console.error('Error adding timer:', error.message);
     }
   };
 
@@ -38,16 +27,8 @@ export function useTimerCRUD(queryClient: QueryClient) {
       if (error) throw error;
       
       queryClient.invalidateQueries({ queryKey: ['timers'] });
-      toast({
-        title: "Timer deleted",
-        description: `Timer has been deleted`,
-      });
     } catch (error: any) {
-      toast({
-        title: "Error deleting timer",
-        description: error.message,
-        variant: "destructive"
-      });
+      console.error('Error deleting timer:', error.message);
     }
   };
 

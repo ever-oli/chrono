@@ -1,12 +1,9 @@
-import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { TimeEntry } from '@/types/timeEntry';
 import { TimerAction } from '@/types/timerState';
 import { Dispatch } from 'react';
 
 export function useTimerStartStop(dispatch: Dispatch<TimerAction>) {
-  const { toast } = useToast();
-
   const startTimer = async (timerId: string) => {
     try {
       const { data: entry, error } = await supabase
@@ -27,11 +24,7 @@ export function useTimerStartStop(dispatch: Dispatch<TimerAction>) {
         payload: { timerId, entry }
       });
     } catch (error: any) {
-      toast({
-        title: "Error starting timer",
-        description: error.message,
-        variant: "destructive"
-      });
+      console.error('Error starting timer:', error.message);
       dispatch({ type: 'SET_ERROR', payload: error });
     }
   };
@@ -50,16 +43,8 @@ export function useTimerStartStop(dispatch: Dispatch<TimerAction>) {
       if (error) throw error;
 
       dispatch({ type: 'STOP_TIMER', payload: { timerId } });
-      toast({
-        title: "Timer stopped",
-        description: `Timer has been stopped`,
-      });
     } catch (error: any) {
-      toast({
-        title: "Error stopping timer",
-        description: error.message,
-        variant: "destructive"
-      });
+      console.error('Error stopping timer:', error.message);
       dispatch({ type: 'SET_ERROR', payload: error });
     }
   };

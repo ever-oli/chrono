@@ -1,12 +1,9 @@
 import { useEffect } from 'react';
-import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Dispatch } from 'react';
 import { TimerAction } from '@/types/timerState';
 
 export function useRunningTimers(dispatch: Dispatch<TimerAction>) {
-  const { toast } = useToast();
-
   useEffect(() => {
     async function checkRunningTimers() {
       const { data: runningEntries, error } = await supabase
@@ -15,11 +12,6 @@ export function useRunningTimers(dispatch: Dispatch<TimerAction>) {
         .is('ended_at', null);
 
       if (error) {
-        toast({
-          title: "Error checking running timers",
-          description: error.message,
-          variant: "destructive"
-        });
         dispatch({ type: 'SET_ERROR', payload: error });
         return;
       }
@@ -35,5 +27,5 @@ export function useRunningTimers(dispatch: Dispatch<TimerAction>) {
     }
 
     checkRunningTimers();
-  }, [dispatch, toast]);
+  }, [dispatch]);
 }
