@@ -3,18 +3,11 @@ import { Timer } from '@/types/timer';
 import { QueryClient } from '@tanstack/react-query';
 
 export function useTimerCRUD(queryClient: QueryClient) {
-  const addTimer = async (timer: Omit<Timer, 'id' | 'created_at' | 'user_id'>) => {
+  const addTimer = async (timer: Omit<Timer, 'id' | 'created_at'>) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) throw new Error('No user found');
-      
       const { error } = await supabase
         .from('timers')
-        .insert({
-          ...timer,
-          user_id: user.id
-        });
+        .insert(timer);
 
       if (error) throw error;
       
