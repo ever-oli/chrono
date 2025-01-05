@@ -4,6 +4,7 @@ import MonthLabels from "./components/MonthLabels";
 import DayLabels from "./components/DayLabels";
 import GridContent from "./components/GridContent";
 import { useHabitGridData } from "./hooks/useHabitGridData";
+import { TimeEntry } from "@/types/timeEntry";
 
 export default function HabitGrid() {
   const { timers, entries, dates, isLoading, error } = useHabitGridData();
