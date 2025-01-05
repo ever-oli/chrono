@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { TimerProvider } from "@/components/Timer/TimerContext";
 import Navigation from "@/components/Navigation";
+import Index from "./pages/Index";
 import Tracking from "./pages/Tracking";
 import Events from "./pages/Events";
 import Timeline from "./pages/Timeline";
@@ -24,7 +25,8 @@ const App = () => {
           <BrowserRouter>
             <div className="min-h-screen pb-20">
               <Routes>
-                <Route path="/" element={<Tracking />} />
+                <Route path="/" element={<Index />} />
+                <Route path="/tracking" element={<Tracking />} />
                 <Route path="/events" element={<Events />} />
                 <Route path="/timeline" element={<Timeline />} />
                 <Route path="/goals" element={<Goals />} />
