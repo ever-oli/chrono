@@ -1,73 +1,73 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { TimeEntry } from "@/types/timeEntry";
 import { format } from "date-fns";
-import HabitGridTooltip from "../HabitGridTooltip";
-import { calculateGridPosition, calculateDayIntensity } from "../utils/gridCalculations";
+import { calculateIntensity } from "../utils/gridCalculations";
+import GridTooltip from "./GridTooltip";
 
 interface GridContentProps {
-  weeks: Date[][];
-  entriesByDate: Record<string, TimeEntry[]>;
-  maxIntensity: number;
+  dates: Date[];
+  entries: TimeEntry[];
   color: string;
 }
 
-export default function GridContent({ 
-  weeks, 
-  entriesByDate, 
-  maxIntensity, 
-  color 
-}: GridContentProps) {
-  const startDate = weeks[0][0];
-  
-  const gridCells = Array.from({ length: 7 * 53 }, (_, index) => {
-    const row = index % 7;
-    const col = Math.floor(index / 7);
-    return { row: row + 1, col: col + 1 };
-  });
+export default function GridContent({ dates, entries, color }: GridContentProps) {
+  const weeks = dates.reduce((acc, date) => {
+    const weekIndex = Math.floor(acc.length / 7);
+    if (!acc[weekIndex]) {
+      acc[weekIndex] = [];
+    }
+    acc[weekIndex].push(date);
+    return acc;
+  }, [] as Date[][]);
 
-  const allDates = weeks.flat().filter(date => 
-    date && date instanceof Date && !isNaN(date.getTime())
-  );
+  const getDayEntries = (date: Date) => {
+    return entries.filter(entry => {
+      const entryDate = new Date(entry.started_at);
+      return (
+        entryDate.getFullYear() === date.getFullYear() &&
+        entryDate.getMonth() === date.getMonth() &&
+        entryDate.getDate() === date.getDate()
+      );
+    });
+  };
 
-  const positionToDate = new Map(
-    allDates.map(date => {
-      const position = calculateGridPosition(date, startDate);
-      return [`${position.row}-${position.column}`, date];
-    })
+  const maxSeconds = Math.max(
+    ...dates.map(date => 
+      getDayEntries(date).reduce((sum, entry) => sum + (entry.seconds || 0), 0)
+    )
   );
 
   return (
-    <div className="grid grid-rows-7 grid-cols-53 gap-[1px]">
-      {gridCells.map(({ row, col }, index) => {
-        const date = positionToDate.get(`${row}-${col}`);
-        const dayEntries = date ? entriesByDate[date.toISOString()] || [] : [];
-        const intensity = date ? calculateDayIntensity(dayEntries, maxIntensity) : 0;
-        
-        // Increased base opacity to 0.4 and improved visibility
-        const opacity = date ? Math.max(0.4, intensity) : 0.1;
-        
-        return (
-          <Tooltip key={`${row}-${col}`}>
-            <TooltipTrigger asChild>
-              <div 
-                className="w-4 h-4 rounded-sm cursor-pointer transition-all duration-200 
-                          hover:ring-2 ring-oxford-blue hover:scale-110 hover:opacity-80"
-                style={{ 
-                  backgroundColor: color,
-                  opacity: dayEntries.length > 0 ? opacity : 0.1,
-                  gridRow: row,
-                  gridColumn: col,
-                }}
-              />
-            </TooltipTrigger>
-            {date && (
-              <TooltipContent sideOffset={5}>
-                <HabitGridTooltip date={date} entries={dayEntries} />
-              </TooltipContent>
-            )}
-          </Tooltip>
-        );
-      })}
+    <div className="grid grid-cols-[repeat(53,1fr)] gap-1">
+      {weeks.map((week, weekIndex) => (
+        <div key={weekIndex} className="grid grid-rows-7 gap-1">
+          {week.map((date, dayIndex) => {
+            const dayEntries = getDayEntries(date);
+            const totalSeconds = dayEntries.reduce((sum, entry) => sum + (entry.seconds || 0), 0);
+            const intensity = calculateIntensity(totalSeconds, maxSeconds);
+            
+            return (
+              <Tooltip key={dayIndex}>
+                <TooltipTrigger asChild>
+                  <div 
+                    className="w-3 h-3 rounded-sm cursor-pointer transition-all hover:scale-110"
+                    style={{ 
+                      backgroundColor: color,
+                      opacity: dayEntries.length > 0 ? intensity : 0.1
+                    }}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <GridTooltip 
+                    date={date}
+                    entries={dayEntries}
+                  />
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }
