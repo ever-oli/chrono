@@ -10,6 +10,7 @@ import Events from "./pages/Events";
 import Timeline from "./pages/Timeline";
 import Goals from "./pages/Goals";
 import Habits from "./pages/Habits";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import { useState } from "react";
 
 const App = () => {
@@ -29,6 +30,7 @@ const App = () => {
                 <Route path="/timeline" element={<Timeline />} />
                 <Route path="/goals" element={<Goals />} />
                 <Route path="/habits" element={<Habits />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </div>
