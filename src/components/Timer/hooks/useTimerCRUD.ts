@@ -1,28 +1,19 @@
 import { supabase } from '@/integrations/supabase/client';
-import { QueryClient } from '@tanstack/react-query';
 import { Timer } from '@/types/timer';
+import { QueryClient } from '@tanstack/react-query';
 
 export function useTimerCRUD(queryClient: QueryClient) {
-  const addTimer = async (timer: Omit<Timer, 'id' | 'created_at' | 'user_id'>) => {
+  const addTimer = async (timer: Omit<Timer, 'id' | 'created_at'>) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) throw new Error('No authenticated user');
-
       const { error } = await supabase
         .from('timers')
-        .insert({
-          name: timer.name,
-          color: timer.color,
-          user_id: user.id
-        });
+        .insert(timer);
 
       if (error) throw error;
-
-      await queryClient.invalidateQueries({ queryKey: ['timers'] });
+      
+      queryClient.invalidateQueries({ queryKey: ['timers'] });
     } catch (error: any) {
       console.error('Error adding timer:', error.message);
-      throw error;
     }
   };
 
@@ -34,33 +25,15 @@ export function useTimerCRUD(queryClient: QueryClient) {
         .eq('id', id);
 
       if (error) throw error;
-
-      await queryClient.invalidateQueries({ queryKey: ['timers'] });
+      
+      queryClient.invalidateQueries({ queryKey: ['timers'] });
     } catch (error: any) {
       console.error('Error deleting timer:', error.message);
-      throw error;
-    }
-  };
-
-  const updateTimer = async (id: string, timer: Partial<Timer>) => {
-    try {
-      const { error } = await supabase
-        .from('timers')
-        .update(timer)
-        .eq('id', id);
-
-      if (error) throw error;
-
-      await queryClient.invalidateQueries({ queryKey: ['timers'] });
-    } catch (error: any) {
-      console.error('Error updating timer:', error.message);
-      throw error;
     }
   };
 
   return {
     addTimer,
-    deleteTimer,
-    updateTimer,
+    deleteTimer
   };
 }
