@@ -1,7 +1,5 @@
 import { getDayEntries } from "./utils/dateUtils";
 import { Card } from "@/components/ui/card";
-import MonthLabels from "./components/MonthLabels";
-import DayLabels from "./components/DayLabels";
 import GridContent from "./components/GridContent";
 import { useHabitGridData } from "./hooks/useHabitGridData";
 import { TimeEntry } from "@/types/timeEntry";
@@ -28,6 +26,9 @@ export default function HabitGrid() {
 
   return (
     <div className="space-y-6">
+      <div className="text-sm text-muted-foreground">
+        Each column represents a week, with dots arranged vertically from Sunday (top) to Saturday (bottom).
+      </div>
       {timers.map(timer => {
         const timerEntries = entries.filter(entry => entry.timer_id === timer.id);
         const entriesByDate = dates.reduce((acc, date) => {
@@ -77,16 +78,12 @@ export default function HabitGrid() {
               
               <div className="min-w-0 w-full">
                 <div className="relative">
-                  <MonthLabels weeks={weeks} />
-                  <div className="flex">
-                    <DayLabels />
-                    <GridContent 
-                      weeks={weeks}
-                      entriesByDate={entriesByDate}
-                      maxIntensity={maxIntensity}
-                      color={timer.color}
-                    />
-                  </div>
+                  <GridContent 
+                    weeks={weeks}
+                    entriesByDate={entriesByDate}
+                    maxIntensity={maxIntensity}
+                    color={timer.color}
+                  />
                 </div>
               </div>
             </div>
