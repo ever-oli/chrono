@@ -11,12 +11,13 @@ export default function TimerList() {
   const [selectedColor, setSelectedColor] = useState("#2D2D2D");
   const { timers, addTimer, deleteTimer, updateTimerSeconds, state } = useTimerContext();
 
-  const handleAddTimer = (e: React.FormEvent) => {
+  const handleAddTimer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newTimerName.trim()) {
-      addTimer({
+      await addTimer({
         name: newTimerName.trim(),
         color: selectedColor,
+        user_id: "", // This will be set in useTimerCRUD.ts
       });
       setNewTimerName("");
       setShowNewTimer(false);
