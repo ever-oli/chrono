@@ -1,51 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { TimeEntry } from "@/types/timeEntry";
-import { generateDateRange, getDayEntries } from "./utils/dateUtils";
+import { getDayEntries } from "./utils/dateUtils";
 import { Card } from "@/components/ui/card";
 import MonthLabels from "./components/MonthLabels";
 import DayLabels from "./components/DayLabels";
 import GridContent from "./components/GridContent";
-import { useEffect } from "react";
+import { useHabitGridData } from "./hooks/useHabitGridData";
 
 export default function HabitGrid() {
-  const dates = generateDateRange();
+  const { timers, entries, dates, isLoading, error } = useHabitGridData();
   
-  const { data: timers = [], isLoading: timersLoading } = useQuery({
-    queryKey: ['timers'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('timers')
-        .select('*')
-        .order('created_at');
-      
-      if (error) throw error;
-      return data;
-    }
-  });
-
-  const { data: entries = [], isLoading: entriesLoading, error } = useQuery({
-    queryKey: ['habit-entries', dates[0], dates[dates.length - 1]],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('time_entries')
-        .select(`
-          *,
-          timer:timers (
-            id,
-            name,
-            color
-          )
-        `)
-        .gte('started_at', dates[0].toISOString())
-        .lte('started_at', dates[dates.length - 1].toISOString())
-        .order('started_at', { ascending: true });
-
-      if (error) throw error;
-      return data as TimeEntry[];
-    }
-  });
-
   if (error) {
     return (
       <div className="rounded-lg bg-destructive/10 p-4 text-destructive">
@@ -54,7 +16,7 @@ export default function HabitGrid() {
     );
   }
 
-  if (timersLoading || entriesLoading) {
+  if (isLoading) {
     return (
       <div className="animate-pulse space-y-4">
         <div className="h-8 w-48 bg-muted rounded-lg" />
