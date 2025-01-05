@@ -6,11 +6,9 @@ import { Card } from "@/components/ui/card";
 import MonthLabels from "./components/MonthLabels";
 import DayLabels from "./components/DayLabels";
 import GridContent from "./components/GridContent";
-import { useToast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
 
 export default function HabitGrid() {
-  const { toast } = useToast();
   const dates = generateDateRange();
   
   const { data: timers = [], isLoading: timersLoading } = useQuery({
@@ -23,14 +21,6 @@ export default function HabitGrid() {
       
       if (error) throw error;
       return data;
-    },
-    meta: {
-      onSuccess: (data: any) => {
-        toast({
-          title: "Timers Loaded",
-          description: `Found ${data.length} timers`
-        });
-      }
     }
   });
 
@@ -53,39 +43,8 @@ export default function HabitGrid() {
 
       if (error) throw error;
       return data as TimeEntry[];
-    },
-    meta: {
-      onSuccess: (data: TimeEntry[]) => {
-        toast({
-          title: "Time Entries Loaded",
-          description: `Found ${data.length} entries`
-        });
-      }
     }
   });
-
-  // Show date range toast only once on mount
-  useEffect(() => {
-    toast({
-      title: "Date Range",
-      description: `From ${dates[0].toLocaleDateString()} to ${dates[dates.length - 1].toLocaleDateString()}`
-    });
-  }, []); // Empty dependency array means this runs once on mount
-
-  // Show timer entries toast when data is available
-  useEffect(() => {
-    if (timers && entries) {
-      timers.forEach(timer => {
-        const timerEntries = entries.filter(entry => entry.timer_id === timer.id);
-        if (timerEntries.length > 0) {
-          toast({
-            title: `Timer: ${timer.name}`,
-            description: `Found ${timerEntries.length} entries`
-          });
-        }
-      });
-    }
-  }, [timers, entries]); // Only run when timers or entries change
 
   if (error) {
     return (
