@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { TimeEntry } from "@/types/timeEntry";
 import EventCard from "./EventCard";
 
@@ -18,7 +18,7 @@ export default function EventsList({ groupedEvents }: EventsListProps) {
         return (
           <div key={date} className="space-y-4">
             <h2 className="text-lg font-semibold">
-              {format(new Date(date), 'EEEE, MMMM d, yyyy')}
+              {format(parseISO(date), 'EEEE, MMMM d, yyyy')}
             </h2>
             <div className="space-y-2">
               {events.map((event) => {
