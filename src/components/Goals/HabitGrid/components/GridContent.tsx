@@ -5,7 +5,7 @@ import GridTooltip from "./GridTooltip";
 
 export default function GridContent({ weeks, entriesByDate, maxIntensity, color }: GridContentProps) {
   return (
-    <div className="grid grid-cols-[repeat(53,1fr)] gap-1">
+    <div className="grid grid-cols-[repeat(53,1fr)] gap-1 mx-auto w-fit">
       {weeks.map((week, weekIndex) => (
         <div key={weekIndex} className="grid grid-rows-7 gap-1">
           {week.map((date, dayIndex) => {
