@@ -1,10 +1,19 @@
-import { Link, useLocation } from "react-router-dom";
-import { Clock, List, Target, CalendarDays, BarChart } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Clock, List, Target, CalendarDays, BarChart, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTimerContext } from "@/components/Timer/TimerContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function Navigation() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { state } = useTimerContext();
   
   const links = [
@@ -14,6 +23,16 @@ export default function Navigation() {
     { to: "/goals", icon: Target, label: "Goals" },
     { to: "/habits", icon: CalendarDays, label: "Habits" },
   ];
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate('/auth');
+      toast.success('Signed out successfully');
+    } catch (error) {
+      toast.error('Error signing out');
+    }
+  };
 
   // Check if any timers are running using the activeTimers Set from context
   const hasRunningTimers = state.activeTimers.size > 0;
@@ -47,6 +66,21 @@ export default function Navigation() {
               </Link>
             );
           })}
+
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex flex-col items-center py-2 px-3 min-w-[4rem] text-muted-foreground hover:text-foreground transition-colors">
+              <User className="h-6 w-6" />
+              <span className="text-xs mt-1">Profile</span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => navigate('/settings')}>
+                Edit Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleSignOut}>
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </nav>
