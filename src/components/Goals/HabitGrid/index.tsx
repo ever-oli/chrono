@@ -42,7 +42,9 @@ export default function HabitGrid() {
 
       if (error) throw error;
       return data as TimeEntry[];
-    }
+    },
+    staleTime: 0, // Always fetch fresh data when query is invalidated
+    refetchOnWindowFocus: true // Refetch when window regains focus
   });
 
   if (error) {
