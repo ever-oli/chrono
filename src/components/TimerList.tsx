@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import Timer from "@/components/Timer";
 import { useTimerContext } from "@/components/Timer/TimerContext";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function TimerList() {
   const [showNewTimer, setShowNewTimer] = useState(false);
@@ -11,13 +12,22 @@ export default function TimerList() {
   const [selectedColor, setSelectedColor] = useState("#2D2D2D");
   const { timers, addTimer, deleteTimer, updateTimerSeconds, state } = useTimerContext();
 
-  const handleAddTimer = (e: React.FormEvent) => {
+  const handleAddTimer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newTimerName.trim()) {
-      addTimer({
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        console.error('User must be authenticated to add a timer');
+        return;
+      }
+
+      await addTimer({
         name: newTimerName.trim(),
         color: selectedColor,
+        user_id: user.id
       });
+      
       setNewTimerName("");
       setShowNewTimer(false);
     }
