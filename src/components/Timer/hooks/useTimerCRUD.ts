@@ -1,23 +1,13 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Timer } from '@/types/timer';
 import { QueryClient } from '@tanstack/react-query';
-import { useAuth } from '@/components/Auth/AuthContext';
 
 export function useTimerCRUD(queryClient: QueryClient) {
-  const { user } = useAuth();
-
-  const addTimer = async (timer: Omit<Timer, 'id' | 'created_at' | 'user_id'>) => {
-    if (!user) {
-      throw new Error('User must be authenticated to add timer');
-    }
-
+  const addTimer = async (timer: Omit<Timer, 'id' | 'created_at'>) => {
     try {
       const { error } = await supabase
         .from('timers')
-        .insert({
-          ...timer,
-          user_id: user.id
-        });
+        .insert(timer);
 
       if (error) throw error;
       

@@ -1,99 +1,52 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { Clock, List, Target, CalendarDays, BarChart } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "./Auth/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useTimerContext } from "@/components/Timer/TimerContext";
 
 export default function Navigation() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { user } = useAuth();
+  const { state } = useTimerContext();
+  
+  const links = [
+    { to: "/", icon: Clock, label: "Tracking" },
+    { to: "/events", icon: List, label: "Events" },
+    { to: "/timeline", icon: BarChart, label: "Timeline" },
+    { to: "/goals", icon: Target, label: "Goals" },
+    { to: "/habits", icon: CalendarDays, label: "Habits" },
+  ];
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/auth');
-  };
-
-  if (!user) return null;
+  // Check if any timers are running using the activeTimers Set from context
+  const hasRunningTimers = state.activeTimers.size > 0;
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
-        <div className="mr-4 hidden md:flex">
-          <Link className="mr-6 flex items-center space-x-2" to="/">
-            <span className="hidden font-bold sm:inline-block">Timey</span>
-          </Link>
-          <div className="flex items-center space-x-6 text-sm font-medium">
-            <Link
-              to="/"
-              className={cn(
-                "transition-colors hover:text-foreground/80",
-                location.pathname === "/" ? "text-foreground" : "text-foreground/60"
-              )}
-            >
-              Home
-            </Link>
-            <Link
-              to="/tracking"
-              className={cn(
-                "transition-colors hover:text-foreground/80",
-                location.pathname === "/tracking"
-                  ? "text-foreground"
-                  : "text-foreground/60"
-              )}
-            >
-              Tracking
-            </Link>
-            <Link
-              to="/habits"
-              className={cn(
-                "transition-colors hover:text-foreground/80",
-                location.pathname === "/habits"
-                  ? "text-foreground"
-                  : "text-foreground/60"
-              )}
-            >
-              Habits
-            </Link>
-            <Link
-              to="/timeline"
-              className={cn(
-                "transition-colors hover:text-foreground/80",
-                location.pathname === "/timeline"
-                  ? "text-foreground"
-                  : "text-foreground/60"
-              )}
-            >
-              Timeline
-            </Link>
-            <Link
-              to="/goals"
-              className={cn(
-                "transition-colors hover:text-foreground/80",
-                location.pathname === "/goals"
-                  ? "text-foreground"
-                  : "text-foreground/60"
-              )}
-            >
-              Goals
-            </Link>
-            <Link
-              to="/events"
-              className={cn(
-                "transition-colors hover:text-foreground/80",
-                location.pathname === "/events"
-                  ? "text-foreground"
-                  : "text-foreground/60"
-              )}
-            >
-              Events
-            </Link>
-          </div>
-        </div>
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <Button variant="ghost" onClick={handleLogout}>
-            Logout
-          </Button>
+    <nav className="fixed bottom-0 left-0 right-0 border-t bg-background">
+      <div className="container max-w-2xl mx-auto">
+        <div className="flex justify-between items-center px-4">
+          {links.map(({ to, icon: Icon, label }) => {
+            const isActive = location.pathname === to;
+            const isTracking = to === "/" && hasRunningTimers;
+            
+            return (
+              <Link
+                key={to}
+                to={to}
+                className={cn(
+                  "flex flex-col items-center py-2 px-3 min-w-[4rem]",
+                  "text-muted-foreground hover:text-foreground transition-colors",
+                  isActive && "text-blue-500",
+                  isTracking && "text-green-500"
+                )}
+              >
+                <div className="relative">
+                  <Icon className="h-6 w-6" />
+                  {isTracking && (
+                    <span className="absolute -top-1 -right-1 h-2 w-2 bg-green-500 rounded-full" />
+                  )}
+                </div>
+                <span className="text-xs mt-1">{label}</span>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </nav>

@@ -1,12 +1,92 @@
-import { getDayEntries } from "./utils/dateUtils";
-import { Card } from "@/components/ui/card";
-import GridContent from "./components/GridContent";
-import { useHabitGridData } from "./hooks/useHabitGridData";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { TimeEntry } from "@/types/timeEntry";
+import { generateDateRange, getDayEntries } from "./utils/dateUtils";
+import { Card } from "@/components/ui/card";
+import MonthLabels from "./components/MonthLabels";
+import DayLabels from "./components/DayLabels";
+import GridContent from "./components/GridContent";
+import { useToast } from "@/components/ui/use-toast";
+import { useEffect } from "react";
 
 export default function HabitGrid() {
-  const { timers, entries, dates, isLoading, error } = useHabitGridData();
+  const { toast } = useToast();
+  const dates = generateDateRange();
   
+  const { data: timers = [], isLoading: timersLoading } = useQuery({
+    queryKey: ['timers'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('timers')
+        .select('*')
+        .order('created_at');
+      
+      if (error) throw error;
+      return data;
+    },
+    meta: {
+      onSuccess: (data: any) => {
+        toast({
+          title: "Timers Loaded",
+          description: `Found ${data.length} timers`
+        });
+      }
+    }
+  });
+
+  const { data: entries = [], isLoading: entriesLoading, error } = useQuery({
+    queryKey: ['habit-entries', dates[0], dates[dates.length - 1]],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('time_entries')
+        .select(`
+          *,
+          timer:timers (
+            id,
+            name,
+            color
+          )
+        `)
+        .gte('started_at', dates[0].toISOString())
+        .lte('started_at', dates[dates.length - 1].toISOString())
+        .order('started_at', { ascending: true });
+
+      if (error) throw error;
+      return data as TimeEntry[];
+    },
+    meta: {
+      onSuccess: (data: TimeEntry[]) => {
+        toast({
+          title: "Time Entries Loaded",
+          description: `Found ${data.length} entries`
+        });
+      }
+    }
+  });
+
+  // Show date range toast only once on mount
+  useEffect(() => {
+    toast({
+      title: "Date Range",
+      description: `From ${dates[0].toLocaleDateString()} to ${dates[dates.length - 1].toLocaleDateString()}`
+    });
+  }, []); // Empty dependency array means this runs once on mount
+
+  // Show timer entries toast when data is available
+  useEffect(() => {
+    if (timers && entries) {
+      timers.forEach(timer => {
+        const timerEntries = entries.filter(entry => entry.timer_id === timer.id);
+        if (timerEntries.length > 0) {
+          toast({
+            title: `Timer: ${timer.name}`,
+            description: `Found ${timerEntries.length} entries`
+          });
+        }
+      });
+    }
+  }, [timers, entries]); // Only run when timers or entries change
+
   if (error) {
     return (
       <div className="rounded-lg bg-destructive/10 p-4 text-destructive">
@@ -15,7 +95,7 @@ export default function HabitGrid() {
     );
   }
 
-  if (isLoading) {
+  if (timersLoading || entriesLoading) {
     return (
       <div className="animate-pulse space-y-4">
         <div className="h-8 w-48 bg-muted rounded-lg" />
@@ -26,9 +106,6 @@ export default function HabitGrid() {
 
   return (
     <div className="space-y-6">
-      <div className="text-sm text-muted-foreground">
-        Each column represents a week, with dots arranged vertically from Sunday (top) to Saturday (bottom).
-      </div>
       {timers.map(timer => {
         const timerEntries = entries.filter(entry => entry.timer_id === timer.id);
         const entriesByDate = dates.reduce((acc, date) => {
@@ -78,12 +155,16 @@ export default function HabitGrid() {
               
               <div className="min-w-0 w-full">
                 <div className="relative">
-                  <GridContent 
-                    weeks={weeks}
-                    entriesByDate={entriesByDate}
-                    maxIntensity={maxIntensity}
-                    color={timer.color}
-                  />
+                  <MonthLabels weeks={weeks} />
+                  <div className="flex">
+                    <DayLabels />
+                    <GridContent 
+                      weeks={weeks}
+                      entriesByDate={entriesByDate}
+                      maxIntensity={maxIntensity}
+                      color={timer.color}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,7 +1,7 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { TimeEntry } from "@/types/timeEntry";
 import { GridContentProps } from "@/types/habitGrid";
-import HabitGridTooltip from "./HabitGridTooltip";
+import GridTooltip from "./GridTooltip";
 
 export default function GridContent({ weeks, entriesByDate, maxIntensity, color }: GridContentProps) {
   return (
@@ -39,7 +39,7 @@ export default function GridContent({ weeks, entriesByDate, maxIntensity, color 
                   />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <HabitGridTooltip 
+                  <GridTooltip 
                     date={date}
                     entries={dayEntries}
                   />
