@@ -1,41 +1,90 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { TimerProvider } from "@/components/Timer/TimerContext";
+import { Toaster } from "@/components/ui/toaster";
 import Navigation from "@/components/Navigation";
-import Tracking from "./pages/Tracking";
-import Events from "./pages/Events";
-import Timeline from "./pages/Timeline";
-import Goals from "./pages/Goals";
-import Habits from "./pages/Habits";
-import { useState } from "react";
+import Index from "@/pages/Index";
+import Goals from "@/pages/Goals";
+import Events from "@/pages/Events";
+import Settings from "@/pages/Settings";
+import Timeline from "@/pages/Timeline";
+import Tracking from "@/pages/Tracking";
+import Habits from "@/pages/Habits";
+import Auth from "@/pages/Auth";
+import { AuthProvider } from "@/components/Auth/AuthContext";
+import ProtectedRoute from "@/components/Auth/ProtectedRoute";
 
-const App = () => {
-  const [queryClient] = useState(() => new QueryClient());
+const queryClient = new QueryClient();
 
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TimerProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <div className="min-h-screen pb-20">
-              <Routes>
-                <Route path="/" element={<Tracking />} />
-                <Route path="/events" element={<Events />} />
-                <Route path="/timeline" element={<Timeline />} />
-                <Route path="/goals" element={<Goals />} />
-                <Route path="/habits" element={<Habits />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </div>
+      <Router>
+        <AuthProvider>
+          <div className="min-h-screen">
             <Navigation />
-          </BrowserRouter>
-        </TooltipProvider>
-      </TimerProvider>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <Index />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/goals"
+                element={
+                  <ProtectedRoute>
+                    <Goals />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/events"
+                element={
+                  <ProtectedRoute>
+                    <Events />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/timeline"
+                element={
+                  <ProtectedRoute>
+                    <Timeline />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/tracking"
+                element={
+                  <ProtectedRoute>
+                    <Tracking />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/habits"
+                element={
+                  <ProtectedRoute>
+                    <Habits />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </div>
+          <Toaster />
+        </AuthProvider>
+      </Router>
     </QueryClientProvider>
   );
 }
