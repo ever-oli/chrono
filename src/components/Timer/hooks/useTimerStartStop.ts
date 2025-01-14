@@ -2,11 +2,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { TimeEntry } from '@/types/timeEntry';
 import { TimerAction } from '@/types/timerState';
 import { Dispatch } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 
 export function useTimerStartStop(dispatch: Dispatch<TimerAction>) {
-  const queryClient = useQueryClient();
-
   const startTimer = async (timerId: string) => {
     try {
       const { data: entry, error } = await supabase
@@ -45,9 +42,6 @@ export function useTimerStartStop(dispatch: Dispatch<TimerAction>) {
 
       if (error) throw error;
 
-      // Invalidate the habit-entries query to refresh the grid
-      queryClient.invalidateQueries({ queryKey: ['habit-entries'] });
-      
       dispatch({ type: 'STOP_TIMER', payload: { timerId } });
     } catch (error: any) {
       console.error('Error stopping timer:', error.message);
