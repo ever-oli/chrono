@@ -9,9 +9,12 @@ import StatementPeriodSelect from "@/components/Events/StatementPeriodSelect";
 import { generateEventsPDF } from "@/utils/pdfGenerator";
 import { useToast } from "@/components/ui/use-toast";
 import { format, parseISO } from "date-fns";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Events() {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
+
   const { data: events = [], isLoading } = useQuery({
     queryKey: ['events'],
     queryFn: async () => {
@@ -76,14 +79,14 @@ export default function Events() {
 
   return (
     <div className="container max-w-2xl mx-auto p-4 min-h-screen bg-background">
-      <div className="flex justify-between items-center mb-8">
+      <div className={`flex flex-col ${isMobile ? 'space-y-4' : 'flex-row justify-between items-center'} mb-8`}>
         <h1 className="text-2xl font-bold text-primary">Events Log</h1>
-        <div className="flex gap-4">
+        <div className={`flex ${isMobile ? 'flex-col w-full' : 'flex-row'} gap-4`}>
           <StatementPeriodSelect onPeriodSelect={handleExport} />
           
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90">
+              <Button className={`bg-primary hover:bg-primary/90 ${isMobile ? 'w-full' : ''}`}>
                 <Plus className="h-4 w-4 mr-2" />
                 New Event
               </Button>

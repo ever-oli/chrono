@@ -2,6 +2,7 @@ import { formatTime } from "@/utils/dateFormatters";
 import { TimeEntry } from "@/types/timeEntry";
 import { Button } from "@/components/ui/button";
 import { Clock } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface EventCardProps {
   entry: TimeEntry;
@@ -9,13 +10,14 @@ interface EventCardProps {
 }
 
 export default function EventCard({ entry, onDelete }: EventCardProps) {
+  const isMobile = useIsMobile();
   const duration = Math.floor(entry.seconds / 60);
   const hours = Math.floor(duration / 60);
   const minutes = duration % 60;
   const seconds = entry.seconds % 60;
 
   return (
-    <div className="flex items-center justify-between p-4 border rounded-lg">
+    <div className={`flex ${isMobile ? 'flex-col' : 'items-center justify-between'} p-4 border rounded-lg space-y-2`}>
       <div className="flex items-center gap-4">
         <div 
           className="w-2 h-2 rounded-full" 
@@ -28,7 +30,7 @@ export default function EventCard({ entry, onDelete }: EventCardProps) {
           </p>
         </div>
       </div>
-      <div className="flex items-center gap-4">
+      <div className={`flex ${isMobile ? 'justify-between' : ''} items-center gap-4`}>
         <div className="flex items-center gap-2 text-muted-foreground">
           <Clock className="h-4 w-4" />
           <span>
