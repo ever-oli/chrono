@@ -3,4 +3,5 @@ export interface Timer {
   name: string;
   color: string;
   created_at: string;
+  user_id: string;
 }
