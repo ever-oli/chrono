@@ -1,6 +1,7 @@
 import Analytics from "@/components/Analytics";
 import LifeChart from "@/components/Analytics/LifeChart";
 import { TimeRange } from "./types";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TimelineContentProps {
   timeRange: TimeRange;
@@ -8,12 +9,18 @@ interface TimelineContentProps {
 }
 
 export default function TimelineContent({ timeRange, currentDate }: TimelineContentProps) {
+  const isMobile = useIsMobile();
+  
   return (
-    <div className="bg-card rounded-lg p-6">
+    <div className={`bg-card rounded-lg ${isMobile ? 'p-2' : 'p-6'}`}>
       {timeRange === "life" ? (
-        <Analytics timeRange="weeks" currentDate={currentDate}>
-          {(data) => <LifeChart data={data} />}
-        </Analytics>
+        <div className="overflow-x-auto">
+          <div className={`min-w-[800px] ${isMobile ? 'pb-4' : ''}`}>
+            <Analytics timeRange="weeks" currentDate={currentDate}>
+              {(data) => <LifeChart data={data} />}
+            </Analytics>
+          </div>
+        </div>
       ) : (
         <Analytics 
           timeRange={timeRange}

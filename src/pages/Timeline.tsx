@@ -3,10 +3,12 @@ import { subDays, addDays } from "date-fns";
 import TimelineHeader from "@/components/Timeline/TimelineHeader";
 import TimelineContent from "@/components/Timeline/TimelineContent";
 import { TimeRange } from "@/components/Timeline/types";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Timeline() {
   const [timeRange, setTimeRange] = useState<TimeRange>("hours");
   const [currentDate, setCurrentDate] = useState(new Date());
+  const isMobile = useIsMobile();
 
   const handlePrevious = () => {
     if (timeRange === "life") return;
@@ -47,7 +49,7 @@ export default function Timeline() {
   };
 
   return (
-    <div className="container max-w-4xl mx-auto p-4 space-y-6">
+    <div className={`container mx-auto ${isMobile ? 'p-2' : 'p-4'} space-y-4`}>
       <TimelineHeader
         timeRange={timeRange}
         currentDate={currentDate}
