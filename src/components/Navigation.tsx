@@ -73,9 +73,6 @@ export default function Navigation() {
               <span className="text-xs mt-1">Profile</span>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => navigate('/settings')}>
-                Edit Profile
-              </DropdownMenuItem>
               <DropdownMenuItem onSelect={handleSignOut}>
                 Sign Out
               </DropdownMenuItem>
