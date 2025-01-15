@@ -9,6 +9,17 @@ export default function Habits() {
           Track your daily activities and build better habits.
         </p>
       </div>
+
+      <div className="space-y-4 text-sm text-space-cadet/80">
+        <p>
+          Each column represents a week, with dots arranged vertically from Sunday (top) to Saturday (bottom).
+        </p>
+        <p>
+          Note: Activities are shown with a one-day delay. This means today's activities will appear in tomorrow's update, 
+          ensuring each day shows complete 24-hour data.
+        </p>
+      </div>
+
       <div className="bg-beige rounded-lg shadow-frosted backdrop-blur-frosted border border-oxford-blue/5 p-3 md:p-6 overflow-x-auto">
         <HabitGrid />
       </div>
