@@ -16,23 +16,22 @@ export default function GridContent({
   return (
     <div className="relative group min-w-fit">
       <button 
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-8 opacity-0 group-hover:opacity-40 hover:!opacity-100 transition-opacity disabled:cursor-not-allowed disabled:opacity-20"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 opacity-0 group-hover:opacity-40 hover:!opacity-100 transition-opacity disabled:cursor-not-allowed disabled:opacity-20"
         onClick={onPrevious}
         aria-label="Previous quarter"
       >
-        <ChevronLeft className="w-6 h-6 text-oxford-blue" />
+        <ChevronLeft className="w-8 h-8 text-oxford-blue" />
       </button>
       
-      <div className="grid grid-cols-[repeat(53,1fr)] gap-[2px] md:gap-1 mx-auto">
+      <div className="grid grid-cols-[repeat(53,1fr)] gap-1 md:gap-1.5 mx-auto">
         {weeks.map((week, weekIndex) => (
-          <div key={weekIndex} className="grid grid-rows-7 gap-[2px] md:gap-1">
+          <div key={weekIndex} className="grid grid-rows-7 gap-1 md:gap-1.5">
             {week.map((date, dayIndex) => {
-              // Skip rendering for invalid dates (new Date(0) or undefined)
               if (!date || date.getTime() === 0) {
                 return (
                   <div 
                     key={dayIndex}
-                    className="w-2 h-2 md:w-3 md:h-3 rounded-sm"
+                    className="w-6 h-6 md:w-8 md:h-8 rounded-sm"
                     style={{ 
                       backgroundColor: color,
                       opacity: 0.1
@@ -51,7 +50,7 @@ export default function GridContent({
                   content={<GridTooltip date={date} entries={dayEntries} />}
                 >
                   <div 
-                    className="w-2 h-2 md:w-3 md:h-3 rounded-sm cursor-pointer transition-all hover:scale-110"
+                    className="w-6 h-6 md:w-8 md:h-8 rounded-sm cursor-pointer transition-all hover:scale-110 hover:shadow-lg"
                     style={{ 
                       backgroundColor: color,
                       opacity: dayEntries.length > 0 ? 0.4 + (0.6 * intensity) : 0.1
@@ -65,12 +64,12 @@ export default function GridContent({
       </div>
 
       <button 
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-8 opacity-0 group-hover:opacity-40 hover:!opacity-100 transition-opacity disabled:cursor-not-allowed disabled:opacity-20"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 opacity-0 group-hover:opacity-40 hover:!opacity-100 transition-opacity disabled:cursor-not-allowed disabled:opacity-20"
         onClick={onNext}
         disabled={!canNavigateNext}
         aria-label="Next quarter"
       >
-        <ChevronRight className="w-6 h-6 text-oxford-blue" />
+        <ChevronRight className="w-8 h-8 text-oxford-blue" />
       </button>
     </div>
   );
