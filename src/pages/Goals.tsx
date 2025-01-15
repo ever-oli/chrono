@@ -90,6 +90,7 @@ export default function Goals() {
           onClick={() => setShowForm(!showForm)}
           variant="ghost"
           size="icon"
+          className="md:static fixed md:top-auto top-2 right-16 z-50"
         >
           <Plus className="h-6 w-6" />
         </Button>
