@@ -19,4 +19,7 @@ export interface GridContentProps {
   entriesByDate: Record<string, TimeEntry[]>;
   maxIntensity: number;
   color: string;
+  onPrevious: () => void;
+  onNext: () => void;
+  canNavigateNext: boolean;
 }
