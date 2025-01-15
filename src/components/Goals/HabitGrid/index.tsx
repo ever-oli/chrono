@@ -1,14 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TimeEntry } from "@/types/timeEntry";
-import { generateDateRange, getDayEntries } from "./utils/dateUtils";
+import { getDayEntries } from "./utils/dateUtils";
+import { getQuarterDates, getNextQuarter, getPreviousQuarter } from "./utils/quarterUtils";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import MonthLabels from "./components/MonthLabels";
 import DayLabels from "./components/DayLabels";
 import GridContent from "./components/GridContent";
+import { useState } from "react";
 
 export default function HabitGrid() {
-  const dates = generateDateRange();
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const dates = getQuarterDates(currentDate);
   
   const { data: timers = [], isLoading: timersLoading } = useQuery({
     queryKey: ['timers'],
@@ -45,6 +50,14 @@ export default function HabitGrid() {
     }
   });
 
+  const handlePreviousQuarter = () => {
+    setCurrentDate(getPreviousQuarter(currentDate));
+  };
+
+  const handleNextQuarter = () => {
+    setCurrentDate(getNextQuarter(currentDate));
+  };
+
   if (error) {
     return (
       <div className="rounded-lg bg-destructive/10 p-4 text-destructive">
@@ -64,6 +77,29 @@ export default function HabitGrid() {
 
   return (
     <div className="space-y-4 md:space-y-6">
+      <div className="flex items-center justify-between gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handlePreviousQuarter}
+          className="h-8 px-2"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <h2 className="text-sm font-medium">
+          {dates[0].toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} - {' '}
+          {dates[dates.length - 1].toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+        </h2>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleNextQuarter}
+          className="h-8 px-2"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
       {timers.map(timer => {
         const timerEntries = entries.filter(entry => entry.timer_id === timer.id);
         const entriesByDate = dates.reduce((acc, date) => {
@@ -111,8 +147,8 @@ export default function HabitGrid() {
                 <h3 className="text-base md:text-lg font-semibold">{timer.name}</h3>
               </div>
               
-              <div className="min-w-0 w-full">
-                <div className="relative">
+              <div className="min-w-0 w-full overflow-x-auto">
+                <div className="relative min-w-[300px]">
                   <MonthLabels weeks={weeks} />
                   <div className="flex">
                     <DayLabels />

@@ -5,7 +5,7 @@ import GridTooltip from "./GridTooltip";
 
 export default function GridContent({ weeks, entriesByDate, maxIntensity, color }: GridContentProps) {
   return (
-    <div className="min-w-fit grid grid-cols-[repeat(53,1fr)] gap-[2px] md:gap-1 mx-auto">
+    <div className="min-w-fit grid grid-cols-[repeat(13,1fr)] gap-[2px] md:gap-1 mx-auto">
       {weeks.map((week, weekIndex) => (
         <div key={weekIndex} className="grid grid-rows-7 gap-[2px] md:gap-1">
           {week.map((date, dayIndex) => {
@@ -14,7 +14,7 @@ export default function GridContent({ weeks, entriesByDate, maxIntensity, color 
               return (
                 <div 
                   key={dayIndex}
-                  className="w-2 h-2 md:w-3 md:h-3 rounded-sm"
+                  className="w-1.5 h-1.5 md:w-3 md:h-3 rounded-sm"
                   style={{ 
                     backgroundColor: color,
                     opacity: 0.1
@@ -31,7 +31,7 @@ export default function GridContent({ weeks, entriesByDate, maxIntensity, color 
               <Tooltip key={dayIndex}>
                 <TooltipTrigger asChild>
                   <div 
-                    className="w-2 h-2 md:w-3 md:h-3 rounded-sm cursor-pointer transition-all hover:scale-110"
+                    className="w-1.5 h-1.5 md:w-3 md:h-3 rounded-sm cursor-pointer transition-all hover:scale-110"
                     style={{ 
                       backgroundColor: color,
                       opacity: dayEntries.length > 0 ? 0.4 + (0.6 * intensity) : 0.1
