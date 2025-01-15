@@ -46,7 +46,7 @@ export default function TimerList() {
           size="icon" 
           variant="ghost" 
           onClick={() => setShowNewTimer(true)}
-          className="md:static fixed md:top-auto top-2 md:right-auto right-2"
+          className="md:static fixed md:top-auto top-2 right-16 z-50"
         >
           <Plus className="h-6 w-6" />
         </Button>

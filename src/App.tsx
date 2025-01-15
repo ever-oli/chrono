@@ -31,10 +31,10 @@ const SignOutButton = () => {
   };
 
   return (
-    <Button
+    <Button 
       variant="ghost"
       size="icon"
-      className="fixed md:top-4 md:right-4 top-2 right-16 z-50"
+      className="fixed md:top-4 md:right-4 top-2 right-2 z-50"
       onClick={handleSignOut}
     >
       <LogOut className="h-5 w-5" />
