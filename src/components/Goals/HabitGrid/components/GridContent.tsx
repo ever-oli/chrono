@@ -4,21 +4,12 @@ import { TimeEntry } from "@/types/timeEntry";
 import { GridContentProps } from "@/types/habitGrid";
 import GridTooltip from "./GridTooltip";
 
-export default function GridContent({ 
-  weeks, 
-  entriesByDate, 
-  maxIntensity, 
-  color,
-  onPrevious,
-  onNext,
-  canNavigateNext 
-}: GridContentProps) {
+export default function GridContent({ weeks, entriesByDate, maxIntensity, color }: GridContentProps) {
   return (
     <div className="relative group min-w-fit">
       <button 
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-8 opacity-0 group-hover:opacity-40 hover:!opacity-100 transition-opacity disabled:cursor-not-allowed disabled:opacity-20"
-        onClick={onPrevious}
-        aria-label="Previous quarter"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-8 opacity-0 group-hover:opacity-40 hover:opacity-100 transition-opacity"
+        onClick={() => {/* TODO: Add quarter navigation */}}
       >
         <ChevronLeft className="w-6 h-6 text-oxford-blue" />
       </button>
@@ -65,10 +56,8 @@ export default function GridContent({
       </div>
 
       <button 
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-8 opacity-0 group-hover:opacity-40 hover:!opacity-100 transition-opacity disabled:cursor-not-allowed disabled:opacity-20"
-        onClick={onNext}
-        disabled={!canNavigateNext}
-        aria-label="Next quarter"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-8 opacity-0 group-hover:opacity-40 hover:opacity-100 transition-opacity"
+        onClick={() => {/* TODO: Add quarter navigation */}}
       >
         <ChevronRight className="w-6 h-6 text-oxford-blue" />
       </button>

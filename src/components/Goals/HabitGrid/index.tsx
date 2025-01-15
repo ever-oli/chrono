@@ -2,19 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TimeEntry } from "@/types/timeEntry";
 import { generateDateRange, getDayEntries } from "./utils/dateUtils";
-import { getQuarterRange, getNextQuarter, getPreviousQuarter, canNavigateNext } from "./utils/quarterUtils";
 import { Card } from "@/components/ui/card";
-import { useState } from "react";
 import MonthLabels from "./components/MonthLabels";
 import DayLabels from "./components/DayLabels";
 import GridContent from "./components/GridContent";
-import { useToast } from "@/components/ui/use-toast";
 
 export default function HabitGrid() {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const { toast } = useToast();
-  const { start, end } = getQuarterRange(currentDate);
-  const dates = generateDateRange(start, end);
+  const dates = generateDateRange();
   
   const { data: timers = [], isLoading: timersLoading } = useQuery({
     queryKey: ['timers'],
@@ -30,7 +24,7 @@ export default function HabitGrid() {
   });
 
   const { data: entries = [], isLoading: entriesLoading, error } = useQuery({
-    queryKey: ['habit-entries', start, end],
+    queryKey: ['habit-entries', dates[0], dates[dates.length - 1]],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('time_entries')
@@ -42,30 +36,14 @@ export default function HabitGrid() {
             color
           )
         `)
-        .gte('started_at', start.toISOString())
-        .lte('started_at', end.toISOString())
+        .gte('started_at', dates[0].toISOString())
+        .lte('started_at', dates[dates.length - 1].toISOString())
         .order('started_at', { ascending: true });
 
       if (error) throw error;
       return data as TimeEntry[];
     }
   });
-
-  const handlePreviousQuarter = () => {
-    setCurrentDate(getPreviousQuarter(currentDate));
-    toast({
-      description: "Navigated to previous quarter",
-    });
-  };
-
-  const handleNextQuarter = () => {
-    if (canNavigateNext(currentDate)) {
-      setCurrentDate(getNextQuarter(currentDate));
-      toast({
-        description: "Navigated to next quarter",
-      });
-    }
-  };
 
   if (error) {
     return (
@@ -143,9 +121,6 @@ export default function HabitGrid() {
                       entriesByDate={entriesByDate}
                       maxIntensity={maxIntensity}
                       color={timer.color}
-                      onPrevious={handlePreviousQuarter}
-                      onNext={handleNextQuarter}
-                      canNavigateNext={canNavigateNext(currentDate)}
                     />
                   </div>
                 </div>

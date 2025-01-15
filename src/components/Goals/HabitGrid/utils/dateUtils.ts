@@ -1,8 +1,10 @@
-import { eachDayOfInterval, startOfDay, endOfDay } from 'date-fns';
+import { eachDayOfInterval, subDays, startOfDay, endOfDay, differenceInCalendarWeeks, startOfWeek, getDay } from 'date-fns';
 import { TimeEntry } from '@/types/timeEntry';
 
-export const generateDateRange = (start: Date, end: Date) => {
-  return eachDayOfInterval({ start, end });
+export const generateDateRange = () => {
+  const endDate = new Date();
+  const startDate = subDays(endDate, 364); // Last 365 days
+  return eachDayOfInterval({ start: startDate, end: endDate });
 };
 
 export const getDayEntries = (date: Date, entries: TimeEntry[]) => {
@@ -17,4 +19,14 @@ export const getDayEntries = (date: Date, entries: TimeEntry[]) => {
 
 export const calculateIntensity = (entries: TimeEntry[]) => {
   return entries.reduce((sum, entry) => sum + (entry.seconds || 0), 0);
+};
+
+export const getGridPosition = (date: Date, startDate: Date) => {
+  const weekIndex = differenceInCalendarWeeks(date, startOfWeek(startDate));
+  const dayOfWeek = getDay(date); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  
+  return {
+    row: dayOfWeek + 1, // Grid rows start at 1
+    column: weekIndex + 1, // Grid columns start at 1
+  };
 };
