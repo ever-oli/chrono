@@ -26,7 +26,7 @@ export default function GridContent({ weeks, entriesByDate, maxIntensity, color 
   }, []);
 
   return (
-    <div className="relative">
+    <div className="flex flex-col w-full">
       <div 
         ref={scrollContainerRef}
         className="overflow-x-auto scrollbar-hide"
@@ -73,9 +73,9 @@ export default function GridContent({ weeks, entriesByDate, maxIntensity, color 
       </div>
 
       {/* Progress bar */}
-      <div className="mt-4 h-0.5 bg-black/5 rounded-full overflow-hidden">
+      <div className="mt-4 h-0.5 bg-black/10 rounded-full overflow-hidden w-full">
         <div 
-          className="h-full bg-black/20 rounded-full transition-all duration-150"
+          className="h-full bg-black/40 rounded-full transition-all duration-150"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
