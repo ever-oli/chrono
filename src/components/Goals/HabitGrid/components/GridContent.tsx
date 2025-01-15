@@ -1,4 +1,3 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { FloatingTooltip } from "@/components/ui/floating-tooltip";
 import { TimeEntry } from "@/types/timeEntry";
 import { GridContentProps } from "@/types/habitGrid";
@@ -27,18 +26,7 @@ export default function GridContent({ weeks, entriesByDate, maxIntensity, color 
   }, []);
 
   return (
-    <div className="relative group">
-      <button 
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-8 opacity-0 group-hover:opacity-40 hover:opacity-100 transition-opacity"
-        onClick={() => {
-          if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
-          }
-        }}
-      >
-        <ChevronLeft className="w-6 h-6 text-oxford-blue" />
-      </button>
-      
+    <div className="relative">
       <div 
         ref={scrollContainerRef}
         className="overflow-x-auto scrollbar-hide"
@@ -84,21 +72,10 @@ export default function GridContent({ weeks, entriesByDate, maxIntensity, color 
         </div>
       </div>
 
-      <button 
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-8 opacity-0 group-hover:opacity-40 hover:opacity-100 transition-opacity"
-        onClick={() => {
-          if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
-          }
-        }}
-      >
-        <ChevronRight className="w-6 h-6 text-oxford-blue" />
-      </button>
-
       {/* Progress bar */}
-      <div className="mt-4 h-0.5 bg-oxford-blue/5 rounded-full overflow-hidden">
+      <div className="mt-4 h-0.5 bg-black/5 rounded-full overflow-hidden">
         <div 
-          className="h-full bg-oxford-blue/20 rounded-full transition-all duration-150"
+          className="h-full bg-black/20 rounded-full transition-all duration-150"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
