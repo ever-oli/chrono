@@ -85,7 +85,7 @@ export default function HabitGrid() {
   }
 
   return (
-    <div className="space-y-6 md:space-y-8">
+    <div className="space-y-4 md:space-y-6">
       {timers.map(timer => {
         const timerEntries = entries.filter(entry => entry.timer_id === timer.id);
         const entriesByDate = dates.reduce((acc, date) => {
@@ -122,18 +122,18 @@ export default function HabitGrid() {
         return (
           <Card 
             key={timer.id} 
-            className="p-4 md:p-6 hover:shadow-card transition-shadow rounded-lg border border-border/5"
+            className="p-3 md:p-component hover:shadow-card transition-shadow rounded-lg border border-border/5"
           >
-            <div className="space-y-6 md:space-y-8">
-              <div className="flex items-center gap-3 md:gap-4">
+            <div className="space-y-4 md:space-y-6">
+              <div className="flex items-center gap-2 md:gap-3">
                 <div 
-                  className="w-3 h-3 md:w-4 md:h-4 rounded-full" 
+                  className="w-2 h-2 md:w-3 md:h-3 rounded-full" 
                   style={{ backgroundColor: timer.color }}
                 />
-                <h3 className="text-lg md:text-xl font-semibold">{timer.name}</h3>
+                <h3 className="text-base md:text-lg font-semibold">{timer.name}</h3>
               </div>
               
-              <div className="min-w-0 w-full overflow-x-auto">
+              <div className="min-w-0 w-full">
                 <div className="relative">
                   <MonthLabels weeks={weeks} />
                   <div className="flex">
