@@ -42,7 +42,12 @@ export default function TimerList() {
     <>
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Timers</h1>
-        <Button size="icon" variant="ghost" onClick={() => setShowNewTimer(true)}>
+        <Button 
+          size="icon" 
+          variant="ghost" 
+          onClick={() => setShowNewTimer(true)}
+          className="md:static fixed md:top-auto top-2 md:right-auto right-2"
+        >
           <Plus className="h-6 w-6" />
         </Button>
       </div>

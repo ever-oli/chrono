@@ -1,4 +1,3 @@
-import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -35,7 +34,7 @@ const SignOutButton = () => {
     <Button
       variant="ghost"
       size="icon"
-      className="fixed top-4 right-4 z-50"
+      className="fixed md:top-4 md:right-4 top-2 right-16 z-50"
       onClick={handleSignOut}
     >
       <LogOut className="h-5 w-5" />
@@ -48,68 +47,65 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TimerProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
+      <TooltipProvider>
+        <TimerProvider>
           <BrowserRouter>
-            <div className="min-h-screen pb-20">
-              <Routes>
-                <Route path="/auth" element={<Auth />} />
-                <Route
-                  path="/"
-                  element={
-                    <ProtectedRoute>
-                      <SignOutButton />
-                      <Tracking />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/events"
-                  element={
-                    <ProtectedRoute>
-                      <SignOutButton />
-                      <Events />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/timeline"
-                  element={
-                    <ProtectedRoute>
-                      <SignOutButton />
-                      <Timeline />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/goals"
-                  element={
-                    <ProtectedRoute>
-                      <SignOutButton />
-                      <Goals />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/habits"
-                  element={
-                    <ProtectedRoute>
-                      <SignOutButton />
-                      <Habits />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </div>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <SignOutButton />
+                    <Tracking />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/events"
+                element={
+                  <ProtectedRoute>
+                    <SignOutButton />
+                    <Events />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/timeline"
+                element={
+                  <ProtectedRoute>
+                    <SignOutButton />
+                    <Timeline />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/goals"
+                element={
+                  <ProtectedRoute>
+                    <SignOutButton />
+                    <Goals />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/habits"
+                element={
+                  <ProtectedRoute>
+                    <SignOutButton />
+                    <Habits />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
             <Navigation />
+            <Sonner position="top-center" />
           </BrowserRouter>
-        </TooltipProvider>
-      </TimerProvider>
+        </TimerProvider>
+      </TooltipProvider>
     </QueryClientProvider>
   );
-}
+};
 
 export default App;
