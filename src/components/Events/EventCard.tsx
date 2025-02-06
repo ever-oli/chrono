@@ -70,6 +70,7 @@ export default function EventCard({ entry, onDelete }: EventCardProps) {
                     started_at: entry.started_at,
                     ended_at: entry.ended_at || ''
                   }}
+                  onClose={() => setIsEditDialogOpen(false)}
                 />
               </DialogContent>
             </Dialog>

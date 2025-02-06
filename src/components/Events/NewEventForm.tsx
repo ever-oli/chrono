@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { DialogClose } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface FormData {
   name: string;
@@ -29,9 +29,10 @@ interface NewEventFormProps {
     ended_at: string;
   };
   mode?: 'create' | 'edit';
+  onClose?: () => void;
 }
 
-export default function NewEventForm({ initialData, mode = 'create' }: NewEventFormProps) {
+export default function NewEventForm({ initialData, mode = 'create', onClose }: NewEventFormProps) {
   const { timers } = useTimerContext();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -89,6 +90,10 @@ export default function NewEventForm({ initialData, mode = 'create' }: NewEventF
           ? "Your event has been updated successfully."
           : "Your new event has been added successfully.",
       });
+      
+      if (onClose) {
+        onClose();
+      }
     } catch (error: any) {
       toast({
         title: "Error",
@@ -114,6 +119,7 @@ export default function NewEventForm({ initialData, mode = 'create' }: NewEventF
           <Input
             type="datetime-local"
             {...register("start_time", { required: true })}
+            disabled={mode === 'edit'}
           />
           {errors.start_time && (
             <span className="text-sm text-red-500">Start time is required</span>
@@ -134,6 +140,7 @@ export default function NewEventForm({ initialData, mode = 'create' }: NewEventF
         <select
           className="w-full border rounded-md h-10 px-3"
           {...register("timer_id", { required: true })}
+          disabled={mode === 'edit'}
         >
           <option value="">Select activity</option>
           {timers.map((timer) => (
