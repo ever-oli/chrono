@@ -5,7 +5,7 @@ import { Clock, Pencil } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -22,10 +22,25 @@ export default function EventCard({ entry, onDelete }: EventCardProps) {
   const minutes = duration % 60;
   const seconds = entry.seconds % 60;
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [newEndTime, setNewEndTime] = useState(entry.ended_at?.slice(0, 16) || '');
+  const [newEndTime, setNewEndTime] = useState('');
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Update newEndTime whenever the dialog opens or entry changes
+  useEffect(() => {
+    if (isEditDialogOpen && entry.ended_at) {
+      // Format the date to local datetime-local format
+      const date = new Date(entry.ended_at);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      
+      setNewEndTime(`${year}-${month}-${day}T${hours}:${minutes}`);
+    }
+  }, [isEditDialogOpen, entry.ended_at]);
 
   const handleEndTimeUpdate = async () => {
     setIsSubmitting(true);
