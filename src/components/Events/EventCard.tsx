@@ -4,8 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Clock, Pencil } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import NewEventForm from "./NewEventForm";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 interface EventCardProps {
   entry: TimeEntry;
@@ -19,6 +22,44 @@ export default function EventCard({ entry, onDelete }: EventCardProps) {
   const minutes = duration % 60;
   const seconds = entry.seconds % 60;
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [newEndTime, setNewEndTime] = useState(entry.ended_at?.slice(0, 16) || '');
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleEndTimeUpdate = async () => {
+    setIsSubmitting(true);
+    try {
+      const endDate = new Date(newEndTime);
+      const startDate = new Date(entry.started_at);
+      const seconds = Math.floor((endDate.getTime() - startDate.getTime()) / 1000);
+
+      const { error } = await supabase
+        .from('time_entries')
+        .update({
+          ended_at: endDate.toISOString(),
+          seconds: seconds
+        })
+        .eq('id', entry.id);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      toast({
+        title: "Time updated",
+        description: "The event end time has been updated successfully.",
+      });
+      setIsEditDialogOpen(false);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: `Failed to update end time: ${error.message}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -55,23 +96,34 @@ export default function EventCard({ entry, onDelete }: EventCardProps) {
                   <Pencil className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                  <DialogTitle>Edit Event</DialogTitle>
+                  <DialogTitle>Edit End Time</DialogTitle>
                 </DialogHeader>
-                <NewEventForm 
-                  mode="edit"
-                  initialData={{
-                    id: entry.id,
-                    name: entry.name || '',
-                    notes: entry.notes || '',
-                    timer_id: entry.timer_id,
-                    marker_size: entry.marker_size || 'medium',
-                    started_at: entry.started_at,
-                    ended_at: entry.ended_at || ''
-                  }}
-                  onClose={() => setIsEditDialogOpen(false)}
-                />
+                <div className="grid gap-4 py-4">
+                  <div className="space-y-2">
+                    <Input
+                      type="datetime-local"
+                      value={newEndTime}
+                      onChange={(e) => setNewEndTime(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex justify-end gap-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsEditDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleEndTimeUpdate}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Updating..." : "Update"}
+                    </Button>
+                  </div>
+                </div>
               </DialogContent>
             </Dialog>
             <Button
