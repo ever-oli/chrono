@@ -1,16 +1,46 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import Timer from "@/components/Timer";
 import { useTimerContext } from "@/components/Timer/TimerContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export default function TimerList() {
   const [showNewTimer, setShowNewTimer] = useState(false);
   const [newTimerName, setNewTimerName] = useState("");
   const [selectedColor, setSelectedColor] = useState("#2D2D2D");
   const { timers, addTimer, deleteTimer, updateTimerSeconds, state } = useTimerContext();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const addYoutubeTimer = async () => {
+      const { data: existingTimers } = await supabase
+        .from('timers')
+        .select('name')
+        .eq('name', 'YouTube');
+
+      if (!existingTimers || existingTimers.length === 0) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await addTimer({
+            name: 'YouTube',
+            color: '#FF0000',
+            user_id: user.id
+          });
+          
+          toast({
+            title: "YouTube Timer Added",
+            description: "The YouTube timer has been restored.",
+          });
+        }
+      }
+    };
+
+    addYoutubeTimer();
+  }, []);
 
   const handleAddTimer = async (e: React.FormEvent) => {
     e.preventDefault();
