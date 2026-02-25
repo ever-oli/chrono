@@ -1,1 +1,0 @@
-export type TimeRange = "hours" | "days" | "weeks" | "months" | "life";

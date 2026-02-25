@@ -1,0 +1,128 @@
+/* ============================================================
+   Timey Tracker — Textual CSS
+   Color palette:
+   - Warm accent:  #DC9E82 (peach)
+   - Deep accent:  #C16E70 (rose)
+   - Dark bg:      #1a1a2e
+   - Surface:      #16213e
+   - Text:         #e0e0e0
+   - Text muted:   #a0a0b8
+   ============================================================ */
+
+Screen {
+    background: #1a1a2e;
+}
+
+/* ---- Header ---- */
+Header {
+    background: #1a1a2e;
+    color: #DC9E82;
+}
+
+/* ---- Footer ---- */
+Footer {
+    background: #1a1a2e;
+}
+
+/* ---- Tabs ---- */
+TabbedContent {
+    height: 1fr;
+}
+
+TabPane {
+    padding: 0;
+}
+
+Tabs {
+    background: #1a1a2e;
+}
+
+Tab {
+    background: #16213e;
+    color: #a0a0b8;
+    padding: 0 2;
+}
+
+Tab.-active {
+    background: #DC9E82;
+    color: #1a1a2e;
+    text-style: bold;
+}
+
+Underline > .underline--bar {
+    color: #C16E70;
+}
+
+/* ---- Buttons ---- */
+Button {
+    background: #16213e;
+    color: #DC9E82;
+    border: solid #3a3a5e;
+}
+
+Button:hover {
+    background: #C16E70;
+    color: #ffffff;
+}
+
+Button.-primary {
+    background: #DC9E82;
+    color: #1a1a2e;
+}
+
+Button.-primary:hover {
+    background: #C16E70;
+    color: #ffffff;
+}
+
+/* ---- Inputs ---- */
+Input {
+    background: #16213e;
+    color: #e0e0e0;
+    border: solid #DC9E82;
+}
+
+Input:focus {
+    border: solid #C16E70;
+}
+
+/* ---- Select ---- */
+Select {
+    background: #16213e;
+    color: #e0e0e0;
+}
+
+SelectCurrent {
+    background: #16213e;
+    border: solid #DC9E82;
+    color: #e0e0e0;
+}
+
+/* ---- ProgressBar ---- */
+ProgressBar {
+    height: 1;
+}
+
+Bar > .bar--bar {
+    color: #DC9E82;
+}
+
+Bar > .bar--complete {
+    color: #4ade80;
+}
+
+/* ---- Labels and Static ---- */
+Label {
+    color: #e0e0e0;
+}
+
+Static {
+    color: #e0e0e0;
+}
+
+/* ---- Notifications ---- */
+Toast {
+    background: #16213e;
+    border: solid #DC9E82;
+    color: #e0e0e0;
+}

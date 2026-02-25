@@ -1,69 +1,89 @@
-# Welcome to your Lovable project
+<div align="center">
+  <h1>⏱ Chrono</h1>
+  <p><b>Track your time, build better habits. All from the comfort of your terminal.</b></p>
+</div>
 
-## Project info
+Chrono is a beautiful, privacy-first, local SQLite terminal UI (TUI) for tracking your time and analyzing your habits over time. It is built entirely in Python using [Textual](https://textual.textualize.io/) and [Peewee](http://docs.peewee-orm.com/en/latest/).
 
-**URL**: https://lovable.dev/projects/779143e4-9b4e-4e3a-8e18-fd34ac5a3c69
+Instead of bloated web apps or subscriptions, Chrono keeps all your data locally on your machine in a fast, reliable SQLite database `~/.timey/timey.db`.
 
-## How can I edit this code?
+<div align="center">
+  <img src="./screenshots/Chrono_2026-02-25T13_55_44_446826.svg" alt="Timers Screen" width="800">
+</div>
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## ✨ Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/779143e4-9b4e-4e3a-8e18-fd34ac5a3c69) and start prompting.
+- **Blazing Fast TUI:** Keyboard-centric design (`Enter` to start/stop, `e` to edit, number keys to switch tabs).
+- **Advanced Analytics:** See horizontal distribution and vertical block charts of your time usage.
+- **Habit Tracking:** Visualize consistency using GitHub-style contribution block grids.
+- **Weekly Goals:** Set and track target hours for deep work, fitness, reading, etc.
+- **CSV Export:** Instantly export your raw time entry data.
+- **Complete Privacy:** 100% offline. No telemetry, no accounts, no cloud sync.
 
-Changes made via Lovable will be committed automatically to this repo.
+## 📸 Screenshots
 
-**Use your preferred IDE**
+### 📊 Timeline Analytics
+Gain deep insights into your habit distribution with custom unicode charts natively rendered in the terminal.
+<div align="center">
+  <img src="./screenshots/Chrono_2026-02-25T13_55_58_099860.svg" alt="Timeline Analytics" width="800">
+</div>
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 🧩 Habit Tracking
+Visualizing specific timer sessions day-by-day.
+<div align="center">
+  <img src="./screenshots/Chrono_2026-02-25T13_56_56_522302.svg" alt="Habits Grid" width="800">
+</div>
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 🎯 Goal setting
+Create weekly goals and track their percentage completion automatically.
+<div align="center">
+  <img src="./screenshots/Chrono_2026-02-25T13_56_05_432794.svg" alt="Goals Screen" width="800">
+</div>
 
-Follow these steps:
+### 📋 Event Management
+Review your individual blocks of time, edit their notes, or export to CSV.
+<div align="center">
+  <img src="./screenshots/Chrono_2026-02-25T13_55_50_506135.svg" alt="Events" width="800">
+</div>
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🚀 Installation & Usage
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Chrono requires **Python 3.10+**.
 
-# Step 3: Install the necessary dependencies.
-npm i
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-username/chrono.git
+cd chrono
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+# 2. Create and activate a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 3. Install dependencies
+pip install setuptools build
+pip install -e .
+
+# 4. Run Chrono!
+python -m timey
 ```
 
-**Edit a file directly in GitHub**
+*(Note: The database is automatically initialized at `~/.timey/timey.db` on your first launch.)*
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## ⌨️ Keyboard Shortcuts
 
-**Use GitHub Codespaces**
+| Key | Action |
+| --- | --- |
+| `1` - `5` | Switch between tabs |
+| `Enter` / `s` | Start/Stop a highlighted timer |
+| `e` | Edit a highlighted timer (rename/color) |
+| `p` | Open Textual command palette / F12 screenshot |
+| `q` | Quit Chrono |
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🛠 Tech Stack
 
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/779143e4-9b4e-4e3a-8e18-fd34ac5a3c69) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+- **[Python](https://www.python.org/)** - Core logic
+- **[Textual](https://textual.textualize.io/)** - Next-generation Terminal UI framework
+- **[Peewee](http://docs.peewee-orm.com/)** - Lightweight ORM for SQLite
+- **[SQLite](https://www.sqlite.org/)** - Local data persistence

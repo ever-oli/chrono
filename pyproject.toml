@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "timey-tracker"
+version = "0.1.0"
+description = "A terminal-based time tracking app built with Textual"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "textual>=0.89",
+    "peewee>=3.17",
+]
+
+[project.optional-dependencies]
+dev = [
+    "textual-dev>=1.0",
+]
+
+[project.scripts]
+timey = "timey.app:main"
+
+[tool.setuptools.packages.find]
+include = ["timey*"]
