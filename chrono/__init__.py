@@ -1,1 +1,1 @@
-"""Timey Tracker — A terminal-based time tracking TUI."""
+"""Chrono — A terminal-based time tracking TUI."""

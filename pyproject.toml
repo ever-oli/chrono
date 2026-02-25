@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "timey-tracker"
+name = "chrono-tracker"
 version = "0.1.0"
 description = "A terminal-based time tracking app built with Textual"
 readme = "README.md"
@@ -19,7 +19,7 @@ dev = [
 ]
 
 [project.scripts]
-timey = "timey.app:main"
+chrono = "chrono.app:main"
 
 [tool.setuptools.packages.find]
-include = ["timey*"]
+include = ["chrono*"]

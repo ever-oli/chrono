@@ -1,1 +1,1 @@
-"""Timey Tracker widgets."""
+"""Chrono widgets."""

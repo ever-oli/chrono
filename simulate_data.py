@@ -143,7 +143,7 @@ def generate_data():
     )
     
     print("Created weekly goals.")
-    print("Simulation complete! You can open Timey Tracker to view screenshots.")
+    print("Simulation complete! You can open Chrono to view screenshots.")
     print(f"If you want to restore your original database, move ~/.chrono/chrono.db.backup to ~/.chrono/chrono.db")
 
 if __name__ == '__main__':

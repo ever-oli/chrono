@@ -5,7 +5,7 @@
 
 Chrono is a beautiful, privacy-first, local SQLite terminal UI (TUI) for tracking your time and analyzing your habits over time. It is built entirely in Python using [Textual](https://textual.textualize.io/) and [Peewee](http://docs.peewee-orm.com/en/latest/).
 
-Instead of bloated web apps or subscriptions, Chrono keeps all your data locally on your machine in a fast, reliable SQLite database `~/.timey/timey.db`.
+Instead of bloated web apps or subscriptions, Chrono keeps all your data locally on your machine in a fast, reliable SQLite database `~/.chrono/data.db`.
 
 <div align="center">
   <img src="./screenshots/Chrono_2026-02-25T13_55_44_446826.svg" alt="Timers Screen" width="800">
@@ -66,10 +66,10 @@ pip install setuptools build
 pip install -e .
 
 # 4. Run Chrono!
-python -m timey
+python -m chrono
 ```
 
-*(Note: The database is automatically initialized at `~/.timey/timey.db` on your first launch.)*
+*(Note: The database is automatically initialized at `~/.chrono/data.db` on your first launch.)*
 
 ## ⌨️ Keyboard Shortcuts
 

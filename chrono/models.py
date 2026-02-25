@@ -1,4 +1,4 @@
-"""Database models for Timey Tracker using Peewee ORM."""
+"""Database models for Chrono using Peewee ORM."""
 
 import uuid
 from datetime import datetime

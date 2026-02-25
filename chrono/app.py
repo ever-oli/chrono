@@ -1,4 +1,4 @@
-"""Timey Tracker — Main Textual TUI application."""
+"""Chrono Tracker — Main Textual TUI application."""
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
@@ -12,7 +12,7 @@ from chrono.screens.timeline import TimelineScreen
 from chrono.screens.tracking import TrackingScreen
 
 
-class TimeyApp(App):
+class ChronoApp(App):
     """A terminal-based time tracking application."""
 
     TITLE = "Chrono"
@@ -83,7 +83,7 @@ class TimeyApp(App):
 
 
 def main() -> None:
-    app = TimeyApp()
+    app = ChronoApp()
     app.run()
 
 
