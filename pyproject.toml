@@ -1,7 +1,3 @@
-[build-system]
-requires = ["setuptools>=68.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "chrono-tracker"
 version = "0.1.0"
@@ -21,5 +17,9 @@ dev = [
 [project.scripts]
 chrono = "chrono.app:main"
 
-[tool.setuptools.packages.find]
-include = ["chrono*"]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["chrono"]

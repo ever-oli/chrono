@@ -1,0 +1,110 @@
+/* Nord Theme - from terminal.sexy */
+
+Screen {
+    background: #2e3440;
+}
+
+Header {
+    background: #2e3440;
+    color: #88c0d0;
+}
+
+Footer {
+    background: #2e3440;
+}
+
+TabbedContent {
+    height: 1fr;
+}
+
+TabPane {
+    padding: 0;
+}
+
+Tabs {
+    background: #2e3440;
+}
+
+Tab {
+    background: #3b4252;
+    color: #4c566a;
+    padding: 0 2;
+}
+
+Tab.-active {
+    background: #88c0d0;
+    color: #2e3440;
+    text-style: bold;
+}
+
+Underline > .underline--bar {
+    color: #bf616a;
+}
+
+Button {
+    background: #3b4252;
+    color: #88c0d0;
+    border: solid #4c566a;
+}
+
+Button:hover {
+    background: #bf616a;
+    color: #ffffff;
+}
+
+Button.-primary {
+    background: #88c0d0;
+    color: #2e3440;
+}
+
+Button.-primary:hover {
+    background: #bf616a;
+    color: #ffffff;
+}
+
+Input {
+    background: #3b4252;
+    color: #eceff4;
+    border: solid #88c0d0;
+}
+
+Input:focus {
+    border: solid #bf616a;
+}
+
+Select {
+    background: #3b4252;
+    color: #eceff4;
+}
+
+SelectCurrent {
+    background: #3b4252;
+    border: solid #88c0d0;
+    color: #eceff4;
+}
+
+ProgressBar {
+    height: 1;
+}
+
+Bar > .bar--bar {
+    color: #88c0d0;
+}
+
+Bar > .bar--complete {
+    color: #a3be8c;
+}
+
+Label {
+    color: #eceff4;
+}
+
+Static {
+    color: #eceff4;
+}
+
+Toast {
+    background: #3b4252;
+    border: solid #88c0d0;
+    color: #eceff4;
+}

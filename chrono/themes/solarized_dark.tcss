@@ -1,0 +1,115 @@
+/* Solarized Dark Theme - from terminal.sexy */
+
+Screen {
+    background: #002b36;
+}
+
+Header {
+    background: #002b36;
+    color: #b58900;
+}
+
+Footer {
+    background: #002b36;
+}
+
+TabbedContent {
+    height: 1fr;
+}
+
+TabPane {
+    padding: 0;
+}
+
+Tabs {
+    background: #002b36;
+}
+
+Tab {
+    background: #073642;
+    color: #657b83;
+    padding: 0 2;
+}
+
+Tab.-active {
+    background: #b58900;
+    color: #002b36;
+    text-style: bold;
+}
+
+Underline > .underline--bar {
+    color: #dc322f;
+}
+
+Button {
+    background: #073642;
+    color: #b58900;
+    border: solid #2b3640;
+}
+
+Button:hover {
+    background: #dc322f;
+    color: #ffffff;
+}
+
+Button.-primary {
+    background: #b58900;
+    color: #002b36;
+}
+
+Button.-primary:hover {
+    background: #dc322f;
+    color: #ffffff;
+}
+
+Input {
+    background: #073642;
+    color: #839496;
+    border: solid #b58900;
+}
+
+Input:focus {
+    border: solid #dc322f;
+}
+
+Select {
+    background: #073642;
+    color: #839496;
+}
+
+SelectCurrent {
+    background: #073642;
+    border: solid #b58900;
+    color: #839496;
+}
+
+ProgressBar {
+    height: 1;
+}
+
+Bar > .bar--bar {
+    color: #b58900;
+}
+
+Bar > .bar--complete {
+    color: #859900;
+}
+
+Label {
+    color: #839496;
+}
+
+Static {
+    color: #839496;
+}
+
+Toast {
+    background: #073642;
+    border: solid #b58900;
+    color: #839496;
+}
+
+/* Text colors mapped from terminal.sexy palette */
+TextualHoliday {
+    color: #2aa198;
+}

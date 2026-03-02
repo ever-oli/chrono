@@ -1,5 +1,6 @@
 """Chrono Tracker — Main Textual TUI application."""
 
+import os
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.widgets import Footer, Header, TabbedContent, TabPane
@@ -10,6 +11,7 @@ from chrono.screens.goals import GoalsScreen
 from chrono.screens.habits import HabitsScreen
 from chrono.screens.timeline import TimelineScreen
 from chrono.screens.tracking import TrackingScreen
+from chrono import themes
 
 
 class ChronoApp(App):
@@ -17,7 +19,7 @@ class ChronoApp(App):
 
     TITLE = "Chrono"
     SUB_TITLE = ""
-    CSS_PATH = "app.tcss"
+    CSS_PATH = None  # Set dynamically in __init__
 
     BINDINGS = [
         Binding("q", "quit", "Quit", show=True),
@@ -29,7 +31,9 @@ class ChronoApp(App):
     ]
 
     def __init__(self) -> None:
-        super().__init__()
+        theme_name = os.environ.get("CHRONO_THEME", themes.DEFAULT_THEME)
+        theme_file = themes.THEMES.get(theme_name, themes.THEMES[themes.DEFAULT_THEME])
+        super().__init__(css_path=theme_file)
         init_db()
 
     def compose(self) -> ComposeResult:

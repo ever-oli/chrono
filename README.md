@@ -50,23 +50,41 @@ Review your individual blocks of time, edit their notes, or export to CSV.
 
 ## 🚀 Installation & Usage
 
-Chrono requires **Python 3.10+**.
+Chrono requires **Python 3.10+** and uses [uv](https://github.com/astral-sh/uv) for package management.
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/chrono.git
+git clone https://github.com/ever-oli/chrono.git
 cd chrono
 
-# 2. Create and activate a virtual environment
-python3 -m venv .venv
-source .venv/bin/activate
+# 2. Install with uv
+uv sync
 
-# 3. Install dependencies
-pip install setuptools build
-pip install -e .
-
-# 4. Run Chrono!
+# 3. Run Chrono!
+chrono
+# or
 python -m chrono
+```
+
+### 🎨 Themes
+
+Chrono supports multiple color themes from [terminal.sexy](https://terminal.sexy):
+
+```bash
+# Default (peach/rose)
+CHRONO_THEME=default chrono
+
+# Solarized Dark
+CHRONO_THEME=solarized_dark chrono
+
+# Dracula
+CHRONO_THEME=dracula chrono
+
+# Nord
+CHRONO_THEME=nord chrono
+
+# One Dark
+CHRONO_THEME=one_dark chrono
 ```
 
 *(Note: The database is automatically initialized at `~/.chrono/data.db` on your first launch.)*
