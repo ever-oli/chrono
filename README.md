@@ -15,6 +15,7 @@ Instead of bloated web apps or subscriptions, Chrono keeps all your data locally
 
 ## ✨ Features
 
+- **60+ Themes:** Choose from beautiful color schemes via command palette (Solarized, Dracula, Nord, Monokai, etc.)
 - **Blazing Fast TUI:** Keyboard-centric design (`Enter` to start/stop, `e` to edit, number keys to switch tabs).
 - **Advanced Analytics:** See horizontal distribution and vertical block charts of your time usage.
 - **Habit Tracking:** Visualize consistency using GitHub-style contribution block grids.
@@ -68,24 +69,13 @@ python -m chrono
 
 ### 🎨 Themes
 
-Chrono supports multiple color themes from [terminal.sexy](https://terminal.sexy):
+Chrono comes with **60+ beautiful color themes** from [terminal.sexy](https://terminal.sexy) built-in. Switch themes instantly using the command palette:
 
-```bash
-# Default (peach/rose)
-CHRONO_THEME=default chrono
+1. Press `Ctrl+P` to open the command palette
+2. Type "theme" to filter theme options
+3. Select any theme and it applies instantly without restarting
 
-# Solarized Dark
-CHRONO_THEME=solarized_dark chrono
-
-# Dracula
-CHRONO_THEME=dracula chrono
-
-# Nord
-CHRONO_THEME=nord chrono
-
-# One Dark
-CHRONO_THEME=one_dark chrono
-```
+Popular themes: Solarized Dark, Dracula, Nord, One Dark, Monokai, and many more!
 
 *(Note: The database is automatically initialized at `~/.chrono/data.db` on your first launch.)*
 
@@ -96,7 +86,7 @@ CHRONO_THEME=one_dark chrono
 | `1` - `5` | Switch between tabs |
 | `Enter` / `s` | Start/Stop a highlighted timer |
 | `e` | Edit a highlighted timer (rename/color) |
-| `p` | Open Textual command palette / F12 screenshot |
+| `Ctrl+P` | Open command palette (search themes, commands) |
 | `q` | Quit Chrono |
 
 ## 🛠 Tech Stack

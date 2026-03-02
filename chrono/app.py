@@ -1,6 +1,5 @@
 """Chrono Tracker — Main Textual TUI application."""
 
-import os
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.widgets import Footer, Header, TabbedContent, TabPane
@@ -11,7 +10,120 @@ from chrono.screens.goals import GoalsScreen
 from chrono.screens.habits import HabitsScreen
 from chrono.screens.timeline import TimelineScreen
 from chrono.screens.tracking import TrackingScreen
-from chrono import themes
+from chrono.themes import TERMINAL_SEXY_THEMES
+
+CSS = """
+Screen {
+    background: $background;
+    color: $foreground;
+}
+
+Header {
+    background: $surface;
+    color: $primary;
+}
+
+Footer {
+    background: $surface;
+    color: $accent;
+}
+
+TabbedContent {
+    height: 1fr;
+}
+
+TabPane {
+    padding: 0;
+}
+
+Tabs {
+    background: $surface;
+}
+
+Tab {
+    background: $surface;
+    color: $secondary;
+    padding: 0 2;
+}
+
+Tab.-active {
+    background: $primary;
+    color: $background;
+    text-style: bold;
+}
+
+Underline > .underline--bar {
+    color: $error;
+}
+
+Button {
+    background: $surface;
+    color: $primary;
+    border: solid $secondary;
+}
+
+Button:hover {
+    background: $error;
+    color: $background;
+}
+
+Button.-primary {
+    background: $primary;
+    color: $background;
+}
+
+Button.-primary:hover {
+    background: $error;
+    color: $background;
+}
+
+Input {
+    background: $surface;
+    color: $foreground;
+    border: solid $primary;
+}
+
+Input:focus {
+    border: solid $error;
+}
+
+Select {
+    background: $surface;
+    color: $foreground;
+}
+
+SelectCurrent {
+    background: $surface;
+    border: solid $primary;
+    color: $foreground;
+}
+
+ProgressBar {
+    height: 1;
+}
+
+Bar > .bar--bar {
+    color: $primary;
+}
+
+Bar > .bar--complete {
+    color: $success;
+}
+
+Label {
+    color: $foreground;
+}
+
+Static {
+    color: $foreground;
+}
+
+Toast {
+    background: $surface;
+    border: solid $primary;
+    color: $foreground;
+}
+"""
 
 
 class ChronoApp(App):
@@ -19,7 +131,7 @@ class ChronoApp(App):
 
     TITLE = "Chrono"
     SUB_TITLE = ""
-    CSS_PATH = None  # Set dynamically in __init__
+    CSS = CSS
 
     BINDINGS = [
         Binding("q", "quit", "Quit", show=True),
@@ -31,10 +143,12 @@ class ChronoApp(App):
     ]
 
     def __init__(self) -> None:
-        theme_name = os.environ.get("CHRONO_THEME", themes.DEFAULT_THEME)
-        theme_file = themes.THEMES.get(theme_name, themes.THEMES[themes.DEFAULT_THEME])
-        super().__init__(css_path=theme_file)
+        super().__init__()
         init_db()
+
+    def on_mount(self) -> None:
+        for theme in TERMINAL_SEXY_THEMES:
+            self.register_theme(theme)
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
