@@ -26,7 +26,7 @@ class EventList(Widget):
     EventList .date-header {
         height: 1;
         text-style: bold;
-        color: #DC9E82;
+        color: $primary;
         margin: 1 0 0 0;
         padding: 0 2;
     }
@@ -34,7 +34,7 @@ class EventList(Widget):
     EventList .event-row {
         height: auto;
         padding: 0 2;
-        color: #e0e0e0;
+        color: $foreground;
     }
 
     EventList .event-actions {
@@ -44,8 +44,8 @@ class EventList(Widget):
     }
 
     EventList .event-del-btn {
-        background: #16213e;
-        color: #ef4444;
+        background: $surface;
+        color: $error;
         min-width: 3;
         height: 1;
         border: none;
@@ -53,7 +53,7 @@ class EventList(Widget):
 
     EventList .no-events {
         padding: 2;
-        color: #a0a0b8;
+        color: $secondary;
         text-align: center;
     }
     """

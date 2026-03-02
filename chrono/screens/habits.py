@@ -25,11 +25,11 @@ class HabitsScreen(Widget):
 
     HabitsScreen #habits-title {
         text-style: bold;
-        color: #DC9E82;
+        color: $primary;
     }
 
     HabitsScreen #habits-info {
-        color: #a0a0b8;
+        color: $secondary;
         padding: 0 2;
         height: auto;
     }
@@ -40,7 +40,7 @@ class HabitsScreen(Widget):
     }
     
     HabitsScreen .empty-msg {
-        color: #a0a0b8;
+        color: $secondary;
         margin: 2 0;
         text-align: center;
     }

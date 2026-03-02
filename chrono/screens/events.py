@@ -28,14 +28,14 @@ class EventsScreen(Widget):
     EventsScreen #events-title {
         width: 1fr;
         text-style: bold;
-        color: #DC9E82;
+        color: $primary;
         margin: 1 0 0 0;
     }
 
     EventsScreen #export-btn {
         min-width: 14;
-        background: #DC9E82;
-        color: #1a1a2e;
+        background: $primary;
+        color: $background;
     }
 
     EventsScreen #events-scroll {

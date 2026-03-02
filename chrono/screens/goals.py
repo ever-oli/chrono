@@ -42,22 +42,22 @@ class GoalsScreen(Widget):
     GoalsScreen #goals-title {
         width: 1fr;
         text-style: bold;
-        color: #DC9E82;
+        color: $primary;
         margin: 1 0 0 0;
     }
 
     GoalsScreen #add-goal-btn {
         min-width: 12;
-        background: #DC9E82;
-        color: #1a1a2e;
+        background: $primary;
+        color: $background;
     }
 
     GoalsScreen #goal-form {
         height: auto;
         padding: 1 2;
         margin: 0 2;
-        background: #16213e;
-        border: solid #DC9E82;
+        background: $surface;
+        border: solid $primary;
         display: none;
     }
 
@@ -73,7 +73,7 @@ class GoalsScreen(Widget):
     GoalsScreen .form-label {
         width: 16;
         margin: 1 1 0 0;
-        color: #e0e0e0;
+        color: $foreground;
     }
 
     GoalsScreen #goals-scroll {
@@ -83,7 +83,7 @@ class GoalsScreen(Widget):
 
     GoalsScreen .empty-msg {
         text-align: center;
-        color: #a0a0b8;
+        color: $secondary;
         margin: 2 0;
     }
     """

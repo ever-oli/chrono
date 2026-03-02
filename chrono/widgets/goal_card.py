@@ -15,8 +15,8 @@ class GoalCard(Widget):
         height: auto;
         margin: 0 0 1 0;
         padding: 1 2;
-        background: #16213e;
-        border: solid #3a3a5e;
+        background: $surface;
+        border: solid $secondary;
     }
 
     GoalCard .goal-header {
@@ -26,25 +26,25 @@ class GoalCard(Widget):
     GoalCard .goal-title {
         width: 1fr;
         text-style: bold;
-        color: #e0e0e0;
+        color: $foreground;
     }
 
     GoalCard .goal-meta {
         width: auto;
-        color: #a0a0b8;
+        color: $secondary;
         margin: 0 1;
     }
 
     GoalCard .goal-progress-text {
-        color: #DC9E82;
+        color: $primary;
         margin: 1 0;
     }
 
     GoalCard .goal-del-btn {
         min-width: 5;
-        background: #16213e;
-        color: #ef4444;
-        border: solid #3a3a5e;
+        background: $surface;
+        color: $error;
+        border: solid $secondary;
     }
     """
 

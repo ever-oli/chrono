@@ -22,20 +22,20 @@ class TimerWidget(Widget, can_focus=True):
         height: 5;
         margin: 0 0 1 0;
         padding: 0 1;
-        background: #16213e;
-        border: solid #3a3a5e;
+        background: $surface;
+        border: solid $secondary;
     }
 
     TimerWidget:focus {
-        border: double #DC9E82;
+        border: double $primary;
     }
 
     TimerWidget.running {
-        border: solid #4ade80;
+        border: solid $success;
     }
 
     TimerWidget.running:focus {
-        border: double #4ade80;
+        border: double $success;
     }
 
     TimerWidget .timer-color {
@@ -48,45 +48,45 @@ class TimerWidget(Widget, can_focus=True):
         width: 1fr;
         margin: 1 0 0 0;
         text-style: bold;
-        color: #e0e0e0;
+        color: $foreground;
     }
 
     TimerWidget .timer-elapsed {
         width: 12;
         margin: 1 1 0 0;
         text-align: right;
-        color: #a0a0b8;
+        color: $secondary;
     }
 
     TimerWidget .timer-elapsed.active {
-        color: #4ade80;
+        color: $success;
         text-style: bold;
     }
 
     TimerWidget .start-btn {
-        background: #22c55e;
-        color: #1a1a2e;
+        background: $success;
+        color: $background;
         min-width: 8;
     }
 
     TimerWidget .stop-btn {
-        background: #ef4444;
-        color: #ffffff;
+        background: $error;
+        color: $background;
         min-width: 8;
     }
 
     TimerWidget .edit-btn {
-        background: #16213e;
-        color: #DC9E82;
+        background: $surface;
+        color: $primary;
         min-width: 5;
-        border: solid #3a3a5e;
+        border: solid $secondary;
     }
 
     TimerWidget .del-btn {
-        background: #16213e;
-        color: #ef4444;
+        background: $surface;
+        color: $error;
         min-width: 5;
-        border: solid #3a3a5e;
+        border: solid $secondary;
     }
     """
 

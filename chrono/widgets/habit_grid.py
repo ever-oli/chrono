@@ -22,8 +22,8 @@ class HabitGrid(Widget):
         height: auto;
         padding: 1 2;
         margin: 0 0 1 0;
-        background: #16213e;
-        border: solid #3a3a5e;
+        background: $surface;
+        border: solid $secondary;
     }
 
     HabitGrid .grid-header {
@@ -38,23 +38,23 @@ class HabitGrid(Widget):
 
     HabitGrid .grid-title {
         text-style: bold;
-        color: #e0e0e0;
+        color: $foreground;
         width: 1fr;
     }
 
     HabitGrid .grid-empty-msg {
-        color: #a0a0b8;
+        color: $secondary;
         padding: 1 2;
     }
 
     HabitGrid .grid-row {
         height: 1;
-        color: #e0e0e0;
+        color: $foreground;
     }
 
     HabitGrid .grid-legend {
         height: 1;
-        color: #a0a0b8;
+        color: $secondary;
         margin: 1 0 0 0;
     }
     """

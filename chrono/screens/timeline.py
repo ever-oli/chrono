@@ -68,7 +68,7 @@ class VerticalBarChart(Widget):
     VerticalBarChart .bar-value {
         text-align: center;
         width: 100%;
-        color: #a0a0b8;
+        color: $secondary;
     }
     
     VerticalBarChart .bar-blocks {
@@ -79,7 +79,7 @@ class VerticalBarChart(Widget):
     VerticalBarChart .bar-label {
         text-align: center;
         width: 100%;
-        color: #e0e0e0;
+        color: $foreground;
         margin-top: 1;
         height: 1;
     }
@@ -136,7 +136,7 @@ class TimelineScreen(Widget):
     TimelineScreen #timeline-title {
         width: 1fr;
         text-style: bold;
-        color: #DC9E82;
+        color: $primary;
         margin: 1 0 0 0;
     }
 
@@ -146,8 +146,8 @@ class TimelineScreen(Widget):
     }
 
     TimelineScreen .period-btn.active {
-        background: #DC9E82;
-        color: #1a1a2e;
+        background: $primary;
+        color: $background;
     }
 
     TimelineScreen #timeline-scroll {
@@ -156,7 +156,7 @@ class TimelineScreen(Widget):
     }
 
     TimelineScreen .empty-msg {
-        color: #a0a0b8;
+        color: $secondary;
         margin: 2 0;
         text-align: center;
     }
@@ -170,8 +170,8 @@ class TimelineScreen(Widget):
     TimelineScreen .chart-box {
         width: 1fr;
         height: 1fr;
-        border: solid #3a3a5e;
-        background: #16213e;
+        border: solid $secondary;
+        background: $surface;
         margin: 0 1;
         padding: 1 2;
         layout: vertical;
@@ -179,7 +179,7 @@ class TimelineScreen(Widget):
 
     TimelineScreen .chart-title {
         text-style: bold;
-        color: #e0e0e0;
+        color: $foreground;
         margin-bottom: 1;
         text-align: center;
     }
@@ -187,8 +187,8 @@ class TimelineScreen(Widget):
     TimelineScreen .stats-list {
         height: auto;
         margin: 1 1;
-        background: #16213e;
-        border: solid #3a3a5e;
+        background: $surface;
+        border: solid $secondary;
         padding: 1 2;
     }
 
@@ -203,13 +203,13 @@ class TimelineScreen(Widget):
 
     TimelineScreen .stat-name {
         width: 1fr;
-        color: #e0e0e0;
+        color: $foreground;
         text-style: bold;
     }
 
     TimelineScreen .stat-time {
         width: auto;
-        color: #a0a0b8;
+        color: $secondary;
     }
     """
 

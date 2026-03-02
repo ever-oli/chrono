@@ -27,22 +27,22 @@ class TrackingScreen(Widget):
     TrackingScreen #tracking-title {
         width: 1fr;
         text-style: bold;
-        color: #DC9E82;
+        color: $primary;
         margin: 1 0 0 0;
     }
 
     TrackingScreen #add-timer-btn {
         min-width: 12;
-        background: #DC9E82;
-        color: #1a1a2e;
+        background: $primary;
+        color: $background;
     }
 
     TrackingScreen #new-timer-form {
         height: auto;
         padding: 1 2;
         margin: 0 2;
-        background: #16213e;
-        border: solid #DC9E82;
+        background: $surface;
+        border: solid $primary;
         display: none;
     }
 
@@ -54,8 +54,8 @@ class TrackingScreen(Widget):
         height: auto;
         padding: 1 2;
         margin: 0 2;
-        background: #16213e;
-        border: solid #C16E70;
+        background: $surface;
+        border: solid $secondary;
         display: none;
     }
 
@@ -67,8 +67,8 @@ class TrackingScreen(Widget):
         height: auto;
         padding: 1 2;
         margin: 0 2;
-        background: #16213e;
-        border: solid #4ade80;
+        background: $surface;
+        border: solid $success;
         display: none;
     }
 
@@ -78,11 +78,11 @@ class TrackingScreen(Widget):
 
     TrackingScreen .form-label {
         margin: 1 0 0 0;
-        color: #e0e0e0;
+        color: $foreground;
     }
 
     TrackingScreen .form-hint {
-        color: #a0a0b8;
+        color: $secondary;
         margin: 0 0 1 0;
     }
 
@@ -92,13 +92,13 @@ class TrackingScreen(Widget):
     }
 
     TrackingScreen .empty-msg {
-        color: #a0a0b8;
+        color: $secondary;
         margin: 2 0;
         text-align: center;
     }
 
     TrackingScreen .empty-hint {
-        color: #DC9E82;
+        color: $primary;
         margin: 1 0;
         text-align: center;
     }
