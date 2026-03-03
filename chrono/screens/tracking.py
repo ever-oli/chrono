@@ -228,6 +228,8 @@ class TrackingScreen(Widget, can_focus=True):
     # ---- New timer ----
 
     def _show_new_form(self) -> None:
+        self._hide_edit_form()
+        self._hide_notes_form()
         self.query_one("#new-timer-form").add_class("visible")
         self.query_one("#timer-name-input", Input).focus()
 
@@ -267,6 +269,8 @@ class TrackingScreen(Widget, can_focus=True):
         else:
             color_select.value = Select.BLANK
 
+        self._hide_new_form()
+        self._hide_notes_form()
         self.query_one("#edit-timer-form").add_class("visible")
         self.query_one("#edit-name-input", Input).focus()
 
@@ -307,6 +311,8 @@ class TrackingScreen(Widget, can_focus=True):
         self._notes_timer_id = event.timer_id
         self._notes_seconds = event.seconds
         mins = event.seconds / 60
+        self._hide_new_form()
+        self._hide_edit_form()
         self.query_one("#notes-form").add_class("visible")
         self.query_one("#notes-input", Input).value = ""
         self.query_one("#notes-input", Input).focus()

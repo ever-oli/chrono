@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 from peewee import fn
 from textual.app import ComposeResult
+from textual.binding import Binding
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.widget import Widget
 from textual.widgets import Button, Input, Label, Select, Static
@@ -24,8 +25,12 @@ def _get_period_start(period: str) -> datetime:
         return now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
 
-class GoalsScreen(Widget):
+class GoalsScreen(Widget, can_focus=True):
     """Widget for managing time goals."""
+
+    BINDINGS = [
+        Binding("escape", "close_forms", "Close", show=False),
+    ]
 
     DEFAULT_CSS = """
     GoalsScreen {
@@ -139,7 +144,7 @@ class GoalsScreen(Widget):
         goals = list(Goal.select(Goal, Timer).join(Timer).where(Goal.active == True))
 
         if not goals:
-            scroll.mount(Static("No goals yet. Click '+ New Goal' to set one.", classes="empty-msg"))
+            scroll.mount(Static("No active goals yet.\n    Press '+ New Goal' to set a daily, weekly, or monthly target.", classes="empty-msg"))
             return
 
         for goal in goals:
@@ -241,3 +246,7 @@ class GoalsScreen(Widget):
         Goal.update(active=False).where(Goal.id == event.goal_id).execute()
         self._refresh_goals()
         self.notify("Goal removed", severity="warning")
+
+    def action_close_forms(self) -> None:
+        """Keyboard: Escape to close the goal form."""
+        self.query_one("#goal-form").remove_class("visible")

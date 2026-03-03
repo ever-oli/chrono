@@ -1,17 +1,24 @@
 """Events screen — view time entry log with CSV export."""
 
+from datetime import datetime
 from pathlib import Path
 
 from textual.app import ComposeResult
+from textual.binding import Binding
 from textual.containers import Horizontal, VerticalScroll
 from textual.widget import Widget
 from textual.widgets import Button, Label
 
+from chrono.models import TimeEntry
 from chrono.widgets.event_list import EventList
 
 
-class EventsScreen(Widget):
+class EventsScreen(Widget, can_focus=True):
     """Widget showing time entries grouped by date."""
+
+    BINDINGS = [
+        Binding("escape", "close_forms", "Close", show=False),
+    ]
 
     DEFAULT_CSS = """
     EventsScreen {
@@ -68,6 +75,17 @@ class EventsScreen(Widget):
 
         export_dir = Path.home() / ".chrono"
         export_dir.mkdir(parents=True, exist_ok=True)
-        export_path = export_dir / "chrono_export.csv"
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        export_path = export_dir / f"chrono_export_{timestamp}.csv"
         export_path.write_text(csv_data)
         self.notify(f"Exported to {export_path}", severity="information")
+
+    def on_event_list_entry_deleted(self, event: EventList.EntryDeleted) -> None:
+        """Handle entry deletion from EventList."""
+        TimeEntry.delete().where(TimeEntry.id == event.entry_id).execute()
+        self.refresh_data()
+        self.notify("Entry deleted", severity="warning")
+
+    def action_close_forms(self) -> None:
+        """Keyboard: Escape — placeholder for future form dismissal."""
+        pass

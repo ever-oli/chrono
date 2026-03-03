@@ -116,6 +116,17 @@ class EventList(Widget):
                     f"    {time_str}  {timer_name:<16} {dur:>10}{notes}",
                     classes="event-row",
                 )
+                yield Horizontal(
+                    Button("✕", classes="event-del-btn", id=f"edel-{entry.id}"),
+                    classes="event-actions",
+                )
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        bid = event.button.id or ""
+        if bid.startswith("edel-"):
+            event.stop()
+            entry_id = bid[5:]  # Strip "edel-" prefix
+            self.post_message(self.EntryDeleted(entry_id))
 
     @staticmethod
     def export_csv() -> str:

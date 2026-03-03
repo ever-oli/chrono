@@ -72,12 +72,20 @@ class GoalCard(Widget):
 
     def compose(self) -> ComposeResult:
         type_icon = "🎯" if self.goal_type == "target" else "🚫"
-        pct = min(self.progress_hours / self.threshold * 100, 100) if self.threshold > 0 else 0
+        pct = (self.progress_hours / self.threshold * 100) if self.threshold > 0 else 0
+
+        # For target goals, cap display at 100% (you met your goal)
+        # For limit goals, show >100% as a warning (you exceeded your limit)
+        display_pct = min(pct, 100) if self.goal_type == "target" else pct
 
         # Build a simple text-based progress bar
         bar_width = 30
-        filled = int(pct / 100 * bar_width)
+        filled = min(int(pct / 100 * bar_width), bar_width)
         bar_str = "█" * filled + "░" * (bar_width - filled)
+
+        # Color the bar red if limit is exceeded
+        if self.goal_type == "limit" and pct > 100:
+            bar_str = f"[bold]{bar_str}[/bold]"
 
         with Horizontal(classes="goal-header"):
             yield Label(f"{type_icon} {self.timer_name}", classes="goal-title")
@@ -85,7 +93,7 @@ class GoalCard(Widget):
             yield Button("✕", classes="goal-del-btn", id=f"gdel-{self.goal_id[:8]}")
 
         yield Static(
-            f"  {bar_str}  {self.progress_hours:.1f}h / {self.threshold:.1f}h  ({pct:.0f}%)",
+            f"  {bar_str}  {self.progress_hours:.1f}h / {self.threshold:.1f}h  ({display_pct:.0f}%)",
             classes="goal-progress-text",
         )
 

@@ -108,6 +108,20 @@ class HabitGrid(Widget):
 
         grid_rows: list[list[str]] = [[] for _ in range(7)]
 
+        # Track streak (consecutive days with activity ending at today)
+        current_streak = 0
+        check_date = today
+        while True:
+            key = check_date.strftime("%Y-%m-%d")
+            if activity.get(key, 0) > 0:
+                current_streak += 1
+                check_date -= timedelta(days=1)
+            else:
+                break
+
+        total_active_days = len(activity)
+        total_hours = sum(activity.values()) / 3600
+
         for week in range(self.weeks):
             for day_offset in range(7): # 0=Sun, 1=Mon, ..., 6=Sat
                 d = start_date + timedelta(weeks=week, days=day_offset)
@@ -130,3 +144,13 @@ class HabitGrid(Widget):
             label = DAY_LABELS[i] if i in (0, 2, 4, 6) else "   "
             cells = "".join(row)
             yield Static(f"  {label}  {cells}", classes="grid-row")
+
+        # Legend and stats
+        legend_parts = [f"[dim]·[/] None"]
+        for i, char in enumerate(INTENSITY_CHARS):
+            legend_parts.append(f"[{self.timer.color}]{char}[/]")
+        legend = "  ".join(legend_parts)
+
+        streak_str = f"🔥 {current_streak}d streak" if current_streak > 0 else "No current streak"
+        stats = f"  {legend}    {streak_str}  ·  {total_active_days} active days  ·  {total_hours:.1f}h total"
+        yield Static(stats, classes="grid-legend")
