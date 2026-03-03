@@ -117,7 +117,7 @@ class HabitGrid(Widget):
                 key = d.strftime("%Y-%m-%d")
                 secs = activity.get(key, 0)
                 if secs == 0:
-                    grid_rows[day_offset].append(f"[#3a3a5e]·[/]")
+                    grid_rows[day_offset].append(f"[dim]·[/]")
                 else:
                     intensity = min(int(secs / max_seconds * len(INTENSITY_CHARS)), len(INTENSITY_CHARS) - 1)
                     char = INTENSITY_CHARS[intensity]

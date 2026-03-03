@@ -88,6 +88,37 @@ class TimerWidget(Widget, can_focus=True):
         min-width: 5;
         border: solid $secondary;
     }
+
+    TimerWidget .confirm-del-btn {
+        background: $error;
+        color: $background;
+        min-width: 10;
+        display: none;
+    }
+
+    TimerWidget .cancel-del-btn {
+        background: $surface;
+        color: $foreground;
+        min-width: 8;
+        border: solid $secondary;
+        display: none;
+    }
+
+    TimerWidget.confirming .del-btn {
+        display: none;
+    }
+
+    TimerWidget.confirming .edit-btn {
+        display: none;
+    }
+
+    TimerWidget.confirming .confirm-del-btn {
+        display: block;
+    }
+
+    TimerWidget.confirming .cancel-del-btn {
+        display: block;
+    }
     """
 
     BINDINGS = [
@@ -98,6 +129,7 @@ class TimerWidget(Widget, can_focus=True):
 
     is_running: reactive[bool] = reactive(False)
     elapsed_seconds: reactive[float] = reactive(0.0)
+    _confirm_delete: reactive[bool] = reactive(False)
 
     class Started(Message):
         def __init__(self, timer_id: str) -> None:
@@ -148,6 +180,11 @@ class TimerWidget(Widget, can_focus=True):
         yield Button("▶ Start", classes="start-btn", id=f"tog-{self._uid}")
         yield Button("✎", classes="edit-btn", id=f"edt-{self._uid}")
         yield Button("✕", classes="del-btn", id=f"del-{self._uid}")
+        yield Button("Delete?", classes="confirm-del-btn", id=f"cdel-{self._uid}")
+        yield Button("Keep", classes="cancel-del-btn", id=f"kdel-{self._uid}")
+
+    def watch__confirm_delete(self, value: bool) -> None:
+        self.set_class(value, "confirming")
 
     def on_mount(self) -> None:
         try:
@@ -248,6 +285,16 @@ class TimerWidget(Widget, can_focus=True):
             self.action_edit_timer()
         elif event.button.id == f"del-{self._uid}":
             event.stop()
+            # First click: show confirmation
+            self._confirm_delete = True
+        elif event.button.id == f"cdel-{self._uid}":
+            event.stop()
+            # Confirmed: actually delete
+            self._confirm_delete = False
             if self.is_running:
                 self.stop()
             self.post_message(self.Deleted(self.timer_id))
+        elif event.button.id == f"kdel-{self._uid}":
+            event.stop()
+            # Cancelled: hide confirmation
+            self._confirm_delete = False

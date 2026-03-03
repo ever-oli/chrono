@@ -59,6 +59,9 @@ class HabitsScreen(Widget):
         with VerticalScroll(id="habits-scroll"):
             pass  # Lazy loaded on first visit
 
+    def on_mount(self) -> None:
+        self.refresh_data()
+
     def refresh_data(self) -> None:
         """Refresh the habit grids with latest data from DB."""
         self._loaded = True

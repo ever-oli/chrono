@@ -237,7 +237,7 @@ class TimelineScreen(Widget):
             pass
 
     def on_mount(self) -> None:
-        pass
+        self._load_data()
 
     def refresh_data(self) -> None:
         self._load_data()

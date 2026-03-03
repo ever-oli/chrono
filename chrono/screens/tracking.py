@@ -1,6 +1,7 @@
 """Tracking screen — manage and run timers."""
 
 from textual.app import ComposeResult
+from textual.binding import Binding
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.widget import Widget
 from textual.widgets import Button, Input, Label, Select, Static
@@ -9,8 +10,13 @@ from chrono.models import TimeEntry, Timer
 from chrono.widgets.timer_widget import TimerWidget
 
 
-class TrackingScreen(Widget):
+class TrackingScreen(Widget, can_focus=True):
     """Main timer management widget."""
+
+    BINDINGS = [
+        Binding("n", "new_timer", "New Timer", show=True),
+        Binding("escape", "close_forms", "Close", show=False),
+    ]
 
     DEFAULT_CSS = """
     TrackingScreen {
@@ -164,6 +170,13 @@ class TrackingScreen(Widget):
 
     def _refresh_timers(self) -> None:
         scroll = self.query_one("#timer-scroll", VerticalScroll)
+
+        # Preserve running timer widgets so we don't kill their tick intervals
+        running_widgets: dict[str, TimerWidget] = {}
+        for widget in self.query(TimerWidget):
+            if widget.is_running:
+                running_widgets[widget.timer_id] = widget
+
         scroll.remove_children()
 
         timers = list(Timer.select().order_by(Timer.created_at.desc()))
@@ -179,7 +192,11 @@ class TrackingScreen(Widget):
             return
 
         for t in timers:
-            scroll.mount(TimerWidget(timer_id=t.id, name=t.name, color=t.color))
+            if t.id in running_widgets:
+                # Re-mount the existing running widget to preserve its state
+                scroll.mount(running_widgets[t.id])
+            else:
+                scroll.mount(TimerWidget(timer_id=t.id, name=t.name, color=t.color))
 
     # ---- Button handlers ----
 
@@ -320,3 +337,15 @@ class TrackingScreen(Widget):
     def on_timer_widget_stopped(self, event: TimerWidget.Stopped) -> None:
         mins = event.seconds / 60
         self.notify(f"Saved {mins:.1f} min entry", severity="information")
+
+    # ---- Keyboard actions ----
+
+    def action_new_timer(self) -> None:
+        """Keyboard: N to open new timer form."""
+        self._show_new_form()
+
+    def action_close_forms(self) -> None:
+        """Keyboard: Escape to close any open form."""
+        self._hide_new_form()
+        self._hide_edit_form()
+        self._hide_notes_form()
