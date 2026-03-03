@@ -37,17 +37,15 @@ class EventList(Widget):
         color: $foreground;
     }
 
-    EventList .event-actions {
-        height: 1;
-        padding: 0 2;
-        margin: 0 0 0 4;
+    EventList .event-row .event-text {
+        width: 1fr;
+        color: $foreground;
     }
 
     EventList .event-del-btn {
         background: $surface;
         color: $error;
-        min-width: 3;
-        height: 1;
+        min-width: 5;
         border: none;
     }
 
@@ -112,13 +110,13 @@ class EventList(Widget):
                 notes = f" — {entry.notes}" if entry.notes else ""
                 eid = entry.id[:8]
 
-                yield Static(
-                    f"    {time_str}  {timer_name:<16} {dur:>10}{notes}",
-                    classes="event-row",
-                )
                 yield Horizontal(
+                    Static(
+                        f"    {time_str}  {timer_name:<16} {dur:>10}{notes}",
+                        classes="event-text",
+                    ),
                     Button("✕", classes="event-del-btn", id=f"edel-{entry.id}"),
-                    classes="event-actions",
+                    classes="event-row",
                 )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:

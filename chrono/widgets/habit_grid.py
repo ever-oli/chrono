@@ -8,6 +8,12 @@ from textual.containers import Horizontal
 from textual.widget import Widget
 from textual.widgets import Label, Static
 
+from graphical.bar import Bar, BarStyle
+from rich.console import Group
+from rich.panel import Panel
+from rich.table import Table
+from rich.text import Text
+
 from chrono.models import TimeEntry, Timer
 
 INTENSITY_CHARS = "░▒▓█"
@@ -91,8 +97,8 @@ class HabitGrid(Widget):
 
     def compose(self) -> ComposeResult:
         with Horizontal(classes="grid-header"):
-            yield Label(f"[{self.timer.color}]●[/]", classes="grid-color")
-            yield Label(self.timer.name, classes="grid-title")
+            yield Label(f"[{str(self.timer.color)}]●[/]", classes="grid-color")
+            yield Label(str(self.timer.name), classes="grid-title")
 
         activity = self._load_activity()
         if not activity:
@@ -121,6 +127,8 @@ class HabitGrid(Widget):
 
         total_active_days = len(activity)
         total_hours = sum(activity.values()) / 3600
+        best_day_hours = (max(activity.values()) / 3600) if activity else 0
+        consistency_pct = (total_active_days / max(self.weeks * 7, 1)) * 100
 
         for week in range(self.weeks):
             for day_offset in range(7): # 0=Sun, 1=Mon, ..., 6=Sat
@@ -154,3 +162,29 @@ class HabitGrid(Widget):
         streak_str = f"🔥 {current_streak}d streak" if current_streak > 0 else "No current streak"
         stats = f"  {legend}    {streak_str}  ·  {total_active_days} active days  ·  {total_hours:.1f}h total"
         yield Static(stats, classes="grid-legend")
+
+        stats_table = Table(show_header=False, box=None, pad_edge=False)
+        stats_table.add_column("k", style="bold")
+        stats_table.add_column("v")
+        stats_table.add_row("Best day", f"{best_day_hours:.1f}h")
+        stats_table.add_row("Consistency", f"{consistency_pct:.0f}%")
+        stats_table.add_row("Avg active day", f"{(total_hours / max(total_active_days, 1)):.1f}h")
+
+        consistency_bar = Bar(
+            value=consistency_pct,
+            value_range=(0, 100),
+            color=str(self.timer.color),
+            width=30,
+            bar_style=BarStyle.BLOCK,
+            end="",
+        )
+        panel = Panel(
+            Group(
+                stats_table,
+                Text("Consistency bar", style="dim"),
+                consistency_bar,
+            ),
+            border_style="dim",
+            title="Habit Stats",
+        )
+        yield Static(panel, classes="grid-legend")
